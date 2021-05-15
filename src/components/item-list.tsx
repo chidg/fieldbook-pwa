@@ -33,6 +33,12 @@ const DataList = () => {
 
   return (
     <>
+      <Link
+          to="/new"
+        >
+        <div className="fab">🌱</div>
+      </Link>
+      
       <div className="flex items-center bg-gray-200 rounded-md mb-8">
         <div className="px-2">
           <svg className="fill-current text-gray-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

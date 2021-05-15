@@ -13,9 +13,10 @@ import {
 } from "./contexts"
 import UserForm from './components/user-form'
 import DataList from './components/item-list'
-import ItemForm from './components/item-form'
+import ItemFormUpdate from './components/item-form-update'
+import ItemFormCreate from './components/item-form-create'
 import LoadingScreen from './components/loading-screen'
-
+import SettingsUpdate from './components/settings-form'
 
 const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
   const { user, loading } = useUserContext()
@@ -30,11 +31,11 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
         </div>
         <div className="items-right align-middle">
           <Link
-            to="/new"
-            className="inline-flex items-center text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white"
+            to="/settings"
+            className="inline-flex items-center text-lg px-2 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white"
           >
-            <span role="img" aria-label="Seedling emoji">
-              🌱 New
+            <span role="img" aria-label="Cog emoji">
+              🤖
             </span>
           </Link>
         </div>
@@ -47,11 +48,11 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
             if (loading) return <LoadingScreen />
             else if (user) return children
             else return <Redirect
-                to={{
-                  pathname: "/login",
-                  state: { from: location },
-                }}
-              />
+              to={{
+                pathname: "/login",
+                state: { from: location },
+              }}
+            />
           }}
         />
       </div>
@@ -75,11 +76,14 @@ function App() {
           <PrivateRoute exact path="/">
             <DataList />
           </PrivateRoute>
+          <PrivateRoute exact path="/settings">
+            <SettingsUpdate />
+          </PrivateRoute>
           <PrivateRoute exact path="/new">
-           <ItemForm />
+           <ItemFormCreate />
           </PrivateRoute>
           <PrivateRoute exact path="/:id/edit">
-           <ItemForm />
+           <ItemFormUpdate />
           </PrivateRoute>
         </Switch>
       </Router>
