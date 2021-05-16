@@ -2,6 +2,8 @@ import { Handler } from "@netlify/functions"
 import Mailgun from "mailgun-js"
 
 const sendEmail = async ({ user, data }) => {
+  console.log(user)
+  console.log(data)
   return new Promise((resolve, reject) => {
     const { MG_API_KEY: apiKey, MG_DOMAIN: domain } = process.env
     const mailgun = Mailgun({

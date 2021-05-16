@@ -9,8 +9,8 @@ import {
 
 const SettingsUpdateForm: React.FC = () => {
   const history = useHistory()
-  const user = useUserContext()
-  const data = useDataContext()
+  const { user } = useUserContext()
+  const { data } = useDataContext()
   const [exporting, setExporting] = useState(false)
 
   const sendStuff = async () => {
