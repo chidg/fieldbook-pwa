@@ -1,4 +1,5 @@
-const Mailgun = require("mailgun-js")
+import { Handler } from "@netlify/functions"
+import Mailgun from "mailgun-js"
 
 const sendEmail = async ({ user, data }) => {
   return new Promise((resolve, reject) => {
@@ -23,7 +24,7 @@ const sendEmail = async ({ user, data }) => {
   })
 }
 
-exports.handler = async (event) => {
+const handler: Handler = async (event) => {
   try {
     const { data, user } = JSON.parse(event.body)
 
@@ -43,3 +44,5 @@ exports.handler = async (event) => {
     }
   }
 }
+
+module.exports = { handler }

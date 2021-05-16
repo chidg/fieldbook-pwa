@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
 import { useHistory } from "react-router-dom"
 import {
@@ -11,11 +11,15 @@ const SettingsUpdateForm: React.FC = () => {
   const history = useHistory()
   const user = useUserContext()
   const data = useDataContext()
+  const [exporting, setExporting] = useState(false)
 
-  const sendStuff = () => {
-    axios.post(`/.netlify/functions/email`, { data, user }, {
+  const sendStuff = async () => {
+    setExporting(true)
+    const response = await axios.post('.netlify/functions/email', { data, user }, {
       responseType: "json",
     })
+    console.log(response)
+    setExporting(false)
   }
   
   return (
@@ -28,7 +32,12 @@ const SettingsUpdateForm: React.FC = () => {
         </svg> Back
       </div>
       <p>
-        <span className="pt-2 text-sm cursor-pointer" onClick={sendStuff}>EXPORT DATA</span>
+        {exporting && <span className="pt-2 text-sm">Exporting...</span>}
+        {!exporting && 
+          <span className="pt-2 text-sm cursor-pointer" onClick={sendStuff}>
+            Export data
+          </span>
+        }
       </p>
     </div>
   )

@@ -21,6 +21,7 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src", 
+    "netlify/functions/send-email/email.ts"
   ]
 }
