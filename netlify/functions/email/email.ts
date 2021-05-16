@@ -21,7 +21,7 @@ const sendEmail = async ({ user, data }) => {
     mailgun.messages().send(mailData, (err) => {
       if (err) return reject(err)
 
-      resolve()
+      resolve(true)
     })
   })
 }
@@ -42,7 +42,7 @@ const handler: Handler = async (event) => {
     console.log(e)
     return {
       statusCode: 500,
-      body: e.mssage,
+      body: e.message,
     }
   }
 }
