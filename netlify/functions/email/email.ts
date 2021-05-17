@@ -1,28 +1,23 @@
 import { Handler } from "@netlify/functions"
-import Mailgun from "mailgun-js"
+import formData from "form-data"
+import Mailgun from "mailgun.js"
+const mailgun = new Mailgun(formData)
 
 const sendEmail = async ({ user, data }) => {
-  console.log(user)
-  console.log(data)
   return new Promise((resolve, reject) => {
-    const { MG_API_KEY: apiKey, MG_DOMAIN: domain } = process.env
-    const mailgun = Mailgun({
-      apiKey,
-      domain,
-    })
+    const mg = mailgun.client({ username: "api", key: process.env.MG_API_KEY })
 
     const mailData = {
-      from: "Fieldbook",
-      to: user.email,
+      from: `Fieldbook <${process.env.FROM_EMAIL}>`,
+      to: [user.email],
       subject: "Data from Fieldbook",
       text: JSON.stringify(data),
     }
 
-    mailgun.messages().send(mailData, (err) => {
-      if (err) return reject(err)
-
-      resolve(true)
-    })
+    return mg.messages
+      .create(process.env.MG_DOMAIN, mailData)
+      .then(resolve)
+      .catch(reject)
   })
 }
 
