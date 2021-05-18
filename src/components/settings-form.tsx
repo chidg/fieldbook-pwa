@@ -9,8 +9,8 @@ import {
 
 const SettingsUpdateForm: React.FC = () => {
   const history = useHistory()
-  const { user } = useUserContext()
-  const { data } = useDataContext()
+  const { user, logout } = useUserContext()
+  const { data, setData } = useDataContext()
   const [exporting, setExporting] = useState(false)
 
   const sendStuff = async () => {
@@ -21,7 +21,19 @@ const SettingsUpdateForm: React.FC = () => {
     console.log(response)
     setExporting(false)
   }
+
+  const clearData = React.useCallback(async () => {
+    setData({})
+  }, [setData])
   
+  
+  const logoutAndClearData = React.useCallback(async () => {
+    clearData()
+    logout()
+    history.replace('/')
+  }, [logout, history, clearData])
+
+
   return (
     <div className="text-white rounded px-8 py-8 pt-8">
       <h3 className="text-lg block">Settings</h3>
@@ -38,6 +50,22 @@ const SettingsUpdateForm: React.FC = () => {
             Export data
           </span>
         }
+      </p>
+      <p>
+        <span className="pt-2 text-sm cursor-pointer" onClick={() => {
+          const confirm = window.confirm("This will permanently delete all data from Fieldbook. Are you sure?")
+          if (confirm) clearData()
+        }}>
+          Clear all data
+        </span>
+      </p>
+      <p>
+        <span className="pt-2 text-sm cursor-pointer" onClick={() => {
+          const confirm = window.confirm("This will permanently delete all data from Fieldbook. Are you sure?")
+          if (confirm) logoutAndClearData()
+        }}>
+          Log out (also clears all data)
+        </span>
       </p>
     </div>
   )

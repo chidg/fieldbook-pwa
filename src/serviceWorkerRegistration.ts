@@ -64,12 +64,15 @@ function registerValidSW(swUrl: string, config?: Config) {
     .register(swUrl)
     .then((registration) => {
       // Check for updates at start.
-      registration.update()
+      registration.update().catch(console.error)
       // Check for updates every 5 min.
       setInterval(() => {
-        registration.update()
+        registration.update().catch((error) => {
+          console.log("in setinerval")
+          console.error(error)
+        })
         console.debug("Checked for update...")
-      }, 1000 * 60 * 5)
+      }, 1000 * 60) // * 5)
 
       registration.onupdatefound = () => {
         const installingWorker = registration.installing

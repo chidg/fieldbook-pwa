@@ -67,11 +67,16 @@ function App() {
       <Router>
         <Switch>
           <Route path="/login">
-            <div className="h-screen grid place-items-center">
-              <div className="w-full max-w-md">
-                <UserForm />
+            <nav className="flex items-center justify-between flex-wrap bg-decorgreen-600 p-4">
+              <div className="flex items-center flex-shrink-0 text-white mr-6">
+                <span className="font-semibold text-xl tracking-tight">
+                  Fieldbook 📒
+                </span>
               </div>
-            </div>
+            </nav>
+            <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
+              <UserForm />
+            </div>  
           </Route>
           <PrivateRoute exact path="/">
             <DataList />

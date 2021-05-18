@@ -12,6 +12,7 @@ interface UserContextState {
   user?: UserDetails
   loading: boolean
   setUser: (arg0: UserDetails) => void
+  logout: () => void
 }
 
 const UserContext = React.createContext<
@@ -34,6 +35,7 @@ const UserProvider: React.FC = ({ children }) => {
         user,
         loading,
         setUser: setLocalStoredValue,
+        logout: () => setLocalStoredValue(undefined)
       }}
     >
       {children}
