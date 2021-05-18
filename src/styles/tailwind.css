@@ -31792,7 +31792,7 @@ video {
 .fab {
   width: 70px;
   height: 70px;
-  background-color: rgb(119, 0, 255);
+  /* background-color: #873bdd; */
   border-radius: 50%;
   box-shadow: 0 6px 10px 0 #666;
   transition: all 0.1s ease-in-out;
@@ -31801,8 +31801,8 @@ video {
   text-align: center;
   line-height: 70px;
   position: fixed;
-  right: 50px;
-  bottom: 50px;
+  right: 30px;
+  bottom: 30px;
 }
 
 .fab:hover {

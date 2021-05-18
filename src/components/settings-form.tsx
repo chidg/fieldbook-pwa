@@ -17,7 +17,7 @@ const SettingsUpdateForm: React.FC = () => {
     setExporting(true)
     const response = await axios.post('.netlify/functions/email', { data, user }, {
       responseType: "json",
-    })
+    }).catch(() => setExporting(false))
     console.log(response)
     setExporting(false)
   }

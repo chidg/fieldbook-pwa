@@ -10,10 +10,10 @@ const DataListItem = (item: DataItem) => {
   const { initials } = useUserContext().user!
 
   return (
-    <div className="flex justify-start bg-gray-200 text-gray-700 hover:text-blue-400 hover:bg-blue-100 rounded-md px-2 py-2 my-1">
+    <div className="flex justify-start bg-gray-200 bg-opacity-20 text-white focus:text-blue-400 focus:bg-blue-100 rounded-sm px-2 py-2 my-1">
       <div className="font-sm px-2">{initials}{item.number}</div>
       <div className="flex-grow font-medium px-2">{item.fieldName}</div>
-      <div className="font-normal text-gray-500 tracking-wide">
+      <div className="font-normal tracking-wide">
         <Link
           to={{
             pathname: `/${item.id}/edit`,
@@ -30,23 +30,33 @@ const DataListItem = (item: DataItem) => {
 
 const DataList = () => {
   const { data } = useDataContext()
+  const { name } = useUserContext().user!
 
   return (
     <>
       <Link
           to="/new"
         >
-        <div className="fab">🌱</div>
+        <div className="fab bg-gradient-to-br from-purple-800 to-purple-500">🌱</div>
       </Link>
       
-      <div className="flex items-center bg-gray-200 rounded-md mb-8">
+      {/* Search bar */}
+      {/* <div className="flex items-center bg-gray-200 rounded-md mb-8">
         <div className="px-2">
           <svg className="fill-current text-gray-500 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path className="heroicon-ui" d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" />
           </svg>
         </div>
         <input className="w-full rounded-md bg-gray-200 text-gray-700 leading-tight focus:outline-none py-2" id="search" type="text" placeholder="Search" />
-      </div>
+      </div> */}
+      {Object.keys(data).length === 0 && (
+        <div className="grid row mx-10">
+          <div className="border-2 border-white text-white rounded px-4 py-2">
+            <p>Hi { name }, welcome to Fieldbook!</p>
+            <p>Hit the 🌱 below to start adding collection records.</p>
+          </div>
+        </div>
+      )}
       {Object.keys(data).map(id => <DataListItem {...data[id]} key={id} />)}
     </>
   )

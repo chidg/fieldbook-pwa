@@ -27,8 +27,6 @@ const ItemFormUpdate: React.FC = () => {
     history.replace('/')
   }, [history, instance, instanceId, saveItem])
 
-  console.log('rendering parent')
-
   return (
     <ItemForm
       initialValues={{ fieldName: instance?.fieldName || "", number: instance?.number || "", notes: instance?.notes || "" }}
