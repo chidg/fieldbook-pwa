@@ -12,8 +12,8 @@ const sendEmail = async ({ user, data }) => {
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: "number", title: "Number" },
-        { id: "notes", title: "Notes" },
         { id: "fieldName", title: "Field Name" },
+        { id: "notes", title: "Notes" },
         { id: "location", title: "Location" },
         { id: "time", title: "Time" },
       ],
@@ -24,8 +24,11 @@ const sendEmail = async ({ user, data }) => {
       return {
         ...item,
         number: `${user.initials}${item.number}`,
-        location: `${item.location?.latitude}, ${item.location?.longitude}`,
-        time: new Date(Date.parse(item.timestamp)),
+        location:
+          item.location && Object.keys(item.location).length > 0
+            ? `${item.location?.latitude}, ${item.location?.longitude}`
+            : "",
+        time: new Date(item.timestamp).toLocaleString(),
       }
     })
 
@@ -36,8 +39,10 @@ const sendEmail = async ({ user, data }) => {
       text: JSON.stringify(data),
       attachment: [
         {
-          data: csvStringifier.stringifyRecords(records),
-          filename: `fieldbook-${user.initials}-${Date.now()}`,
+          data:
+            csvStringifier.getHeaderString() +
+            csvStringifier.stringifyRecords(records),
+          filename: `fieldbook-${user.initials}-${Date.now()}.csv`,
         },
       ],
     }
