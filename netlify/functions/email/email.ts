@@ -36,7 +36,7 @@ const sendEmail = async ({ user, data }) => {
       text: JSON.stringify(data),
       attachment: [
         {
-          data: Buffer.from(csvStringifier.stringifyRecords(records), "base64"),
+          data: csvStringifier.stringifyRecords(records),
           filename: `fieldbook-${user.initials}-${Date.now()}`,
         },
       ],
