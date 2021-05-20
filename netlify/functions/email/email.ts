@@ -5,6 +5,10 @@ import { createObjectCsvStringifier } from "csv-writer"
 
 const mailgun = new Mailgun(formData)
 
+function dontIndent(str: string): string {
+  return ("" + str).replace(/(\n)\s+/g, "$1")
+}
+
 const sendEmail = async ({ user, data }) => {
   return new Promise((resolve, reject) => {
     const mg = mailgun.client({ username: "api", key: process.env.MG_API_KEY })
@@ -36,7 +40,11 @@ const sendEmail = async ({ user, data }) => {
       from: `Fieldbook <${process.env.FROM_EMAIL}>`,
       to: [user.email],
       subject: "Data from Fieldbook",
-      text: JSON.stringify(data),
+      text: dontIndent(`Hi ${user.name}, \n
+      Here's some fresh data for you from your latest work with Fieldbook. \n\n
+      Enjoy! \n
+      🌱
+      `),
       attachment: [
         {
           data:

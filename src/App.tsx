@@ -8,6 +8,7 @@ import {
   Link,
 } from "react-router-dom"
 
+
 import {
   useUserContext,
 } from "./contexts"
@@ -60,9 +61,9 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
     </>
   )
 }
-//<div className="container mx-auto lg:px-10 mt-2"></div>
 
 function App() {
+  
   return (
     <div className="mx-auto h-screen bg-gradient-to-br from-purple-600 to-blue-200">
       <Router>
