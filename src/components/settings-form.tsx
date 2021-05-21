@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import { useHistory } from "react-router-dom"
+import { useHistory, Link } from "react-router-dom"
 import {
   useUserContext,
   useDataContext
@@ -40,9 +40,22 @@ const SettingsUpdateForm: React.FC = () => {
 
       <div className="flex flex-col content-between">
         <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
+          <h4>Update Your Details</h4>
+          <div className="flex justify-center mt-2">
+            <Link to="/settings/user">
+              <button type="button" className="border-2 bg-green-500 rounded px-4 py-2">
+                Update your details 🙋
+              </button>
+            </Link>
+          </div>
+        </div>
+        
+        <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
           <h4>Export</h4>
-          <div className="flex justify-center">
-            {exporting && <span className="pt-2 text-sm">Exporting...</span>}
+          <div className="text-sm text-gray-100 border-2 border-opacity-25 bg-opacity-20 bg-gray-200 border-gray-200 rounded p-2 my-2">
+            This button will send the data to the email address { user?.email }.
+          </div>
+          <div className="flex justify-center mt-2">
             {!exporting && 
               <button type="button" className="border-2 bg-green-500 rounded px-4 py-2" onClick={sendStuff} disabled={exporting}>
                 {!exporting && <span>Export Data 🎉</span>}
@@ -54,7 +67,7 @@ const SettingsUpdateForm: React.FC = () => {
 
         <div className="flex-col bg-red-400 bg-opacity-20 rounded px-2 pb-6 my-1">
           <h4>Danger Zone</h4>
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-2">
             <button type="button" className="border-2 border-white bg-red-600 rounded px-4 py-2" disabled={clearing} onClick={() => {
               setClearing(true)
               setTimeout(() => {

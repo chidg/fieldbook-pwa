@@ -83,6 +83,11 @@ function App() {
         <PrivateRoute exact path="/settings">
           <SettingsUpdate />
         </PrivateRoute>
+        <PrivateRoute exact path="/settings/user">
+          <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
+            <UserForm />
+          </div> 
+        </PrivateRoute>
         <PrivateRoute exact path="/new">
           <ItemFormCreate />
         </PrivateRoute>
