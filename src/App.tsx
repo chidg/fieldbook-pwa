@@ -65,7 +65,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
 function App() {
   
   return (
-    <div className="mx-auto h-screen bg-gradient-to-br from-purple-600 to-blue-200">
+    <div className="mx-auto">
       <Router>
         <Switch>
           <Route path="/login">
