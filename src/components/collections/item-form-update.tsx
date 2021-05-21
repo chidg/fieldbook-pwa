@@ -3,11 +3,11 @@ import { useHistory, useParams } from "react-router-dom"
 import {
   DataItem,
   useDataContext,
-} from "../contexts"
+} from "../../contexts"
 import ItemForm from './item-form'
 
 
-const ItemFormUpdate: React.FC = () => {
+export const ItemFormUpdate: React.FC = () => {
   const history = useHistory()
   const { saveItem, data } = useDataContext()
   const [instance, setInstance] = React.useState<DataItem | undefined>(undefined)
@@ -42,5 +42,3 @@ const ItemFormUpdate: React.FC = () => {
       title="Edit Item"
     />
 )}
-
-export default ItemFormUpdate

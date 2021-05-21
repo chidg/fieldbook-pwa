@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import * as Yup from 'yup';
 import {
   useUserContext
-} from "../contexts";
+} from "../../contexts";
 
 const ItemValidation = Yup.object().shape({
   fieldName: Yup.string().required('Required'),

@@ -3,20 +3,20 @@ import {
   DataItem,
   useDataContext,
   useUserContext
-} from "../contexts"
+} from "../../contexts"
 import { Link } from 'react-router-dom'
 
 const DataListItem = (item: DataItem) => {
   const { initials } = useUserContext().user!
 
   return (
-    <div className="flex justify-start bg-gray-200 bg-opacity-20 text-white focus:text-blue-400 focus:bg-blue-100 rounded-sm px-2 py-2 my-1">
+    <div className="flex justify-start items-center bg-gray-200 bg-opacity-20 text-white focus:text-blue-400 focus:bg-blue-100 rounded-sm px-2 py-2 my-1">
       <div className="font-sm px-2">{initials}{item.number}</div>
       <div className="flex-grow font-medium px-2">{item.fieldName}</div>
       <div className="font-normal tracking-wide">
         <Link
           to={{
-            pathname: `/${item.id}/edit`,
+            pathname: `/${item.id}/`,
           }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -28,7 +28,7 @@ const DataListItem = (item: DataItem) => {
   )
 }
 
-const DataList = () => {
+export const DataList = () => {
   const { data } = useDataContext()
   const { name } = useUserContext().user!
 
@@ -61,5 +61,3 @@ const DataList = () => {
     </>
   )
 }
-
-export default DataList

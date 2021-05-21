@@ -3,11 +3,11 @@ import { v4 } from 'uuid'
 import { useHistory } from "react-router-dom"
 import {
   useDataContext,
-} from "../contexts"
+} from "../../contexts"
 import ItemForm from './item-form'
 
 
-const ItemFormCreate: React.FC = () => {
+export const ItemFormCreate: React.FC = () => {
   const history = useHistory()
   const { saveItem, data } = useDataContext()
   const [geoLocation, setGeoLocation] = React.useState<GeolocationPosition | undefined>(undefined)
@@ -65,5 +65,3 @@ const ItemFormCreate: React.FC = () => {
       title="New Item"
       />
 )}
-
-export default ItemFormCreate
