@@ -22,6 +22,13 @@ const ItemFormUpdate: React.FC = () => {
     }
   }, [setInstance, data, instanceId, history])
 
+  const getLocationDisplay = React.useCallback(() => {
+    if (instance?.location && Object.keys(instance?.location).length > 0) {
+      return `${instance.location.latitude.toPrecision(6)}, ${instance.location.longitude.toPrecision(7)}`
+    }
+    return "No location recorded"
+  }, [instance])
+
   const onSubmit = React.useCallback((values) => {
     saveItem({ ...values, id: instanceId, timestamp: instance!.timestamp, location: instance!.location })
     history.replace('/')
@@ -29,6 +36,7 @@ const ItemFormUpdate: React.FC = () => {
 
   return (
     <ItemForm
+      locationDisplay={getLocationDisplay()}
       initialValues={{ fieldName: instance?.fieldName || "", number: instance?.number || "", notes: instance?.notes || "" }}
       onSubmit={onSubmit}
       title="Edit Item"

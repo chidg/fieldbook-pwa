@@ -1,10 +1,10 @@
-import React from 'react'
-import { Formik, Field, Form, FormikConfig, FieldProps } from 'formik'
+import { Field, FieldProps, Form, Formik, FormikConfig } from 'formik';
+import React from 'react';
+import { useHistory } from "react-router-dom";
 import * as Yup from 'yup';
-import { useHistory } from "react-router-dom"
 import {
-  useUserContext,
-} from "../contexts"
+  useUserContext
+} from "../contexts";
 
 const ItemValidation = Yup.object().shape({
   fieldName: Yup.string().required('Required'),
@@ -19,11 +19,13 @@ type ItemFormValues = {
 
 interface ItemFormProps extends FormikConfig<ItemFormValues> {
   title: string
+  locationDisplay?: string
 }
 
-const ItemForm: React.FC<ItemFormProps> = ({ title, initialValues, onSubmit }) => {
+const ItemForm: React.FC<ItemFormProps> = ({ title, locationDisplay, initialValues, onSubmit }) => {
   const history = useHistory()
   const { initials } = useUserContext().user!
+
   return (
     <Formik
       initialValues={initialValues}
@@ -51,7 +53,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ title, initialValues, onSubmit }) =
             
           <div className="pb-4">
             <label className="text-sm block font-bold pb-2" htmlFor="fieldName">Field Name</label>
-            <Field id="fieldName" name="fieldName" autoCorrect="off" autoCapitalize="off" spellCheck="false" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300" />
+            <Field id="fieldName" autoFocus={true} name="fieldName" autoCorrect="off" autoCapitalize="off" spellCheck="false" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300" />
           </div>
 
           <div className="pb-4">
@@ -63,6 +65,24 @@ const ItemForm: React.FC<ItemFormProps> = ({ title, initialValues, onSubmit }) =
               className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300"
             />
           </div>
+
+          <div className="pb-4">
+            <div className="flex justify-between items-center">
+              <label className="text-sm block font-bold pb-2" htmlFor="notes">Location</label>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" onClick={() => window.alert(locationDisplay)}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <input
+              disabled
+              id="location"
+              name="location"
+              type="text"
+              className="appearance-none border rounded w-full py-2 px-3 text-gray-900 bg-gray-100 leading-tight cursor-pointer"
+              value={locationDisplay}
+            />
+          </div>
+
           <div className="pb-4 flex justify-between mt-2">
             <button type="button" className="border-2 border-gray-500 hover:bg-gray-500 hover:text-white text-gray-500 py-1 px-2 rounded focus:outline-none focus:shadow-outline" onClick={() => {
               history.goBack()
