@@ -61,7 +61,7 @@ export const ItemFormCreate: React.FC = () => {
       onSubmit={(values) => {
         console.log('saving lo', geoLocation)
         console.log('coords ?', geoLocation?.coords)
-        saveItem({ ...values, id: v4(), timestamp: Date.now(), location: geoLocation?.coords })
+        saveItem({ ...values, id: v4(), timestamp: Date.now(), location: geoLocation ? { ...geoLocation.coords } : undefined })
         history.replace('/')
       }}
       title="New Item"
