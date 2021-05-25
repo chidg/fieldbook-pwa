@@ -34,6 +34,7 @@ const DataProvider: React.FC = ({ children }) => {
   
   const saveItem = React.useCallback(async (item: DataItem) => {
     const newData = { ...data, [item.id]: item }
+    console.log("storing saved item", item)
     setLocalStoredValue(newData)
     // Results in update to `data` due to effect above
   }, [data, setLocalStoredValue])
