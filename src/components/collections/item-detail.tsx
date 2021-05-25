@@ -5,19 +5,26 @@ import {
   useDataContext,
   useUserContext
 } from "../../contexts"
-import ReactMapGL, { ViewportProps } from 'react-map-gl'
+import ReactMapGL, { ViewportProps, Source, Layer, LayerProps } from 'react-map-gl'
 
-type ItemDetailProps = {
+
+const layerStyle: LayerProps = {
+  id: 'point',
+  type: 'circle',
+  paint: {
+    'circle-radius': 10,
+    'circle-color': '#007cbf'
+  }
 }
 
-
-export const ItemDetail: React.FC<ItemDetailProps> = () => {
+export const ItemDetail: React.FC = () => {
   const history = useHistory()
   
   const { user } = useUserContext()
   const { data } = useDataContext()
   const { id: instanceId }: { id: string } = useParams()
   const [instance, setInstance] = React.useState<DataItem | undefined>(undefined)
+  const [geoJson, setGeoJson] = React.useState<any | undefined>(undefined)
 
   const [viewport, setViewport] = React.useState<ViewportProps | undefined>(undefined);
 
@@ -38,8 +45,15 @@ export const ItemDetail: React.FC<ItemDetailProps> = () => {
         longitude,
         zoom: 8
       })
+      setGeoJson({
+        type: 'FeatureCollection',
+        features: [
+          {type: 'Feature', geometry: {type: 'Point', coordinates: [longitude, latitude]}}
+        ]
+      });
+
     }
-  }, [instance])
+  }, [instance, setGeoJson])
 
   return (
     <div className="text-white rounded px-4">
@@ -72,15 +86,19 @@ export const ItemDetail: React.FC<ItemDetailProps> = () => {
         }
       </div>}
 
-      {viewport && 
+      {viewport && geoJson &&
         <div style={{ height: "400px" }}>
           <ReactMapGL
             {...viewport}
             width="100%"
             height="100%"
-            mapStyle="mapbox://styles/mapbox/light-v9"
+            mapStyle="mapbox://styles/mapbox/satellite-v9"
             onViewportChange={(viewport: ViewportProps) => setViewport(viewport)}
-            />
+            >
+            <Source id="item-location" type="geojson" data={geoJson}>
+              <Layer {...layerStyle} />
+            </Source>
+          </ReactMapGL>
         </div>
       }
     </div>
