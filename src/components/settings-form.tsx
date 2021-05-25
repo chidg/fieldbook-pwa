@@ -56,12 +56,10 @@ const SettingsUpdateForm: React.FC = () => {
             This button will send the data to the email address { user?.email }.
           </div>
           <div className="flex justify-center mt-2">
-            {!exporting && 
-              <button type="button" className="border-2 bg-green-500 rounded px-4 py-2" onClick={sendStuff} disabled={exporting}>
-                {!exporting && <span>Export Data 🎉</span>}
-                {exporting && <span>Exporting...</span>}
-              </button>
-            }
+            <button type="button" className="border-2 bg-green-500 rounded px-4 py-2" onClick={sendStuff} disabled={exporting}>
+              {!exporting && <span>Export Data 🎉</span>}
+              {exporting && <span>Exporting...</span>}
+            </button>
           </div>
         </div>
 
