@@ -10,12 +10,23 @@ import ItemForm from './item-form'
 export const ItemFormCreate: React.FC = () => {
   const history = useHistory()
   const { saveItem, data } = useDataContext()
-  const [geoLocation, setGeoLocation] = React.useState<GeolocationPosition | undefined>(undefined)
+  const [geoLocation, setGeoLocation] = React.useState<GeolocationCoordinates | undefined>(undefined)
   const [geoLocationWarning, setGeoLocationWarning] = React.useState<number | undefined>(undefined)
 
   React.useEffect(() => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(setGeoLocation, (err) => {
+      navigator.geolocation.getCurrentPosition(({ coords }) => {
+        // Necessary to do this transformation because the coords object is a prototype with getters rather than a normal object
+        setGeoLocation({
+          accuracy: coords.accuracy,
+          altitude: coords.altitude,
+          altitudeAccuracy: coords.altitudeAccuracy,
+          heading: coords.heading,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          speed: coords.speed
+        })
+      }, (err) => {
         setGeoLocationWarning(err.code)
       }, { enableHighAccuracy: true });
     }
@@ -23,7 +34,7 @@ export const ItemFormCreate: React.FC = () => {
 
   const getLocationDisplay = React.useCallback(() => {
     if (geoLocation) {
-      return `${geoLocation.coords.latitude.toPrecision(6)}, ${geoLocation.coords.longitude.toPrecision(7)}`
+      return `${geoLocation.latitude.toPrecision(6)}, ${geoLocation.longitude.toPrecision(7)}`
     } else if (geoLocationWarning) {
       switch (geoLocationWarning) {
         case 1:
