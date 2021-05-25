@@ -17,6 +17,11 @@ const layerStyle: LayerProps = {
   }
 }
 
+type MapDetails = {
+  viewport: ViewportProps,
+  geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>
+}
+
 export const ItemDetail: React.FC = () => {
   const history = useHistory()
   
@@ -24,9 +29,8 @@ export const ItemDetail: React.FC = () => {
   const { data } = useDataContext()
   const { id: instanceId }: { id: string } = useParams()
   const [instance, setInstance] = React.useState<DataItem | undefined>(undefined)
-  const [geoJson, setGeoJson] = React.useState<any | undefined>(undefined)
-
-  const [viewport, setViewport] = React.useState<ViewportProps | undefined>(undefined);
+  
+  const [mapDetails, setMapDetails] = React.useState<MapDetails | undefined>(undefined)
 
   React.useEffect(() => {
     const item = data[instanceId]
@@ -40,20 +44,21 @@ export const ItemDetail: React.FC = () => {
   React.useEffect(() => {
     if (instance?.location && Object.keys(instance?.location).length > 0) {
       const { latitude, longitude } = instance.location
-      setViewport({
-        latitude,
-        longitude,
-        zoom: 8
+      setMapDetails({
+        viewport: {
+          latitude,
+          longitude,
+          zoom: 6
+        },
+        geoJson: {
+          type: 'FeatureCollection',
+          features: [
+            {type: 'Feature', geometry: {type: 'Point', coordinates: [longitude, latitude]}, properties: {}}
+          ]
+        }
       })
-      setGeoJson({
-        type: 'FeatureCollection',
-        features: [
-          {type: 'Feature', geometry: {type: 'Point', coordinates: [longitude, latitude]}}
-        ]
-      });
-
     }
-  }, [instance, setGeoJson])
+  }, [instance, setMapDetails])
 
   return (
     <div className="text-white rounded px-4">
@@ -78,7 +83,7 @@ export const ItemDetail: React.FC = () => {
       </svg> Back
     </div>
     
-    <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
+    <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-2">
       {instance && <div className="grid grid-cols-3 text-sm">
         <div>Recorded at:</div><div className="col-span-2 justify-end">{ new Date(instance.timestamp).toLocaleString() }</div>
         {instance.notes && 
@@ -86,16 +91,16 @@ export const ItemDetail: React.FC = () => {
         }
       </div>}
 
-      {viewport && geoJson &&
+      {mapDetails &&
         <div style={{ height: "400px" }}>
           <ReactMapGL
-            {...viewport}
+            { ...mapDetails.viewport }
             width="100%"
             height="100%"
             mapStyle="mapbox://styles/mapbox/satellite-v9"
-            onViewportChange={(viewport: ViewportProps) => setViewport(viewport)}
+            onViewportChange={(viewport: ViewportProps) => setMapDetails({ ...mapDetails, viewport })}
             >
-            <Source id="item-location" type="geojson" data={geoJson}>
+            <Source id="item-location" type="geojson" data={mapDetails.geoJson}>
               <Layer {...layerStyle} />
             </Source>
           </ReactMapGL>
