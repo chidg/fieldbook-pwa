@@ -29,6 +29,7 @@ export const useLocalStorage = (key: string, initialValue: any) => {
       if (valueToStore === undefined) {
         window.localStorage.removeItem(key)
       } else {
+        console.log("storing locally:", JSON.stringify(valueToStore))
         window.localStorage.setItem(key, JSON.stringify(valueToStore))
       }
     } catch (error) {
