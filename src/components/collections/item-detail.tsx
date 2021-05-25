@@ -5,6 +5,7 @@ import {
   useDataContext,
   useUserContext
 } from "../../contexts"
+import ReactMapGL, { ViewportProps } from 'react-map-gl'
 
 type ItemDetailProps = {
 }
@@ -15,8 +16,10 @@ export const ItemDetail: React.FC<ItemDetailProps> = () => {
   
   const { user } = useUserContext()
   const { data } = useDataContext()
-  const [instance, setInstance] = React.useState<DataItem | undefined>(undefined)
   const { id: instanceId }: { id: string } = useParams()
+  const [instance, setInstance] = React.useState<DataItem | undefined>(undefined)
+
+  const [viewport, setViewport] = React.useState<ViewportProps | undefined>(undefined);
 
   React.useEffect(() => {
     const item = data[instanceId]
@@ -27,6 +30,20 @@ export const ItemDetail: React.FC<ItemDetailProps> = () => {
     }
   }, [setInstance, data, instanceId, history])
   
+  React.useEffect(() => {
+    if (instance?.location && Object.keys(instance?.location).length > 0) {
+      console.log("instance.location", instance.location)
+      const { latitude, longitude } = instance.location
+      setViewport({
+        latitude,
+        longitude,
+        zoom: 8
+      })
+    }
+  }, [instance])
+
+  console.log(viewport)
+
   return (
     <div className="text-white rounded px-4">
       <div className="flex justify-between items-center">
@@ -49,5 +66,27 @@ export const ItemDetail: React.FC<ItemDetailProps> = () => {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 19l-7-7 7-7" />
       </svg> Back
     </div>
+    
+    <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
+      {instance && <div className="grid grid-cols-3 text-sm">
+        <div>Recorded at:</div><div className="col-span-2 justify-end">{ new Date(instance.timestamp).toLocaleString() }</div>
+        {instance.notes && 
+          <><div>Notes:</div><div className="col-span-2 justify-end">{ instance.notes }</div></>
+        }
+      </div>}
+
+      {viewport && 
+        <div style={{ height: "400px" }}>
+          <ReactMapGL
+            {...viewport}
+            width="100%"
+            height="100%"
+            mapStyle="mapbox://styles/mapbox/light-v9"
+            onViewportChange={(viewport: ViewportProps) => setViewport(viewport)}
+            />
+        </div>
+      }
+    </div>
   </div>
+
 )}
