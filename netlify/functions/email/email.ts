@@ -18,7 +18,9 @@ const sendEmail = async ({ user, data }) => {
         { id: "number", title: "Number" },
         { id: "fieldName", title: "Field Name" },
         { id: "notes", title: "Notes" },
-        { id: "location", title: "Location" },
+        { id: "latitude", title: "Latitude" },
+        { id: "longitude", title: "Longitude" },
+        { id: "date", title: "Time" },
         { id: "time", title: "Time" },
       ],
     })
@@ -28,11 +30,10 @@ const sendEmail = async ({ user, data }) => {
       return {
         ...item,
         number: `${user.initials}${item.number}`,
-        location:
-          item.location && Object.keys(item.location).length > 0
-            ? `${item.location?.latitude}, ${item.location?.longitude}`
-            : "",
-        time: new Date(item.timestamp).toLocaleString(),
+        latitude: item.location?.latitude ? item.location?.latitude : "",
+        longitude: item.location?.longitude ? item.location?.longitude : "",
+        date: new Date(item.timestamp).toLocaleDateString(),
+        time: new Date(item.timestamp).toLocaleTimeString(),
       }
     })
 

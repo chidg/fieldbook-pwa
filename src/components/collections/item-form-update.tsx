@@ -23,8 +23,6 @@ export const ItemFormUpdate: React.FC = () => {
   }, [setInstance, data, instanceId, history])
 
   const getLocationDisplay = React.useCallback(() => {
-    console.log("getLocationDisplay", instance?.location)
-    if (instance?.location) console.log(Object.keys(instance?.location).length)
     if (instance?.location && Object.keys(instance?.location).length > 0) {
       return `${instance.location.latitude.toPrecision(6)}, ${instance.location.longitude.toPrecision(7)}`
     }

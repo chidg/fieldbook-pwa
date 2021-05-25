@@ -32,7 +32,6 @@ export const ItemDetail: React.FC<ItemDetailProps> = () => {
   
   React.useEffect(() => {
     if (instance?.location && Object.keys(instance?.location).length > 0) {
-      console.log("instance.location", instance.location)
       const { latitude, longitude } = instance.location
       setViewport({
         latitude,
@@ -41,8 +40,6 @@ export const ItemDetail: React.FC<ItemDetailProps> = () => {
       })
     }
   }, [instance])
-
-  console.log(viewport)
 
   return (
     <div className="text-white rounded px-4">
