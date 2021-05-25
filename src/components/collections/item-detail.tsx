@@ -12,8 +12,10 @@ const layerStyle: LayerProps = {
   id: 'point',
   type: 'circle',
   paint: {
-    'circle-radius': 10,
-    'circle-color': '#007cbf'
+    'circle-radius': 8,
+    "circle-stroke-color": "#7c3aed",
+    'circle-color': '#9663ef',
+    'circle-stroke-width': 1
   }
 }
 
@@ -48,7 +50,7 @@ export const ItemDetail: React.FC = () => {
         viewport: {
           latitude,
           longitude,
-          zoom: 6
+          zoom: 12
         },
         geoJson: {
           type: 'FeatureCollection',
