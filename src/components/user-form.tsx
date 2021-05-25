@@ -6,8 +6,13 @@ import {
   useUserContext,
 } from "../contexts"
 
+import {
+  useGoogleAnalytics
+} from "../hooks"
+
 const UserForm = () => {
   const { setUser, user } = useUserContext()
+  const { sendEvent } = useGoogleAnalytics()
   const history = useHistory()
 
   const initialValues = {
@@ -24,6 +29,10 @@ const UserForm = () => {
       initialValues={initialValues}
       onSubmit={values => {
         setUser(values)
+        sendEvent({
+          category: 'User',
+          action: `${user ? 'Updated' : 'Created'} user details`
+        })
         history.replace('/')
       }}
     >

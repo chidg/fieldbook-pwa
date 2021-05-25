@@ -4,12 +4,15 @@ import { useHistory } from "react-router-dom"
 import {
   useDataContext,
 } from "../../contexts"
+import { useGoogleAnalytics } from '../../hooks'
 import ItemForm from './item-form'
 
 
 export const ItemFormCreate: React.FC = () => {
   const history = useHistory()
   const { saveItem, data } = useDataContext()
+  const { sendEvent } = useGoogleAnalytics()
+
   const [geoLocation, setGeoLocation] = React.useState<GeolocationCoordinates | undefined>(undefined)
   const [geoLocationWarning, setGeoLocationWarning] = React.useState<number | undefined>(undefined)
 
@@ -71,6 +74,10 @@ export const ItemFormCreate: React.FC = () => {
       initialValues={initialValues()}
       onSubmit={(values) => {
         saveItem({ ...values, id: v4(), timestamp: Date.now(), location: geoLocation })
+        sendEvent({
+          category: 'Collection',
+          action: 'Created collection'
+        })
         history.replace('/')
       }}
       title="New Item"
