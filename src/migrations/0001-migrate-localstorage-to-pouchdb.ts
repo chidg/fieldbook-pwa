@@ -1,6 +1,4 @@
 import { v4 } from "uuid"
-import { usePouch } from "use-pouchdb"
-import { useLocalStorage } from "../../hooks"
 
 type LocalDataItem = {
   id: string
@@ -30,31 +28,33 @@ type LocalUserDetails = {
   email?: string
 }
 
-export const useMigration_0001 = async () => {
-  const dataLocalStoredValue: LocalDataCollection = useLocalStorage(
-    "data",
-    {}
-  )[0]
+export const migration_0001 = async (db: PouchDB.Database) => {
+  const dataLocal = window.localStorage.getItem("data")
+  const dataLocalStoredValue: LocalDataCollection | false = dataLocal
+    ? JSON.parse(dataLocal)
+    : false
 
-  const userLocalStoredValue: LocalUserDetails = useLocalStorage("user", {})[0]
+  const userLocal = window.localStorage.getItem("user")
+  const userLocalStoredValue: LocalUserDetails | false = userLocal
+    ? JSON.parse(userLocal)
+    : false
 
-  const db = usePouch()
+  if (dataLocalStoredValue)
+    Object.keys(dataLocalStoredValue).forEach(async (key) => {
+      const localCollectionItem = dataLocalStoredValue[key]
+      const pouchItem: PouchDBDataItem = {
+        _id: localCollectionItem.id,
+        number: localCollectionItem.number,
+        notes: localCollectionItem.notes,
+        fieldName: localCollectionItem.fieldName,
+        location: localCollectionItem.location,
+        timestamp: localCollectionItem.timestamp,
+        type: "collection",
+      }
+      await db.put(pouchItem)
+    })
 
-  Object.keys(dataLocalStoredValue).forEach(async (key) => {
-    const localCollectionItem = dataLocalStoredValue[key]
-    const pouchItem: PouchDBDataItem = {
-      _id: localCollectionItem.id,
-      number: localCollectionItem.number,
-      notes: localCollectionItem.notes,
-      fieldName: localCollectionItem.fieldName,
-      location: localCollectionItem.location,
-      timestamp: localCollectionItem.timestamp,
-      type: "collection",
-    }
-    await db.put(pouchItem)
-  })
-
-  if (userLocalStoredValue.email) {
+  if (userLocalStoredValue && userLocalStoredValue.email) {
     const pouchUser = {
       ...userLocalStoredValue,
       type: "user",
