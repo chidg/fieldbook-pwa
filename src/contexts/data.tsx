@@ -1,20 +1,26 @@
 import React from "react"
-import { useLocalStorage } from '../hooks'
+import { usePouch, useAllDocs } from 'use-pouchdb'
 
 export interface DataItem {
-  id: string
+  _id: string
   number: string
   notes: string
   fieldName: string
   location?: GeolocationCoordinates
   timestamp: number
+  type: 'collection'
+  photos?: File[]
 }
 
-interface Data {[id: string]: DataItem}
 
+type CollectionsDBResponse = PouchDB.Core.AllDocsResponse<DataItem> & { loading: boolean }
+export type CollectionDoc = PouchDB.Core.ExistingDocument<DataItem>
+
+type CollectionData = { [id: string]: CollectionDoc }
 interface DataState {
-  data: Data
-  setData: (arg0: Data) => void,
+  data: CollectionData
+  // setData: (arg0: Data) => void,
+  loading: boolean
   saveItem: (arg0: DataItem) => void
 }
 
@@ -22,27 +28,36 @@ const DataContext = React.createContext<
   DataState | undefined
 >(undefined)
 
+
 const DataProvider: React.FC = ({ children }) => {
-  const [localStoredValue, setLocalStoredValue] = useLocalStorage('data', {})
-  const [data, setData] = React.useState<Data>(
+  // const [localStoredValue, setLocalStoredValue] = useLocalStorage('data', {})
+  const db = usePouch() // get the database
+  const [data, setData] = React.useState<CollectionData>(
     {}
   )
+  const { rows: collections, loading }: CollectionsDBResponse = useAllDocs({
+    include_docs: true, // Load all document bodies
+    attachments: true
+  })
 
   React.useEffect(() => {
-    setData(localStoredValue)
-  }, [setData, localStoredValue])
+    const data = collections.reduce((result, item) => {
+      if (item.doc) result[item.id] = item.doc
+      return result
+    }, {} as CollectionData)
+    setData(data)
+  }, [collections])
   
   const saveItem = React.useCallback(async (item: DataItem) => {
-    const newData = { ...data, [item.id]: item }
-    setLocalStoredValue(newData)
-    // Results in update to `data` due to effect above
-  }, [data, setLocalStoredValue])
+    const newData = { ...item, type: 'collection' }
+    await db.put(newData)
+  }, [db])
 
   return (
     <DataContext.Provider
       value={{
         data,
-        setData: setLocalStoredValue,
+        loading,
         saveItem
       }}
     >

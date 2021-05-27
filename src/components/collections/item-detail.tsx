@@ -68,7 +68,7 @@ export const ItemDetail: React.FC = () => {
         <h3 className="text-lg flex-1">{ user?.initials }{ instance?.number } {instance?.fieldName}</h3>
         <Link
           to={{
-            pathname: `/${instance?.id}/edit`,
+            pathname: `/${instance?._id}/edit`,
           }}
         >
           <button type="button" className="hover:bg-gray-200 hover:text-blue-500 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">

@@ -9,7 +9,7 @@ import {
 } from "react-router-dom"
 
 import { useUserContext } from "./contexts"
-import { useGoogleAnalytics } from "./hooks"
+import { useGoogleAnalytics, useMigrations } from "./hooks"
 import UserForm from "./components/user-form"
 import {
   ItemList,
@@ -84,6 +84,8 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
 }
 
 function App() {
+  useMigrations()
+  
   return (
     <Router>
       <Switch>

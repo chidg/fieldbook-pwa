@@ -33,11 +33,13 @@ export const ItemFormUpdate: React.FC = () => {
     saveItem({ ...values, id: instanceId, timestamp: instance!.timestamp, location: instance!.location })
     history.replace('/')
   }, [history, instance, instanceId, saveItem])
+  
+  const photo = instance && instance.photos && instance.photos.length > 0 ? instance.photos[0].name : ""
 
   return (
     <ItemForm
       locationDisplay={getLocationDisplay()}
-      initialValues={{ fieldName: instance?.fieldName || "", number: instance?.number || "", notes: instance?.notes || "" }}
+      initialValues={{ photo, fieldName: instance?.fieldName || "", number: instance?.number || "", notes: instance?.notes || "" }}
       onSubmit={onSubmit}
       title="Edit Item"
     />

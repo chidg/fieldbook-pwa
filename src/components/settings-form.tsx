@@ -6,7 +6,7 @@ import { useUserContext, useDataContext } from "../contexts"
 const SettingsUpdateForm: React.FC = () => {
   const history = useHistory()
   const { user } = useUserContext()
-  const { data, setData } = useDataContext()
+  const { data } = useDataContext()
   const [exporting, setExporting] = useState(false)
   const [clearing, setClearing] = useState(false)
 
@@ -26,9 +26,9 @@ const SettingsUpdateForm: React.FC = () => {
   }
 
   const clearData = React.useCallback(async () => {
-    setData({})
+    console.log('TODO clear data')
     setClearing(false)
-  }, [setData, setClearing])
+  }, [setClearing])
 
   return (
     <div className="text-white px-4 h-500">

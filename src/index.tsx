@@ -8,14 +8,22 @@ import {
   UserProvider,
   DataProvider,
 } from "./contexts"
+import PouchDB from 'pouchdb-browser'
+import PouchDBFind from 'pouchdb-find'
+import { Provider } from 'use-pouchdb'
+
+PouchDB.plugin(PouchDBFind)
+const db = new PouchDB('local')
 
 ReactDOM.render(
   <React.StrictMode>
-    <UserProvider>
-      <DataProvider>
-        <App />
-      </DataProvider>
-    </UserProvider>
+    <Provider pouchdb={db}>
+      <UserProvider>
+        <DataProvider>
+          <App />
+        </DataProvider>
+      </UserProvider>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

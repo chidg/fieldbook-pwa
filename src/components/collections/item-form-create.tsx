@@ -65,6 +65,7 @@ export const ItemFormCreate: React.FC = () => {
       fieldName: '',
       notes: '',
       number: number.toString().padStart(3, '0'),
+      photo: ''
     }
   }, [data])
 
@@ -73,7 +74,7 @@ export const ItemFormCreate: React.FC = () => {
       locationDisplay={getLocationDisplay()}
       initialValues={initialValues()}
       onSubmit={(values) => {
-        saveItem({ ...values, id: v4(), timestamp: Date.now(), location: geoLocation })
+        saveItem({ ...values, _id: v4(), timestamp: Date.now(), location: geoLocation, type: 'collection' })
         sendEvent({
           category: 'Collection',
           action: 'Created collection'
