@@ -11,6 +11,7 @@ type LocalDataItem = {
 
 type PouchDBDataItem = {
   _id: string
+  uuid: string
   number: string
   notes: string
   fieldName: string
@@ -39,11 +40,13 @@ export const migration_0001 = async (db: PouchDB.Database) => {
     ? JSON.parse(userLocal)
     : false
 
+  const migrations: Array<Promise<PouchDB.Core.Response>> = []
   if (dataLocalStoredValue)
     Object.keys(dataLocalStoredValue).forEach(async (key) => {
       const localCollectionItem = dataLocalStoredValue[key]
       const pouchItem: PouchDBDataItem = {
-        _id: localCollectionItem.id,
+        _id: localCollectionItem.number.toString(),
+        uuid: localCollectionItem.id,
         number: localCollectionItem.number,
         notes: localCollectionItem.notes,
         fieldName: localCollectionItem.fieldName,
@@ -51,7 +54,7 @@ export const migration_0001 = async (db: PouchDB.Database) => {
         timestamp: localCollectionItem.timestamp,
         type: "collection",
       }
-      await db.put(pouchItem)
+      migrations.push(db.put(pouchItem).catch((error) => new Promise(error)))
     })
 
   if (userLocalStoredValue && userLocalStoredValue.email) {
@@ -60,6 +63,7 @@ export const migration_0001 = async (db: PouchDB.Database) => {
       type: "user",
       _id: v4(),
     }
-    await db.put(pouchUser)
+    migrations.push(db.put(pouchUser).catch((error) => new Promise(error)))
   }
+  return Promise.all(migrations)
 }

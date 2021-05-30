@@ -3,6 +3,7 @@ import { usePouch, useAllDocs } from 'use-pouchdb'
 
 export interface DataItem {
   _id: string
+  uuid: string
   number: string
   notes: string
   fieldName: string
@@ -42,7 +43,7 @@ const DataProvider: React.FC = ({ children }) => {
 
   React.useEffect(() => {
     const data = collections.reduce((result, item) => {
-      if (item.doc) result[item.id] = item.doc
+      if (item.doc && item.doc.type === "collection") result[item.id] = item.doc
       return result
     }, {} as CollectionData)
     setData(data)
