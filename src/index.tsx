@@ -1,3 +1,4 @@
+import './wdyr'; // <--- first import
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles/tailwind.css';
@@ -7,23 +8,26 @@ import reportWebVitals from './reportWebVitals';
 import {
   UserProvider,
   DataProvider,
+  MetaProvider
 } from "./contexts"
 import PouchDB from 'pouchdb-browser'
 import PouchDBFind from 'pouchdb-find'
 import { Provider } from 'use-pouchdb'
 
 PouchDB.plugin(PouchDBFind)
-const db = new PouchDB('local')
+const db = new PouchDB('fieldbook')
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider pouchdb={db}>
-      <UserProvider>
-        <DataProvider>
-          <App />
-        </DataProvider>
-      </UserProvider>
-    </Provider>
+    <MetaProvider>
+      <Provider pouchdb={db}>
+        <UserProvider>
+          <DataProvider>
+            <App />
+          </DataProvider>
+        </UserProvider>
+      </Provider>
+    </MetaProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

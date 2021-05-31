@@ -1,6 +1,6 @@
 import React from "react"
-import { usePouch, useAllDocs } from 'use-pouchdb'
-
+import { usePouch, useFind } from "use-pouchdb"
+import { useMetaContext } from '../contexts'
 export interface DataItem {
   _id: string
   uuid: string
@@ -9,57 +9,57 @@ export interface DataItem {
   fieldName: string
   location?: GeolocationCoordinates
   timestamp: number
-  type: 'collection'
+  type: "collection"
   photos?: File[]
 }
 
-
-type CollectionsDBResponse = PouchDB.Core.AllDocsResponse<DataItem> & { loading: boolean }
+type CollectionsDBResponse = PouchDB.Find.FindResponse<DataItem> & {
+  loading: boolean
+}
 export type CollectionDoc = PouchDB.Core.ExistingDocument<DataItem>
 
-type CollectionData = { [id: string]: CollectionDoc }
+type CollectionData = Array<CollectionDoc>
 interface DataState {
   data: CollectionData
-  // setData: (arg0: Data) => void,
-  loading: boolean
   saveItem: (arg0: DataItem) => void
 }
 
-const DataContext = React.createContext<
-  DataState | undefined
->(undefined)
-
+const DataContext = React.createContext<DataState | undefined>(undefined)
 
 const DataProvider: React.FC = ({ children }) => {
   // const [localStoredValue, setLocalStoredValue] = useLocalStorage('data', {})
   const db = usePouch() // get the database
-  const [data, setData] = React.useState<CollectionData>(
-    {}
-  )
-  const { rows: collections, loading }: CollectionsDBResponse = useAllDocs({
-    include_docs: true, // Load all document bodies
-    attachments: true
+  const { setLoading } = useMetaContext()
+  const [data, setData] = React.useState<CollectionData>([])
+  const { docs: collections }: CollectionsDBResponse = useFind({
+    index: {
+      fields: ["type"],
+    },
+    selector: {
+      type: "collection",
+    },
   })
 
+  const setDataLoading = React.useCallback((value: boolean) => setLoading('data', value), [setLoading])
+
   React.useEffect(() => {
-    const data = collections.reduce((result, item) => {
-      if (item.doc && item.doc.type === "collection") result[item.id] = item.doc
-      return result
-    }, {} as CollectionData)
-    setData(data)
-  }, [collections])
-  
-  const saveItem = React.useCallback(async (item: DataItem) => {
-    const newData = { ...item, type: 'collection' }
-    await db.put(newData)
-  }, [db])
+    setData(collections)
+    setDataLoading(false)
+  }, [collections, setData, setDataLoading])
+
+  const saveItem = React.useCallback(
+    async (item: DataItem) => {
+      const newData = { ...item, type: "collection" }
+      await db.put(newData)
+    },
+    [db]
+  )
 
   return (
     <DataContext.Provider
       value={{
         data,
-        loading,
-        saveItem
+        saveItem,
       }}
     >
       {children}
@@ -70,9 +70,7 @@ const DataProvider: React.FC = ({ children }) => {
 const useDataContext = () => {
   const context = React.useContext(DataContext)
   if (context === undefined) {
-    throw new Error(
-      "useDataContext must be used within a DataProvider"
-    )
+    throw new Error("useDataContext must be used within a DataProvider")
   }
   return context
 }

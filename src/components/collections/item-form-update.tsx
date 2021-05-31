@@ -1,27 +1,16 @@
 import React from 'react'
-import { useHistory, useParams } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import {
-  DataItem,
   useDataContext,
 } from "../../contexts"
 import ItemForm from './item-form'
-
+import { useCollectionInstance } from '../../hooks'
 
 export const ItemFormUpdate: React.FC = () => {
   const history = useHistory()
-  const { saveItem, data } = useDataContext()
-  const [instance, setInstance] = React.useState<DataItem | undefined>(undefined)
-  const { id: instanceId }: { id: string } = useParams()
-
-  React.useEffect(() => {
-    const item = data[instanceId]
-    if (item) {
-      setInstance(item)
-    } else {
-      history.replace('/')
-    }
-  }, [setInstance, data, instanceId, history])
-
+  const { saveItem } = useDataContext()
+  const instance = useCollectionInstance()
+  
   const getLocationDisplay = React.useCallback(() => {
     if (instance?.location && Object.keys(instance?.location).length > 0) {
       return `${instance.location.latitude.toPrecision(6)}, ${instance.location.longitude.toPrecision(7)}`
@@ -30,9 +19,9 @@ export const ItemFormUpdate: React.FC = () => {
   }, [instance])
 
   const onSubmit = React.useCallback((values) => {
-    saveItem({ ...values, id: instanceId, timestamp: instance!.timestamp, location: instance!.location })
+    saveItem({ ...values, _id: instance?._id, timestamp: instance!.timestamp, location: instance!.location, _rev: instance?._rev })
     history.replace('/')
-  }, [history, instance, instanceId, saveItem])
+  }, [history, instance, saveItem])
   
   const photo = instance && instance.photos && instance.photos.length > 0 ? instance.photos[0].name : ""
 

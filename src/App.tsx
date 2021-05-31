@@ -8,7 +8,7 @@ import {
   Link,
 } from "react-router-dom"
 
-import { useUserContext } from "./contexts"
+import { useUserContext, useMetaContext } from "./contexts"
 import { useGoogleAnalytics, useMigrations } from "./hooks"
 import UserForm from "./components/user-form"
 import {
@@ -21,7 +21,7 @@ import LoadingScreen from "./components/loading-screen"
 import SettingsUpdate from "./components/settings-form"
 
 const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
-  const { user, loading } = useUserContext()
+  const { user } = useUserContext()
   useGoogleAnalytics()
 
   return (
@@ -65,8 +65,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
         <Route
           {...rest}
           render={({ location }) => {
-            if (loading) return <LoadingScreen />
-            else if (user) return children
+            if (user) return children
             else
               return (
                 <Redirect
@@ -85,8 +84,12 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
 
 function App() {
   useMigrations()
+
+  const { loading } = useMetaContext()
   
-  return (
+  if (loading) return <LoadingScreen />
+
+  return (  
     <Router>
       <Switch>
         <Route path="/login">

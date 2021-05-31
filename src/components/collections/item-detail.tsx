@@ -1,11 +1,10 @@
 import React from 'react'
-import { useHistory, useParams, Link } from "react-router-dom"
+import { useHistory, Link } from "react-router-dom"
+import ReactMapGL, { ViewportProps, Source, Layer, LayerProps } from 'react-map-gl'
 import {
-  DataItem,
-  useDataContext,
   useUserContext
 } from "../../contexts"
-import ReactMapGL, { ViewportProps, Source, Layer, LayerProps } from 'react-map-gl'
+import { useCollectionInstance } from '../../hooks'
 
 
 const layerStyle: LayerProps = {
@@ -25,24 +24,12 @@ type MapDetails = {
 }
 
 export const ItemDetail: React.FC = () => {
-  const history = useHistory()
-  
+  const instance = useCollectionInstance()
   const { user } = useUserContext()
-  const { data } = useDataContext()
-  const { id: instanceId }: { id: string } = useParams()
-  const [instance, setInstance] = React.useState<DataItem | undefined>(undefined)
+  const history = useHistory()
   
   const [mapDetails, setMapDetails] = React.useState<MapDetails | undefined>(undefined)
 
-  React.useEffect(() => {
-    const item = data[instanceId]
-    if (item) {
-      setInstance(item)
-    } else {
-      history.replace('/')
-    }
-  }, [setInstance, data, instanceId, history])
-  
   React.useEffect(() => {
     if (instance?.location && Object.keys(instance?.location).length > 0) {
       const { latitude, longitude } = instance.location

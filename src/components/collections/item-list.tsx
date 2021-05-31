@@ -49,7 +49,7 @@ export const DataList = () => {
         </div>
         <input className="w-full rounded-md bg-gray-200 text-gray-700 leading-tight focus:outline-none py-2" id="search" type="text" placeholder="Search" />
       </div> */}
-      {Object.keys(data).length === 0 && (
+      {data.length === 0 && (
         <div className="grid row mx-10">
           <div className="border-2 border-white text-white rounded px-4 py-2">
             <p>Hi { name }, welcome to Fieldbook!</p>
@@ -57,7 +57,7 @@ export const DataList = () => {
           </div>
         </div>
       )}
-      {Object.keys(data).map(id => <DataListItem {...data[id]} key={id} />)}
+      {data.map(collection => <DataListItem { ...collection } key={collection._id} />)}
     </>
   )
 }

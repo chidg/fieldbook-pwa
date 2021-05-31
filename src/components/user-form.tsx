@@ -1,4 +1,5 @@
 import React from 'react'
+import { v4 } from 'uuid'
 import { Formik, Field, Form } from 'formik'
 import { useHistory } from "react-router-dom"
 
@@ -28,7 +29,7 @@ const UserForm = () => {
     <Formik
       initialValues={initialValues}
       onSubmit={values => {
-        setUser(values)
+        setUser({ ...values, _id: user?._id || v4() })
         sendEvent({
           category: 'User',
           action: `${user ? 'Updated' : 'Created'} user details`

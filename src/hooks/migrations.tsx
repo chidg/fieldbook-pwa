@@ -1,6 +1,6 @@
 import React from "react"
 import { usePouch } from "use-pouchdb"
-
+import { useMetaContext } from '../contexts'
 import { migration_0001 } from "../migrations/0001-migrate-localstorage-to-pouchdb"
 
 type MigrationDBRecord = {
@@ -16,10 +16,14 @@ const migrations: Array<
 > = [migration_0001]
 
 export const useMigrations = () => {
+  const { setLoading } = useMetaContext()
   const db: PouchDB.Database<MigrationDoc> = usePouch()
+  
+  const setMigrationsLoading = React.useCallback((value: boolean) => setLoading('migrations', value), [setLoading])
   // On application init, check the DB for applied migrations
   React.useEffect(() => {
     const startup = async () => {
+      setMigrationsLoading(true)
       const index = await db.createIndex({
         index: {
           fields: ["type"],
@@ -65,8 +69,9 @@ export const useMigrations = () => {
         .catch((err) => {
           console.log(err)
         })
+        .finally(() => setMigrationsLoading(false))
     }
 
     startup()
-  }, [db])
+  }, [db, setMigrationsLoading])
 }

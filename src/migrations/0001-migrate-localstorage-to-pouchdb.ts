@@ -41,7 +41,8 @@ export const migration_0001 = async (db: PouchDB.Database) => {
     : false
 
   const migrations: Array<Promise<PouchDB.Core.Response>> = []
-  if (dataLocalStoredValue)
+  if (dataLocalStoredValue) {
+    console.log("dataLocalStoredValue:", dataLocalStoredValue)
     Object.keys(dataLocalStoredValue).forEach(async (key) => {
       const localCollectionItem = dataLocalStoredValue[key]
       const pouchItem: PouchDBDataItem = {
@@ -56,6 +57,7 @@ export const migration_0001 = async (db: PouchDB.Database) => {
       }
       migrations.push(db.put(pouchItem).catch((error) => new Promise(error)))
     })
+  }
 
   if (userLocalStoredValue && userLocalStoredValue.email) {
     const pouchUser = {
