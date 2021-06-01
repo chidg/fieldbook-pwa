@@ -78,4 +78,6 @@ const useDataContext = () => {
   return context
 }
 
+DataProvider.whyDidYouRender = true
+
 export { DataProvider, useDataContext }

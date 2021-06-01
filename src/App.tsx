@@ -24,6 +24,8 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
   const { user } = useUserContext()
   useGoogleAnalytics()
 
+  console.log("private route user - ", user)
+
   return (
     <>
       <nav className="flex items-center justify-between flex-wrap p-4">
@@ -82,51 +84,45 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
   )
 }
 
-function App() {
+const FieldbookRouterSwitch = () => {
   useMigrations()
-
   const { loading } = useMetaContext()
-  
-  if (loading) return <LoadingScreen />
 
-  return (  
+  if (loading) return <LoadingScreen />
+  console.log('FieldbookRouterSwitch')
+  return (
+    <Switch>
+      <Route path="/login">
+        <UserForm />
+      </Route>
+      <PrivateRoute exact path="/">
+        <ItemList />
+      </PrivateRoute>
+      <PrivateRoute exact path="/settings">
+        <SettingsUpdate />
+      </PrivateRoute>
+      <PrivateRoute exact path="/settings/user">
+        <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
+          <UserForm />
+        </div>
+      </PrivateRoute>
+      <PrivateRoute exact path="/new">
+        <ItemFormCreate />
+      </PrivateRoute>
+      <PrivateRoute exact path="/:id/">
+        <ItemDetail />
+      </PrivateRoute>
+      <PrivateRoute exact path="/:id/edit">
+        <ItemFormUpdate />
+      </PrivateRoute>
+    </Switch>
+  )
+}
+function App() {
+  return (
     <Router>
-      <Switch>
-        <Route path="/login">
-          <nav className="flex items-center justify-between flex-wrap bg-decorgreen-600 p-4">
-            <div className="flex items-center flex-shrink-0 text-white mr-6">
-              <span className="font-semibold text-xl tracking-tight">
-                Fieldbook 📒
-              </span>
-            </div>
-          </nav>
-          <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
-            <UserForm />
-          </div>
-        </Route>
-        <PrivateRoute exact path="/">
-          <ItemList />
-        </PrivateRoute>
-        <PrivateRoute exact path="/settings">
-          <SettingsUpdate />
-        </PrivateRoute>
-        <PrivateRoute exact path="/settings/user">
-          <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
-            <UserForm />
-          </div>
-        </PrivateRoute>
-        <PrivateRoute exact path="/new">
-          <ItemFormCreate />
-        </PrivateRoute>
-        <PrivateRoute exact path="/:id/">
-          <ItemDetail />
-        </PrivateRoute>
-        <PrivateRoute exact path="/:id/edit">
-          <ItemFormUpdate />
-        </PrivateRoute>
-      </Switch>
+      <FieldbookRouterSwitch />
     </Router>
   )
 }
-
 export default App

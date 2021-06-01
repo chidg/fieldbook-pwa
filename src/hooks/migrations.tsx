@@ -69,9 +69,12 @@ export const useMigrations = () => {
         .catch((err) => {
           console.log(err)
         })
-        .finally(() => setMigrationsLoading(false))
+        .finally(() => {
+          setMigrationsLoading(false)
+        })
     }
 
     startup()
+
   }, [db, setMigrationsLoading])
 }

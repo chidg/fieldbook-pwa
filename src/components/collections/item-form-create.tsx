@@ -52,10 +52,10 @@ export const ItemFormCreate: React.FC = () => {
   const initialValues = React.useCallback(() => {
     // calculate the initial collection number
     let number = 1
-    const itemCount = data.length
+    const itemIds = Object.keys(data)
+    const itemCount = itemIds.length
     
     if (itemCount) {
-      const itemIds = Object.keys(data)
       const lastItem = data[itemIds[itemIds.length - 1]]
       const numbStrings = lastItem.number.match(/\d+$/)
       if (numbStrings) {

@@ -33,7 +33,6 @@ const defaultMeta = {
 const MetaContext = React.createContext<MetaProviderProps>(defaultMeta)
 
 const MetaProvider: React.FC = ({ children }) => {
-  console.log("MetaProvider loading")
   const [localStoredValue, setLocalStoredValue] = useLocalStorage(
     "meta",
     defaultMeta
@@ -52,8 +51,6 @@ const MetaProvider: React.FC = ({ children }) => {
     // Returns true if any of the values in 'loading' are true
     return migrationsLoading || userLoading || dataLoading
   }, [migrationsLoading, userLoading, dataLoading])
-
-  console.log("loadingState", loadingState)
 
   const setLoadingByKey = React.useCallback(
     (key: keyof LoadingState, value: boolean) => {

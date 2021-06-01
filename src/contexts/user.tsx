@@ -12,7 +12,6 @@ interface UserDetails {
 
 export type NewUserDoc = PouchDB.Core.NewDocument<UserDetails>
 export type ExistingUserDoc = PouchDB.Core.ExistingDocument<UserDetails>
-
 interface UserContextState {
   user?: ExistingUserDoc
   setUser: (arg0: UserDetails) => void
@@ -25,7 +24,7 @@ const UserProvider: React.FC = ({ children }) => {
   const db = usePouch<UserDetails>()
   const { setLoading } = useMetaContext()
   const [user, setUser] = React.useState<ExistingUserDoc | undefined>(undefined)
-  const { docs: userDocs, loading } = useFind({
+  const { docs: userDocs } = useFind({
     index: {
       fields: ["type"],
     },
@@ -38,10 +37,10 @@ const UserProvider: React.FC = ({ children }) => {
     (value: boolean) => setLoading("user", value),
     [setLoading]
   )
-
-  useDeepCompareEffect(() => {
-    setUserLoading(loading)
-  }, [loading, setUserLoading])
+  
+  React.useEffect(() => {
+    setUserLoading(user === undefined)
+  }, [user, setUserLoading])
 
   useDeepCompareEffect(() => {
     setUser(userDocs[0])
