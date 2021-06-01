@@ -18,7 +18,7 @@ type CollectionsDBResponse = PouchDB.Find.FindResponse<DataItem> & {
 }
 export type CollectionDoc = PouchDB.Core.ExistingDocument<DataItem>
 
-type CollectionData = Array<CollectionDoc>
+type CollectionData = {[id: string]: CollectionDoc }
 interface DataState {
   data: CollectionData
   saveItem: (arg0: DataItem) => void
@@ -27,10 +27,9 @@ interface DataState {
 const DataContext = React.createContext<DataState | undefined>(undefined)
 
 const DataProvider: React.FC = ({ children }) => {
-  // const [localStoredValue, setLocalStoredValue] = useLocalStorage('data', {})
   const db = usePouch() // get the database
   const { setLoading } = useMetaContext()
-  const [data, setData] = React.useState<CollectionData>([])
+  const [data, setData] = React.useState<CollectionData>({})
   const { docs: collections }: CollectionsDBResponse = useFind({
     index: {
       fields: ["type"],
@@ -43,7 +42,11 @@ const DataProvider: React.FC = ({ children }) => {
   const setDataLoading = React.useCallback((value: boolean) => setLoading('data', value), [setLoading])
 
   React.useEffect(() => {
-    setData(collections)
+    const dataById = collections.reduce((result, collection) => {
+      result[collection._id] = collection
+      return result
+    }, {} as CollectionData)
+    setData(dataById)
     setDataLoading(false)
   }, [collections, setData, setDataLoading])
 
