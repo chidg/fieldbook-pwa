@@ -6,6 +6,7 @@ import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import {
+  DataBaseProvider,
   UserProvider,
   DataProvider,
   MetaProvider
@@ -19,15 +20,17 @@ const db = new PouchDB('fieldbook')
 
 ReactDOM.render(
   <React.StrictMode>
-    <MetaProvider>
-      <Provider pouchdb={db}>
-        <UserProvider>
-          <DataProvider>
-            <App />
-          </DataProvider>
-        </UserProvider>
-      </Provider>
-    </MetaProvider>
+    <Provider pouchdb={db}>
+      <DataBaseProvider>
+        <MetaProvider>
+          <UserProvider>
+            <DataProvider>
+              <App />
+            </DataProvider>
+          </UserProvider>
+        </MetaProvider>
+      </DataBaseProvider>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

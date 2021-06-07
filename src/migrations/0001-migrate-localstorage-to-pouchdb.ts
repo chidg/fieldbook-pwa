@@ -77,8 +77,7 @@ export const migration_0001 = async (db: PouchDB.Database) => {
     docs.push(pouchUser)
   }
 
-  const migrations: Promise<(PouchDB.Core.Response | PouchDB.Core.Error)[]> =
-    db.bulkDocs(docs)
+  const migrations = db.bulkDocs(docs)
 
   return migrations
 }

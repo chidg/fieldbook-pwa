@@ -1,7 +1,7 @@
 import { useRef, useEffect } from "react"
 export { useLocalStorage } from "./local-storage"
 export { useGoogleAnalytics } from "./analytics"
-export { useMigrations } from "./migrations"
+// export { useMigrations } from "./migrations"
 export { useCollectionInstance } from "./useCollectionInstance"
 
 export const useNoRenderRef = (currentValue: any) => {

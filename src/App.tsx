@@ -9,7 +9,7 @@ import {
 } from "react-router-dom"
 
 import { useUserContext, useMetaContext } from "./contexts"
-import { useGoogleAnalytics, useMigrations } from "./hooks"
+import { useGoogleAnalytics } from "./hooks"
 import UserForm from "./components/user-form"
 import {
   ItemList,
@@ -84,7 +84,6 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
 
 const FieldbookRouterSwitch = () => {
   const { loading } = useMetaContext()
-  useMigrations()
 
   if (loading) return <LoadingScreen />
 
@@ -116,6 +115,9 @@ const FieldbookRouterSwitch = () => {
     </Switch>
   )
 }
+
+// FieldbookRouterSwitch.whyDidYouRender = true 
+
 function App() {
   return (
     <Router>

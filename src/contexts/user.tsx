@@ -1,6 +1,6 @@
 import React from "react"
 import { usePouch, useFind } from "use-pouchdb"
-import { useMetaContext } from "../contexts"
+import { useMetaContext, useDataBaseContext } from "../contexts"
 import useDeepCompareEffect from "use-deep-compare-effect"
 
 interface UserDetails {
@@ -22,30 +22,7 @@ const UserContext = React.createContext<UserContextState | undefined>(undefined)
 
 const UserProvider: React.FC = ({ children }) => {
   const db = usePouch<UserDetails>()
-  const { setLoading } = useMetaContext()
-  const [user, setUser] = React.useState<ExistingUserDoc | undefined>(undefined)
-  const { docs: userDocs, state } = useFind({
-    index: {
-      fields: ["type"],
-    },
-    selector: {
-      type: "user",
-    },
-  })
-
-  const setUserLoading = React.useCallback(
-    (value: boolean) => setLoading("user", value),
-    [setLoading]
-  )
-  
-  useDeepCompareEffect(() => {
-    if (userDocs.length > 0) setUser(userDocs[0])
-  }, [userDocs, setUser])
-
-  React.useEffect(() => {
-    console.log('state', state)
-    setUserLoading(state !== 'done')
-  }, [state, setUserLoading])
+  const { user } = useDataBaseContext()
 
   const saveUser = React.useCallback(
     async (item: UserDetails & { _rev?: string }) => {
@@ -78,6 +55,5 @@ const useUserContext = () => {
   }
   return context
 }
-UserProvider.whyDidYouRender = true
 
 export { UserProvider, useUserContext }

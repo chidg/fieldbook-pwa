@@ -1,6 +1,6 @@
 import React from "react"
 import { usePouch, useFind } from "use-pouchdb"
-import { useMetaContext } from '../contexts'
+import { useMetaContext, useDataBaseContext } from '../contexts'
 export interface DataItem {
   _id: string
   uuid: string
@@ -27,42 +27,15 @@ interface DataState {
 const DataContext = React.createContext<DataState | undefined>(undefined)
 
 const DataProvider: React.FC = ({ children }) => {
-  const db = usePouch() // get the database
-  const { setLoading } = useMetaContext()
-  const [data, setData] = React.useState<CollectionData>({})
-  const { docs: collections }: CollectionsDBResponse = useFind({
-    index: {
-      fields: ["type"],
-    },
-    selector: {
-      type: "collection",
-    },
-  })
+  const { collections, saveCollection } = useDataBaseContext()
 
-  const setDataLoading = React.useCallback((value: boolean) => setLoading('data', value), [setLoading])
-
-  React.useEffect(() => {
-    const dataById = collections.reduce((result, collection) => {
-      result[collection._id] = collection
-      return result
-    }, {} as CollectionData)
-    setData(dataById)
-    setDataLoading(false)
-  }, [collections, setData, setDataLoading])
-
-  const saveItem = React.useCallback(
-    async (item: DataItem) => {
-      const newData = { ...item, type: "collection" }
-      await db.put(newData)
-    },
-    [db]
-  )
+  // const setDataLoading = React.useCallback((value: boolean) => setLoading('data', value), [setLoading])
 
   return (
     <DataContext.Provider
       value={{
-        data,
-        saveItem,
+        data: collections,
+        saveItem: saveCollection,
       }}
     >
       {children}
@@ -77,7 +50,5 @@ const useDataContext = () => {
   }
   return context
 }
-
-DataProvider.whyDidYouRender = true
 
 export { DataProvider, useDataContext }
