@@ -24,7 +24,7 @@ const UserProvider: React.FC = ({ children }) => {
   const db = usePouch<UserDetails>()
   const { setLoading } = useMetaContext()
   const [user, setUser] = React.useState<ExistingUserDoc | undefined>(undefined)
-  const { docs: userDocs } = useFind({
+  const { docs: userDocs, state } = useFind({
     index: {
       fields: ["type"],
     },
@@ -38,13 +38,14 @@ const UserProvider: React.FC = ({ children }) => {
     [setLoading]
   )
   
-  React.useEffect(() => {
-    setUserLoading(user === undefined)
-  }, [user, setUserLoading])
-
   useDeepCompareEffect(() => {
-    setUser(userDocs[0])
+    if (userDocs.length > 0) setUser(userDocs[0])
   }, [userDocs, setUser])
+
+  React.useEffect(() => {
+    console.log('state', state)
+    setUserLoading(state !== 'done')
+  }, [state, setUserLoading])
 
   const saveUser = React.useCallback(
     async (item: UserDetails & { _rev?: string }) => {

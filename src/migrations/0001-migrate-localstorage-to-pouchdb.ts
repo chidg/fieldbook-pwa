@@ -29,6 +29,14 @@ type LocalUserDetails = {
   email?: string
 }
 
+type PouchDBUserItem = {
+  initials?: string
+  name?: string
+  email?: string
+  _id: string
+  type: "user"
+}
+
 export const migration_0001 = async (db: PouchDB.Database) => {
   const dataLocal = window.localStorage.getItem("data")
   const dataLocalStoredValue: LocalDataCollection | false = dataLocal
@@ -40,10 +48,10 @@ export const migration_0001 = async (db: PouchDB.Database) => {
     ? JSON.parse(userLocal)
     : false
 
-  const migrations: Array<Promise<PouchDB.Core.Response>> = []
+  const docs: Array<PouchDBDataItem | PouchDBUserItem> = []
+
   if (dataLocalStoredValue) {
-    console.log("dataLocalStoredValue:", dataLocalStoredValue)
-    Object.keys(dataLocalStoredValue).forEach(async (key) => {
+    const collectionDocs = Object.keys(dataLocalStoredValue).map((key) => {
       const localCollectionItem = dataLocalStoredValue[key]
       const pouchItem: PouchDBDataItem = {
         _id: localCollectionItem.number.toString(),
@@ -55,17 +63,22 @@ export const migration_0001 = async (db: PouchDB.Database) => {
         timestamp: localCollectionItem.timestamp,
         type: "collection",
       }
-      migrations.push(db.put(pouchItem).catch((error) => new Promise(error)))
+      return pouchItem
     })
+    docs.concat(collectionDocs)
   }
 
   if (userLocalStoredValue && userLocalStoredValue.email) {
-    const pouchUser = {
+    const pouchUser: PouchDBUserItem = {
       ...userLocalStoredValue,
       type: "user",
       _id: v4(),
     }
-    migrations.push(db.put(pouchUser).catch((error) => new Promise(error)))
+    docs.push(pouchUser)
   }
-  return Promise.all(migrations)
+
+  const migrations: Promise<(PouchDB.Core.Response | PouchDB.Core.Error)[]> =
+    db.bulkDocs(docs)
+
+  return migrations
 }

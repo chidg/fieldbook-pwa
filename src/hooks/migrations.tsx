@@ -12,7 +12,7 @@ type MigrationDBRecord = {
 type MigrationDoc = PouchDB.Core.Document<MigrationDBRecord>
 
 const migrations: Array<
-  (db: PouchDB.Database<{}>) => Promise<PouchDB.Core.Response[]>
+  (db: PouchDB.Database<{}>) => Promise<(PouchDB.Core.Response | PouchDB.Core.Error)[][]>
 > = [migration_0001]
 
 export const useMigrations = () => {
@@ -73,7 +73,7 @@ export const useMigrations = () => {
           setMigrationsLoading(false)
         })
     }
-
+    console.log('Migrations starting')
     startup()
 
   }, [db, setMigrationsLoading])

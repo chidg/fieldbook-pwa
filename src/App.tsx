@@ -24,8 +24,6 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
   const { user } = useUserContext()
   useGoogleAnalytics()
 
-  console.log("private route user - ", user)
-
   return (
     <>
       <nav className="flex items-center justify-between flex-wrap p-4">
@@ -85,11 +83,11 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
 }
 
 const FieldbookRouterSwitch = () => {
-  useMigrations()
   const { loading } = useMetaContext()
+  useMigrations()
 
   if (loading) return <LoadingScreen />
-  console.log('FieldbookRouterSwitch')
+
   return (
     <Switch>
       <Route path="/login">
