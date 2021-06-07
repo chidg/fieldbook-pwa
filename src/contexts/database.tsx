@@ -1,6 +1,7 @@
 import React from "react"
 import useDeepCompareEffect from "use-deep-compare-effect"
 import { usePouch, useAllDocs } from "use-pouchdb"
+import { areEqual } from "@essentials/are-equal"
 
 import { migration_0001 } from "../migrations/0001-migrate-localstorage-to-pouchdb"
 
@@ -47,7 +48,6 @@ type MigrationsData = { [id: string]: ExistingMigration }
 interface DataState {
   collections: CollectionData
   user: ExistingUserDoc | undefined
-  // migrations: MigrationsData
   loading: boolean
   saveCollection: (arg0: CollectionItem) => void
 }
@@ -60,34 +60,34 @@ const DataBaseProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = React.useState<boolean>(true)
   const [collections, setCollections] = React.useState<CollectionData>({})
   const [user, setUser] = React.useState<ExistingUserDoc | undefined>(undefined)
-  const [migrations, setMigrations] = React.useState<MigrationsData| undefined>(undefined)
+  const [migrations, setMigrations] =
+    React.useState<MigrationsData | undefined>(undefined)
   const { rows, state }: CollectionsDBResponse = useAllDocs({
     attachments: true,
     include_docs: true,
   })
 
   useDeepCompareEffect(() => {
-    if (state !== 'done') return 
+    if (state !== "done") return
 
-    console.log('got rows', rows)
-    const collections: CollectionData = {}
-    const migrations: MigrationsData = {}
+    const collectionsRows: CollectionData = {}
+    const migrationsRows: MigrationsData = {}
     rows.forEach((row) => {
       switch (row.doc?.type) {
         case "collection":
-          collections[row.id] = row.doc!
+          collectionsRows[row.id] = row.doc!
           return null
         case "user":
-          setUser(row.doc!)
+          if (!user || !areEqual(user, row.doc!)) setUser(row.doc!)
           return null
         case "migration":
-          migrations[row.id] = row.doc!
+          migrationsRows[row.id] = row.doc!
           return null
       }
     })
-    setCollections(collections)
-    setMigrations(migrations)
-    console.log("setting migrations")
+    if (!areEqual(collections, collectionsRows)) setCollections(collectionsRows)
+    if (!migrations || !areEqual(migrations, migrationsRows))
+      setMigrations(migrationsRows)
     setLoading(false)
   }, [rows, state, setUser, setCollections, setLoading])
 
@@ -99,8 +99,8 @@ const DataBaseProvider: React.FC = ({ children }) => {
     [db]
   )
 
-  React.useEffect(() => {
-    if (migrations === undefined) return 
+  useDeepCompareEffect(() => {
+    if (migrations === undefined) return
 
     const migrationFiles: Array<
       (
@@ -172,6 +172,6 @@ const useDataBaseContext = () => {
   return context
 }
 
-DataBaseProvider.whyDidYouRender = true
+// DataBaseProvider.whyDidYouRender = true
 
 export { DataBaseProvider, useDataBaseContext }

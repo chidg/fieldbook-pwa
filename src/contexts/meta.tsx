@@ -11,7 +11,6 @@ export interface MetaData {
 
 type MetaProviderProps = {
   meta: MetaData
-  setMetaData?: (arg0: MetaData) => void
   loading: boolean
 }
 
@@ -21,17 +20,17 @@ const defaultMeta = {
     notifications: [],
   },
   loading: false,
-  setLoading: () => null,
 }
 
 
 const MetaContext = React.createContext<MetaProviderProps>(defaultMeta)
 
 const MetaProvider: React.FC = ({ children }) => {
-  const [localStoredValue, setLocalStoredValue] = useLocalStorage(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const localStoredValue = useLocalStorage(
     "meta",
     defaultMeta
-  )
+  )[0]
   const [metaData, setMetaData] = React.useState<MetaData>(defaultMeta.meta)
   const { loading } = useDataBaseContext()
 
@@ -43,7 +42,6 @@ const MetaProvider: React.FC = ({ children }) => {
     <MetaContext.Provider
       value={{
         meta: metaData,
-        setMetaData: setLocalStoredValue,
         loading,
       }}
     >

@@ -82,9 +82,11 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
   )
 }
 
-const FieldbookRouterSwitch = () => {
-  const { loading } = useMetaContext()
+type FieldbookRouterSwitchProps = {
+  loading: boolean
+}
 
+const FieldbookRouterSwitch: React.FC<FieldbookRouterSwitchProps> = ({ loading }) => {
   if (loading) return <LoadingScreen />
 
   return (
@@ -119,9 +121,12 @@ const FieldbookRouterSwitch = () => {
 // FieldbookRouterSwitch.whyDidYouRender = true 
 
 function App() {
+  const { loading } = useMetaContext()
+  const MemoisedRouterSwitch = React.memo(FieldbookRouterSwitch)
+  
   return (
     <Router>
-      <FieldbookRouterSwitch />
+      <MemoisedRouterSwitch {...{ loading }} />
     </Router>
   )
 }

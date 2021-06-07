@@ -51,7 +51,7 @@ export const migration_0001 = async (db: PouchDB.Database) => {
   const docs: Array<PouchDBDataItem | PouchDBUserItem> = []
 
   if (dataLocalStoredValue) {
-    const collectionDocs = Object.keys(dataLocalStoredValue).map((key) => {
+    Object.keys(dataLocalStoredValue).map((key) => {
       const localCollectionItem = dataLocalStoredValue[key]
       const pouchItem: PouchDBDataItem = {
         _id: localCollectionItem.number.toString(),
@@ -63,9 +63,8 @@ export const migration_0001 = async (db: PouchDB.Database) => {
         timestamp: localCollectionItem.timestamp,
         type: "collection",
       }
-      return pouchItem
+      docs.push(pouchItem)
     })
-    docs.concat(collectionDocs)
   }
 
   if (userLocalStoredValue && userLocalStoredValue.email) {
@@ -76,7 +75,6 @@ export const migration_0001 = async (db: PouchDB.Database) => {
     }
     docs.push(pouchUser)
   }
-
   const migrations = db.bulkDocs(docs)
 
   return migrations
