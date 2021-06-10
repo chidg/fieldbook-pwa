@@ -1,48 +1,71 @@
 import React from "react"
 import { useLocalStorage } from "../hooks"
 import useDeepCompareEffect from "use-deep-compare-effect"
-import { useDataBaseContext } from "./database"
 
 export interface MetaData {
   version: string
-  notifications: Array<string>
-}
-
-
-type MetaProviderProps = {
-  meta: MetaData
   loading: boolean
+  setLoading: (arg0: boolean) => void
+  updating: boolean
+  completeUpdate: () => void
 }
 
 const defaultMeta = {
-  meta: {
-    version: process.env.GIT_SHA || "0.1",
-    notifications: [],
-  },
+  version: process.env.GIT_SHA || "0.1",
   loading: false,
+  setLoading: () => null,
+  updating: false,
+  completeUpdate: () => null,
 }
 
-
-const MetaContext = React.createContext<MetaProviderProps>(defaultMeta)
+const MetaContext = React.createContext<MetaData>(defaultMeta)
 
 const MetaProvider: React.FC = ({ children }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const localStoredValue = useLocalStorage(
+  const [localStoredMeta, setLocalStoredMeta] = useLocalStorage(
     "meta",
     defaultMeta
-  )[0]
-  const [metaData, setMetaData] = React.useState<MetaData>(defaultMeta.meta)
-  const { loading } = useDataBaseContext()
+  )
+  const [version, setVersion] = React.useState<string>(defaultMeta.version)
+  const [loading, setLoading] = React.useState<boolean>(false)
+  const [updating, setUpdating] = React.useState<boolean>(false)
+
 
   useDeepCompareEffect(() => {
-    setMetaData(localStoredValue)
-  }, [localStoredValue, setMetaData])
+    setVersion(localStoredMeta)
+    if (localStoredMeta.version !== process.env.REACT_APP_GIT_SHA) {
+      console.log("start updating")
+      setUpdating(true)
+    } else {
+      console.log("version the same, do not update")
+      setUpdating(false)
+    }
+  }, [localStoredMeta.version, setVersion, setUpdating])
+
+  // React.useEffect(() => {
+
+  //   setLocalStoredMeta({ version: process.env.REACT_APP_GIT_SHA })
+  // }, [version, setLocalStoredMeta])
+
+  const completeUpdate = React.useCallback(() => {
+    setLocalStoredMeta({ version: process.env.REACT_APP_GIT_SHA })
+  }, [setLocalStoredMeta])
+
+  const memoisedState = React.useMemo(
+    () => ({
+      version,
+      loading,
+      updating,
+      completeUpdate
+    }),
+    [version, loading, updating, completeUpdate]
+  )
 
   return (
     <MetaContext.Provider
       value={{
-        meta: metaData,
-        loading,
+        ...memoisedState,
+        setLoading,
       }}
     >
       {children}

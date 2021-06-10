@@ -54,8 +54,8 @@
   },
   "scripts": {
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
-    "start": "craco start",
-    "build": "craco build",
+    "start": "REACT_APP_GIT_SHA=`git rev-parse --short HEAD` HTTPS=true craco start",
+    "build": "REACT_APP_GIT_SHA=`git rev-parse --short HEAD` craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },

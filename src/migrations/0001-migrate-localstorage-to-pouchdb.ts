@@ -51,7 +51,7 @@ export const migration_0001 = async (db: PouchDB.Database) => {
   const docs: Array<PouchDBDataItem | PouchDBUserItem> = []
 
   if (dataLocalStoredValue) {
-    Object.keys(dataLocalStoredValue).map((key) => {
+    Object.keys(dataLocalStoredValue).forEach((key) => {
       const localCollectionItem = dataLocalStoredValue[key]
       const pouchItem: PouchDBDataItem = {
         _id: localCollectionItem.number.toString(),

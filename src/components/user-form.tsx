@@ -96,15 +96,17 @@ const UserForm = () => {
               />
             </div>
             <div className="pb-4 flex justify-between mt-2">
-              <button
-                type="button"
-                className="border-2 border-gray-500 hover:bg-gray-500 hover:text-white text-gray-500 py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                onClick={() => {
-                  history.goBack()
-                }}
-              >
-                Cancel
-              </button>
+              {user && (
+                <button
+                  type="button"
+                  className="border-2 border-gray-500 hover:bg-gray-500 hover:text-white text-gray-500 py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                  onClick={() => {
+                    history.goBack()
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
               <button
                 type="submit"
                 className="border-2 border-blue-500 hover:bg-blue-500 hover:text-white text-blue-500 py-1 px-2 rounded focus:outline-none focus:shadow-outline"

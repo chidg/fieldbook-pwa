@@ -9,6 +9,7 @@
 
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://cra.link/PWA
+import { runMigrations } from "./migrations"
 
 const isLocalhost = Boolean(
   window.location.hostname === "localhost" ||
@@ -26,10 +27,13 @@ type Config = {
 }
 
 export function register(config?: Config) {
-  if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
+  if ("serviceWorker" in navigator) {
+    // if process.env.environment === "PRODUCTION "
+    console.log("sw")
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href)
     if (publicUrl.origin !== window.location.origin) {
+      console.log("rill weturn")
       // Our service worker won't work if PUBLIC_URL is on a different origin
       // from what our page is served on. This might happen if a CDN is used to
       // serve assets; see https://github.com/facebook/create-react-app/issues/2374
@@ -38,8 +42,9 @@ export function register(config?: Config) {
 
     window.addEventListener("load", () => {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`
-
+      console.log(1)
       if (isLocalhost) {
+        console.log(2)
         // This is running on localhost. Let's check if a service worker still exists or not.
         checkValidServiceWorker(swUrl, config)
 
@@ -52,6 +57,7 @@ export function register(config?: Config) {
           )
         })
       } else {
+        console.log("should register")
         // Is not localhost. Just register service worker
         registerValidSW(swUrl, config)
       }
@@ -60,6 +66,7 @@ export function register(config?: Config) {
 }
 
 function registerValidSW(swUrl: string, config?: Config) {
+  console.log("should register")
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
@@ -73,6 +80,27 @@ function registerValidSW(swUrl: string, config?: Config) {
         })
         console.debug("Checked for update...")
       }, 1000 * 60) // * 5)
+      console.log("run migrations")
+      // migrations
+      // check if migrations should be run
+      console.log(process.env.REACT_APP_GIT_SHA)
+      let version
+      const newVersion = process.env.REACT_APP_GIT_SHA
+      const localData = window.localStorage.getItem("fieldbook")
+      if (localData) {
+        version = JSON.parse(localData).version
+      }
+      if (newVersion !== version) {
+        console.log("will run migrations")
+        runMigrations().then(() => {
+          window.localStorage.setItem(
+            "fieldbook",
+            JSON.stringify({ version: newVersion })
+          )
+        })
+      } else {
+        console.log("will not run migrations")
+      }
 
       registration.onupdatefound = () => {
         const installingWorker = registration.installing
@@ -115,17 +143,25 @@ function registerValidSW(swUrl: string, config?: Config) {
 }
 
 function checkValidServiceWorker(swUrl: string, config?: Config) {
+  console.log(3)
   // Check if the service worker can be found. If it can't reload the page.
   fetch(swUrl, {
     headers: { "Service-Worker": "script" },
   })
     .then((response) => {
+      console.log(5)
+      console.log(response)
       // Ensure service worker exists, and that we really are getting a JS file.
       const contentType = response.headers.get("content-type")
       if (
         response.status === 404 ||
         (contentType != null && contentType.indexOf("javascript") === -1)
       ) {
+        console.log(
+          "no sw",
+          contentType,
+          contentType != null && contentType.indexOf("javascript") === -1
+        )
         // No service worker found. Probably a different app. Reload the page.
         navigator.serviceWorker.ready.then((registration) => {
           registration.unregister().then(() => {
@@ -133,6 +169,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
           })
         })
       } else {
+        console.log(4)
         // Service worker found. Proceed as normal.
         registerValidSW(swUrl, config)
       }

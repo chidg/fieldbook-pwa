@@ -4,6 +4,7 @@ import { usePouch, useAllDocs } from "use-pouchdb"
 import { areEqual } from "@essentials/are-equal"
 
 import { migration_0001 } from "../migrations/0001-migrate-localstorage-to-pouchdb"
+import { useMetaContext } from "./meta"
 
 export interface CollectionItem {
   _id: string
@@ -48,7 +49,7 @@ type MigrationsData = { [id: string]: ExistingMigration }
 interface DataState {
   collections: CollectionData
   user: ExistingUserDoc | undefined
-  loading: boolean
+  // runMigrations: () => void
   saveCollection: (arg0: CollectionItem) => void
 }
 
@@ -56,23 +57,31 @@ const DataBaseContext = React.createContext<DataState | undefined>(undefined)
 
 const DataBaseProvider: React.FC = ({ children }) => {
   const db = usePouch() // get the database
+  const { setLoading, updating, completeUpdate } = useMetaContext()
 
-  const [loading, setLoading] = React.useState<boolean>(true)
   const [collections, setCollections] = React.useState<CollectionData>({})
   const [user, setUser] = React.useState<ExistingUserDoc | undefined>(undefined)
   const [migrations, setMigrations] =
     React.useState<MigrationsData | undefined>(undefined)
-  const { rows, state }: CollectionsDBResponse = useAllDocs({
+  const { rows: dbRows, state: dbState }: CollectionsDBResponse = useAllDocs({
     attachments: true,
     include_docs: true,
   })
 
+  const memoisedDBState = React.useMemo(
+    () => ({
+      rows: dbRows,
+      state: dbState,
+    }),
+    [dbRows, dbState]
+  )
+
   useDeepCompareEffect(() => {
-    if (state !== "done") return
+    if (memoisedDBState.state !== "done") return
 
     const collectionsRows: CollectionData = {}
     const migrationsRows: MigrationsData = {}
-    rows.forEach((row) => {
+    memoisedDBState.rows.forEach((row) => {
       switch (row.doc?.type) {
         case "collection":
           collectionsRows[row.id] = row.doc!
@@ -89,7 +98,7 @@ const DataBaseProvider: React.FC = ({ children }) => {
     if (!migrations || !areEqual(migrations, migrationsRows))
       setMigrations(migrationsRows)
     setLoading(false)
-  }, [rows, state, setUser, setCollections, setLoading])
+  }, [memoisedDBState.rows, memoisedDBState.state, setUser, setCollections, setLoading])
 
   const saveCollection = React.useCallback(
     async (item: CollectionItem) => {
@@ -99,64 +108,70 @@ const DataBaseProvider: React.FC = ({ children }) => {
     [db]
   )
 
-  useDeepCompareEffect(() => {
-    if (migrations === undefined) return
+  // const runMigrations = React.useCallback(() => {
+  //   if (migrations === undefined) return
 
-    const migrationFiles: Array<
-      (
-        db: PouchDB.Database<{}>
-      ) => Promise<(PouchDB.Core.Response | PouchDB.Core.Error)[]>
-    > = [migration_0001]
+  //   const migrationFiles: Array<
+  //     (
+  //       db: PouchDB.Database<{}>
+  //     ) => Promise<(PouchDB.Core.Response | PouchDB.Core.Error)[]>
+  //   > = [migration_0001]
 
-    const startup = async () => {
-      setLoading(true)
+  //   const startup = async () => {
+  //     setLoading(true)
 
-      const migrationPromises: Array<any> = []
-      migrationFiles.forEach((migration, index) => {
-        if (!migrations[index]?.applied) {
-          console.log(`Applying migration ${index}`)
-          migration(db as PouchDB.Database<MigrationDBRecord>)
-            .then((result) => {
-              const record: MigrationDBRecord = {
-                _id: index.toString(),
-                type: "migration",
-                applied: true,
-              }
-              migrationPromises.push(db.put(record))
-            })
-            .catch((error) => {
-              console.error(`Failed migration ${index}`)
-              console.error(error)
-            })
-        }
-      })
-      if (migrationPromises.length === 0) console.log("No migrations to apply")
-      Promise.all(migrationPromises)
-        .then((result) => {
-          console.log("Migrations successful")
-          console.log(result)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-    }
+  //     const migrationPromises: Array<any> = []
+  //     migrationFiles.forEach((migration, index) => {
+  //       if (!migrations[index]?.applied) {
+  //         console.log(`Applying migration ${index}`)
+  //         migration(db as PouchDB.Database<MigrationDBRecord>)
+  //           .then((result) => {
+  //             const record: MigrationDBRecord = {
+  //               _id: index.toString(),
+  //               type: "migration",
+  //               applied: true,
+  //             }
+  //             migrationPromises.push(db.put(record))
+  //           })
+  //           .catch((error) => {
+  //             console.error(`Failed migration ${index}`)
+  //             console.error(error)
+  //           })
+  //       }
+  //     })
+  //     if (migrationPromises.length === 0) console.log("No migrations to apply")
+  //     return Promise.all(migrationPromises)
+  //       .then((result) => {
+  //         console.log("Migrations successful")
+  //         console.log(result)
+  //       })
+  //       .catch((err) => {
+  //         console.log(err)
+  //       })
+  //       .finally(() => {
+  //         setLoading(false)
+  //       })
+  //   }
 
-    console.log("Migrations starting")
-    console.log(migrations)
-    startup()
-  }, [db, setLoading, migrations])
+  //   console.log("Migrations starting")
+  //   console.log(migrations)
+  //   return startup()
+  // }, [db, setLoading, migrations])
+
+  // React.useEffect(() => {
+  //   if (updating && migrations !== undefined) {
+  //     console.log("will run migrations and complete update")
+  //     runMigrations()?.then(() => completeUpdate())
+  //   }
+  // }, [updating, migrations, completeUpdate, runMigrations])
 
   return (
     <DataBaseContext.Provider
       value={{
         collections,
         user,
-        // migrations,
+        // runMigrations,
         saveCollection,
-        loading,
       }}
     >
       {children}
