@@ -42,9 +42,7 @@ export function register(config?: Config) {
 
     window.addEventListener("load", () => {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`
-      console.log(1)
       if (isLocalhost) {
-        console.log(2)
         // This is running on localhost. Let's check if a service worker still exists or not.
         checkValidServiceWorker(swUrl, config)
 
@@ -57,7 +55,6 @@ export function register(config?: Config) {
           )
         })
       } else {
-        console.log("should register")
         // Is not localhost. Just register service worker
         registerValidSW(swUrl, config)
       }
@@ -149,8 +146,6 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
     headers: { "Service-Worker": "script" },
   })
     .then((response) => {
-      console.log(5)
-      console.log(response)
       // Ensure service worker exists, and that we really are getting a JS file.
       const contentType = response.headers.get("content-type")
       if (
@@ -169,7 +164,6 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
           })
         })
       } else {
-        console.log(4)
         // Service worker found. Proceed as normal.
         registerValidSW(swUrl, config)
       }
