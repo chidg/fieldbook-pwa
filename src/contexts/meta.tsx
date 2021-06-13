@@ -1,64 +1,51 @@
 import React from "react"
-import { useLocalStorage } from "../hooks"
-import useDeepCompareEffect from "use-deep-compare-effect"
 
 export interface MetaData {
-  version: string
   loading: boolean
   setLoading: (arg0: boolean) => void
   updating: boolean
-  completeUpdate: () => void
 }
 
 const defaultMeta = {
-  version: process.env.GIT_SHA || "0.1",
-  loading: false,
+  // version: process.env.GIT_SHA || "0.1",
+  loading: true,
   setLoading: () => null,
   updating: false,
-  completeUpdate: () => null,
 }
 
 const MetaContext = React.createContext<MetaData>(defaultMeta)
 
 const MetaProvider: React.FC = ({ children }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [localStoredMeta, setLocalStoredMeta] = useLocalStorage(
-    "meta",
-    defaultMeta
-  )
-  const [version, setVersion] = React.useState<string>(defaultMeta.version)
-  const [loading, setLoading] = React.useState<boolean>(false)
+
+  // Loading needs to be true on init to enable the DB query time to return the user
+  // This prevents a race condition which would otherwise cause a redirect to the login screen 
+  const [loading, setLoading] = React.useState<boolean>(true)  
   const [updating, setUpdating] = React.useState<boolean>(false)
+  const channel = React.useRef(new BroadcastChannel("fieldbook-messages"))
 
-
-  useDeepCompareEffect(() => {
-    setVersion(localStoredMeta)
-    if (localStoredMeta.version !== process.env.REACT_APP_GIT_SHA) {
-      console.log("start updating")
-      setUpdating(true)
-    } else {
-      console.log("version the same, do not update")
-      setUpdating(false)
+  React.useEffect(() => {
+    if (channel && channel.current) {
+      channel.current.onmessage = (e) => {
+        if (e.data.hasOwnProperty("updating")) {
+          setUpdating(e.data.updating)
+        }
+      }
     }
-  }, [localStoredMeta.version, setVersion, setUpdating])
-
-  // React.useEffect(() => {
-
-  //   setLocalStoredMeta({ version: process.env.REACT_APP_GIT_SHA })
-  // }, [version, setLocalStoredMeta])
-
-  const completeUpdate = React.useCallback(() => {
-    setLocalStoredMeta({ version: process.env.REACT_APP_GIT_SHA })
-  }, [setLocalStoredMeta])
+    const currentChannel = channel.current
+    return function cleanup() {
+      if (currentChannel) {
+        currentChannel.close()
+      }
+    }
+  }, [])
 
   const memoisedState = React.useMemo(
     () => ({
-      version,
       loading,
       updating,
-      completeUpdate
     }),
-    [version, loading, updating, completeUpdate]
+    [loading, updating]
   )
 
   return (
@@ -81,6 +68,6 @@ const useMetaContext = () => {
   return context
 }
 
-// MetaProvider.whyDidYouRender = true
+MetaProvider.whyDidYouRender = true
 
 export { MetaProvider, useMetaContext }

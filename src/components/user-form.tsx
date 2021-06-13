@@ -23,7 +23,7 @@ const UserForm = () => {
 
   return (
     <>
-      <nav className="flex items-center justify-between flex-wrap bg-decorgreen-600 p-4">
+      <nav className="flex items-center justify-between flex-wrap p-4">
         <div className="flex items-center flex-shrink-0 text-white mr-6">
           <span className="font-semibold text-xl tracking-tight">
             Fieldbook 📒
@@ -34,12 +34,13 @@ const UserForm = () => {
         <Formik
           initialValues={initialValues}
           onSubmit={(values) => {
-            setUser({ ...values, _id: user?._id || v4() })
-            sendEvent({
-              category: "User",
-              action: `${user ? "Updated" : "Created"} user details`,
+            setUser({ ...values, _id: user?._id || v4() }).then((result) => {
+              sendEvent({
+                category: "User",
+                action: `${user ? "Updated" : "Created"} user details`,
+              })
+              history.replace("/")
             })
-            history.replace("/")
           }}
         >
           <Form className="bg-white shadow-md rounded-lg px-12 py-8 pt-8 relative">

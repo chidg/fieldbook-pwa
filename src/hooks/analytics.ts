@@ -25,7 +25,7 @@ export const useGoogleAnalytics = () => {
     ReactGA.pageview(currentPath)
   }, [location])
 
-  const sendEvent = React.useCallback((payload) => {
+  const sendEvent = React.useCallback((payload: ReactGA.EventArgs) => {
     ReactGA.event(payload)
   }, [])
 

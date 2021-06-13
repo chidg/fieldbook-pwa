@@ -8,9 +8,8 @@ type MigrationRecord = {
 
 type MigrationDBRecord = PouchDB.Core.Document<MigrationRecord>
 
-const db = new PouchDB<MigrationDBRecord>("fieldbook")
 
-export const runMigrations = async () => {
+export const runMigrations = async (db: PouchDB.Database<MigrationDBRecord>) => {
   const { rows } = await db.allDocs({
     include_docs: true,
   })
@@ -27,7 +26,7 @@ export const runMigrations = async () => {
   > = [migration_0001]
 
   const migrationPromises: Array<any> = []
-  migrationFiles.forEach((migration, index) => {
+  await migrationFiles.forEach(async (migration, index) => {
     if (!migrations[index]?.applied) {
       console.log(`Applying migration ${index}`)
       migration(db)
@@ -37,8 +36,7 @@ export const runMigrations = async () => {
             type: "migration",
             applied: true,
           }
-          db.put(record)
-          migrationPromises.push()
+          migrationPromises.push(db.put(record))
         })
         .catch((error) => {
           console.error(`Failed migration ${index}`)

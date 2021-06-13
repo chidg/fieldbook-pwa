@@ -1,38 +1,31 @@
 import React from "react"
-import { usePouch, useFind } from "use-pouchdb"
-import { useMetaContext, useDataBaseContext } from "../contexts"
-import useDeepCompareEffect from "use-deep-compare-effect"
+import { usePouch } from "use-pouchdb"
+import { useDataBaseContext, UserDetails, UserState } from "../contexts"
 
-interface UserDetails {
-  _id: string
-  initials?: string
-  name?: string
-  email?: string
-}
-
-export type NewUserDoc = PouchDB.Core.NewDocument<UserDetails>
-export type ExistingUserDoc = PouchDB.Core.ExistingDocument<UserDetails>
 interface UserContextState {
-  user?: ExistingUserDoc
-  setUser: (arg0: UserDetails) => void
+  user?: UserState
+  setUser: (arg0: UserFormDetails) => Promise<PouchDB.Core.Response>
   logout: () => void
 }
+
+type UserFormDetails = Pick<UserDetails, "email" | "initials" | "name"> & PouchDB.Core.IdMeta
 
 const UserContext = React.createContext<UserContextState | undefined>(undefined)
 
 const UserProvider: React.FC = ({ children }) => {
-  const db = usePouch<UserDetails>()
-  const { user } = useDataBaseContext()
+  const db = usePouch<UserState>()
+  const { user, setUser } = useDataBaseContext()
 
   const saveUser = React.useCallback(
-    async (item: UserDetails & { _rev?: string }) => {
-      const newData = { ...item, type: "user" }
+    async (item: UserFormDetails & {_rev?: string}) => {
+      const newData: UserState = { type: "user" , ...item } 
+      setUser(newData)
       if (user?._rev) {
         newData._rev = user._rev
       }
-      await db.put(newData)
+      return await db.put(newData)
     },
-    [db, user?._rev]
+    [db, setUser, user?._rev]
   )
 
   return (

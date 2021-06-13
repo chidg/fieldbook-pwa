@@ -18,6 +18,7 @@ import {
   ItemDetail,
 } from "./components/collections/"
 import LoadingScreen from "./components/loading-screen"
+import UpdatingScreen from "./components/updating-screen"
 import SettingsUpdate from "./components/settings-form"
 
 const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
@@ -86,7 +87,10 @@ type FieldbookRouterSwitchProps = {
   loading: boolean
 }
 
-const FieldbookRouterSwitch: React.FC<FieldbookRouterSwitchProps> = ({ loading }) => {
+const FieldbookRouterSwitch: React.FC<FieldbookRouterSwitchProps> = ({
+  loading,
+}) => {
+  console.log(loading ? "loading" : "Not loading")
   if (loading) return <LoadingScreen />
 
   return (
@@ -118,16 +122,31 @@ const FieldbookRouterSwitch: React.FC<FieldbookRouterSwitchProps> = ({ loading }
   )
 }
 
-// FieldbookRouterSwitch.whyDidYouRender = true 
+// FieldbookRouterSwitch.whyDidYouRender = true
 
 function App() {
-  const { loading } = useMetaContext()
+  const { loading, updating } = useMetaContext()
   const MemoisedRouterSwitch = React.memo(FieldbookRouterSwitch)
-  
+  const [showUpdateDialog, setShowUpdateDialog] = React.useState(false)
+
+  React.useEffect(() => {
+    if (updating) setShowUpdateDialog(true)
+  }, [updating, setShowUpdateDialog])
+
+  const acknowledgeUpdate = React.useCallback(
+    () => setShowUpdateDialog(false),
+    [setShowUpdateDialog]
+  )
+
   return (
-    <Router>
-      <MemoisedRouterSwitch {...{ loading }} />
-    </Router>
+    <>
+      <Router>
+        {showUpdateDialog && <UpdatingScreen {...{ acknowledgeUpdate }} />}
+        {!showUpdateDialog && (
+          <MemoisedRouterSwitch {...{ loading, updating }} />
+        )}
+      </Router>
+    </>
   )
 }
 export default App

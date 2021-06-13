@@ -82,6 +82,9 @@ export const DataList = () => {
     [displayData]
   )
 
+  const dataItemsCount = Object.keys(data).length
+  const dataItemsExist = React.useMemo(() => dataItemsCount > 0, [dataItemsCount])
+
   return (
     <>
       <Link to="/new">
@@ -91,7 +94,7 @@ export const DataList = () => {
       </Link>
 
       {/* Search bar */}
-      {Object.keys(data).length > 0 && (
+      {dataItemsExist && (
         <div className="flex items-center bg-white rounded-md mb-8">
           <div className="px-2 py-2 ">
             <svg
@@ -140,7 +143,7 @@ export const DataList = () => {
           )}
         </div>
       )}
-      {Object.keys(data).length === 0 && (
+      {!dataItemsExist && (
         <div className="grid row mx-10">
           <div className="border-2 border-white text-white rounded px-4 py-2">
             <p>Hi {name}, welcome to Fieldbook!</p>

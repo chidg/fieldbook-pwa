@@ -9,7 +9,6 @@
 
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://cra.link/PWA
-import { runMigrations } from "./migrations"
 
 const isLocalhost = Boolean(
   window.location.hostname === "localhost" ||
@@ -29,7 +28,6 @@ type Config = {
 export function register(config?: Config) {
   if ("serviceWorker" in navigator) {
     // if process.env.environment === "PRODUCTION "
-    console.log("sw")
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href)
     if (publicUrl.origin !== window.location.origin) {
@@ -63,7 +61,6 @@ export function register(config?: Config) {
 }
 
 function registerValidSW(swUrl: string, config?: Config) {
-  console.log("should register")
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
@@ -77,27 +74,6 @@ function registerValidSW(swUrl: string, config?: Config) {
         })
         console.debug("Checked for update...")
       }, 1000 * 60) // * 5)
-      console.log("run migrations")
-      // migrations
-      // check if migrations should be run
-      console.log(process.env.REACT_APP_GIT_SHA)
-      let version
-      const newVersion = process.env.REACT_APP_GIT_SHA
-      const localData = window.localStorage.getItem("fieldbook")
-      if (localData) {
-        version = JSON.parse(localData).version
-      }
-      if (newVersion !== version) {
-        console.log("will run migrations")
-        runMigrations().then(() => {
-          window.localStorage.setItem(
-            "fieldbook",
-            JSON.stringify({ version: newVersion })
-          )
-        })
-      } else {
-        console.log("will not run migrations")
-      }
 
       registration.onupdatefound = () => {
         const installingWorker = registration.installing
@@ -140,7 +116,6 @@ function registerValidSW(swUrl: string, config?: Config) {
 }
 
 function checkValidServiceWorker(swUrl: string, config?: Config) {
-  console.log(3)
   // Check if the service worker can be found. If it can't reload the page.
   fetch(swUrl, {
     headers: { "Service-Worker": "script" },
@@ -152,11 +127,6 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
         response.status === 404 ||
         (contentType != null && contentType.indexOf("javascript") === -1)
       ) {
-        console.log(
-          "no sw",
-          contentType,
-          contentType != null && contentType.indexOf("javascript") === -1
-        )
         // No service worker found. Probably a different app. Reload the page.
         navigator.serviceWorker.ready.then((registration) => {
           registration.unregister().then(() => {

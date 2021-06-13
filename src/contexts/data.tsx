@@ -1,6 +1,5 @@
 import React from "react"
-import { usePouch, useFind } from "use-pouchdb"
-import { useMetaContext, useDataBaseContext } from '../contexts'
+import { useDataBaseContext } from '../contexts'
 export interface DataItem {
   _id: string
   uuid: string
@@ -13,9 +12,6 @@ export interface DataItem {
   photos?: File[]
 }
 
-type CollectionsDBResponse = PouchDB.Find.FindResponse<DataItem> & {
-  loading: boolean
-}
 export type CollectionDoc = PouchDB.Core.ExistingDocument<DataItem>
 
 type CollectionData = {[id: string]: CollectionDoc }
@@ -28,8 +24,6 @@ const DataContext = React.createContext<DataState | undefined>(undefined)
 
 const DataProvider: React.FC = ({ children }) => {
   const { collections, saveCollection } = useDataBaseContext()
-
-  // const setDataLoading = React.useCallback((value: boolean) => setLoading('data', value), [setLoading])
 
   return (
     <DataContext.Provider
