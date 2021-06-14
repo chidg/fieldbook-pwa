@@ -26,7 +26,7 @@ const UpdatingScreen: React.FC<UpdatingScreenProps> = ({
 
       <div className="container mx-auto lg:px-10 mt-2">
         <div className="grid max-h-screen place-items-center from-gray-300 to-white bg-gradient-to-br bg-opacity-70 rounded p-5 mx-2">
-          <div className="text-6xl">💐</div>
+          <div className="text-6xl">🌿</div>
           <div className="text-2xl mt-2">Fieldbook has been updated</div>
           {!updating && (
             <button

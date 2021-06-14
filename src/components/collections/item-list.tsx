@@ -62,6 +62,7 @@ export const DataList = () => {
     }
   }, [collectionsArray, fuse, setFuse])
 
+  // useEffect for Search
   useDeepCompareEffect(() => {
     if (searchQuery.length === 0) {
       setDisplayData(collectionsArray)
@@ -71,19 +72,11 @@ export const DataList = () => {
     }
   }, [searchQuery, fuse, collectionsArray])
 
-  const DataListMemo = React.useMemo(
-    () => (
-      <>
-        {displayData.map((collection) => (
-          <DataListItem {...collection} key={collection._id} />
-        ))}
-      </>
-    ),
-    [displayData]
-  )
-
   const dataItemsCount = Object.keys(data).length
-  const dataItemsExist = React.useMemo(() => dataItemsCount > 0, [dataItemsCount])
+  const dataItemsExist = React.useMemo(
+    () => dataItemsCount > 0,
+    [dataItemsCount]
+  )
 
   return (
     <>
@@ -151,7 +144,9 @@ export const DataList = () => {
           </div>
         </div>
       )}
-      {DataListMemo}
+      {displayData.map((collection) => (
+        <DataListItem {...collection} key={collection._id} />
+      ))}
     </>
   )
 }
