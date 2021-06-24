@@ -9,15 +9,25 @@ export interface DataItem {
   location?: GeolocationCoordinates
   timestamp: number
   type: "collection"
-  photos?: File[]
 }
 
-export type CollectionDoc = PouchDB.Core.ExistingDocument<DataItem>
 
-type CollectionData = {[id: string]: CollectionDoc }
+export type FullAttachments = {
+    [attachmentId: string]: PouchDB.Core.FullAttachment;
+}
+
+type AllDocsFullAttachmentsMeta = PouchDB.Core.AllDocsMeta & {
+  _attachments?: FullAttachments
+}
+
+export type PutCollectionDoc = PouchDB.Core.PutDocument<DataItem>
+export type ExistingCollectionDoc = PouchDB.Core.ExistingDocument<DataItem & AllDocsFullAttachmentsMeta>
+
+
+type CollectionData = {[id: string]: ExistingCollectionDoc }
 interface DataState {
   data: CollectionData
-  saveItem: (arg0: DataItem) => void
+  saveItem: (arg0: PutCollectionDoc) => void
 }
 
 const DataContext = React.createContext<DataState | undefined>(undefined)

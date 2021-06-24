@@ -1,5 +1,5 @@
 import React from "react"
-
+import { useMigrationsContext } from '../contexts'
 export interface MetaData {
   loading: boolean
   setLoading: (arg0: boolean) => void
@@ -16,36 +16,17 @@ const defaultMeta = {
 const MetaContext = React.createContext<MetaData>(defaultMeta)
 
 const MetaProvider: React.FC = ({ children }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
   // Loading needs to be true on init to enable the DB query time to return the user
   // This prevents a race condition which would otherwise cause a redirect to the login screen 
   const [loading, setLoading] = React.useState<boolean>(true)  
-  const [updating, setUpdating] = React.useState<boolean>(false)
-  const channel = React.useRef(new BroadcastChannel("fieldbook-messages"))
-
-  React.useEffect(() => {
-    if (channel && channel.current) {
-      channel.current.onmessage = (e) => {
-        if (e.data.hasOwnProperty("updating")) {
-          setUpdating(e.data.updating)
-        }
-      }
-    }
-    const currentChannel = channel.current
-    return function cleanup() {
-      if (currentChannel) {
-        currentChannel.close()
-      }
-    }
-  }, [])
+  const { running } = useMigrationsContext()
 
   const memoisedState = React.useMemo(
     () => ({
       loading,
-      updating,
+      updating: running,
     }),
-    [loading, updating]
+    [loading, running]
   )
 
   return (

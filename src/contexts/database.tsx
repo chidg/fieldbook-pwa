@@ -2,20 +2,8 @@ import React from "react"
 import useDeepCompareEffect from "use-deep-compare-effect"
 import { usePouch, useAllDocs } from "use-pouchdb"
 import { areEqual } from "@essentials/are-equal"
-
+import { ExistingCollectionDoc, PutCollectionDoc } from './data'
 import { useMetaContext } from "./meta"
-
-export interface CollectionItem {
-  _id: string
-  uuid: string
-  number: string
-  notes: string
-  fieldName: string
-  location?: GeolocationCoordinates
-  timestamp: number
-  type: "collection"
-  photos?: File[]
-}
 
 export interface UserDetails {
   initials?: string
@@ -32,26 +20,24 @@ type MigrationDBRecord = {
 
 export type UserDoc = PouchDB.Core.Document<UserDetails>
 export type ExistingUserDoc = PouchDB.Core.ExistingDocument<UserDetails>
-export type UserState = UserDetails & { _id?: string, _rev?: string }
+export type UserState = UserDetails & { _id?: string; _rev?: string }
 
 type ExistingMigration = PouchDB.Core.ExistingDocument<MigrationDBRecord>
 
-type DBItem = CollectionItem | ExistingUserDoc | ExistingMigration
+type DBItem = ExistingCollectionDoc | ExistingUserDoc | ExistingMigration
 
 type CollectionsDBResponse = PouchDB.Core.AllDocsResponse<DBItem> & {
   state: string
 }
 
-export type CollectionDoc = PouchDB.Core.ExistingDocument<CollectionItem>
-
-type CollectionData = { [id: string]: CollectionDoc }
+type CollectionData = { [id: string]: ExistingCollectionDoc }
 type MigrationsData = { [id: string]: ExistingMigration }
 
 interface DataState {
   collections: CollectionData
   user: UserState | undefined
   setUser: (arg0: UserState) => void
-  saveCollection: (arg0: CollectionItem) => void
+  saveCollection: (arg0: PutCollectionDoc) => void
 }
 
 const DataBaseContext = React.createContext<DataState | undefined>(undefined)
@@ -97,7 +83,7 @@ const DataBaseProvider: React.FC = ({ children }) => {
   }, [rows, state, setUser, setCollections, setLoading])
 
   const saveCollection = React.useCallback(
-    async (item: CollectionItem) => {
+    async (item: PutCollectionDoc) => {
       const newData = { ...item, type: "collection" }
       await db.put(newData)
     },

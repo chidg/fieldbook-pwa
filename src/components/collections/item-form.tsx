@@ -1,8 +1,15 @@
 import React from "react"
-import { Field, FieldProps, Form, Formik, FormikConfig } from "formik"
+import {
+  Field,
+  FieldProps,
+  FieldArray,
+  Form,
+  Formik,
+  FormikConfig,
+} from "formik"
 import { useHistory } from "react-router-dom"
 import * as Yup from "yup"
-import { useUserContext } from "../../contexts"
+import { useUserContext, FullAttachments } from "../../contexts"
 
 const ItemValidation = Yup.object().shape({
   fieldName: Yup.string().required("Required"),
@@ -11,13 +18,15 @@ const ItemValidation = Yup.object().shape({
 
 type ItemFormValues = {
   fieldName: string
-  number: string  
+  number: string
   notes: string
-  photo?: string
+  newPhotos: File[]
+  existingPhotos?: string[]
 }
 
 interface ItemFormProps extends FormikConfig<ItemFormValues> {
   title: string
+  photos?: FullAttachments
   locationDisplay?: string
 }
 
@@ -25,12 +34,14 @@ const ItemForm: React.FC<ItemFormProps> = ({
   title,
   locationDisplay,
   initialValues,
+  photos,
   onSubmit,
 }) => {
   const history = useHistory()
   const { initials } = useUserContext().user!
-  const isUpdate = initialValues.fieldName
-  
+
+  const newFileUploadInput = React.useRef<HTMLInputElement>(null)
+
   return (
     <Formik
       initialValues={initialValues}
@@ -38,7 +49,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
       validationSchema={ItemValidation}
       onSubmit={onSubmit}
     >
-      {({ setFieldValue }) => (
+      {({ values }) => (
         <Form className=" bg-white shadow-md rounded px-12 py-8 pt-8">
           <div className="pb-4">
             <h3 className="text-lg block">🌱 {title}</h3>
@@ -125,17 +136,87 @@ const ItemForm: React.FC<ItemFormProps> = ({
               value={locationDisplay}
             />
           </div>
-          {!isUpdate && process.env.REACT_APP_UPLOADCARE_PUBLICKEY && (
-            <input
-              type="file"
-              accept="image/x-png,image/jpeg,image/gif,image/heic"
-              onChange={(event) => {
-                if (event.target.files) {
-                  console.log(event.target.files[0])
-                  setFieldValue("photo", event.target.files[0]);
-                }
-              }}
-            />
+          {process.env.REACT_APP_UPLOADCARE_PUBLICKEY && (
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-1">
+              {photos && <FieldArray
+                name="existingPhotos"
+                render={({ remove }) => (
+                  <>
+                    {values.existingPhotos?.map((photoName, index) => (
+                      <div
+                        key={`existing-photo-${index}`}
+                        className="square-image-container border-2 rounded border-gray-500"
+                      >
+                        <img
+                          src={`data:${photos[photoName].content_type};base64, ${photos[photoName].data}`}
+                          alt=""
+                        />
+                        <span className="absolute top-0 right-0 text-white bg-opacity-70 rounded bg-gray-400 cursor-pointer" onClick={() => remove(index)}>x</span>
+                      </div>
+                    ))}
+                  </>
+                )}
+              />}
+
+              <FieldArray
+                name="newPhotos"
+                render={({ insert }) => (
+                  <>
+                    {values.newPhotos.map((photo, index) => (
+                      <div
+                        key={`new-photo-${index}`}
+                        className="square-image-container border-2 rounded border-gray-500"
+                      >
+                        <img src={URL.createObjectURL(photo)} alt="" />
+                      </div>
+                    ))}
+                    <div
+                      className="square-image-container border-2 border-purple-500 text-purple-500 flex justify-center items-center rounded"
+                      onClick={() => {
+                        newFileUploadInput?.current?.click()
+                      }}
+                    >
+                      <input
+                        hidden
+                        ref={newFileUploadInput}
+                        type="file"
+                        onChange={(event) => {
+                          if (
+                            event.currentTarget.files &&
+                            event.currentTarget.files[0]
+                          ) {
+                            insert(
+                              values.newPhotos.length,
+                              event.currentTarget.files[0]
+                            )
+                          }
+                        }}
+                      />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-8 w-8 absolute top-1/3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1}
+                          d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1}
+                          d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                    </div>
+                  </>
+                )}
+              />
+            </div>
           )}
 
           <div className="pb-4 flex justify-between mt-2">

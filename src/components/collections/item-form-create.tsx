@@ -1,5 +1,6 @@
 import React from 'react'
 import { v4 } from 'uuid'
+import PouchDB from 'pouchdb-browser'
 import { useHistory } from "react-router-dom"
 import {
   useDataContext,
@@ -67,7 +68,7 @@ export const ItemFormCreate: React.FC = () => {
       fieldName: '',
       notes: '',
       number: number.toString().padStart(3, '0'),
-      photo: ''
+      newPhotos: []
     }
   }, [data])
 
@@ -76,7 +77,17 @@ export const ItemFormCreate: React.FC = () => {
       locationDisplay={getLocationDisplay()}
       initialValues={initialValues()}
       onSubmit={(values) => {
-        saveItem({ ...values, _id: values.number, uuid: v4(), timestamp: Date.now(), location: geoLocation, type: 'collection' })
+
+        // transform array of photos to PouchDB attachments shape
+        const attachments = values.newPhotos.reduce((result: PouchDB.Core.Attachments, photo: File) => {
+            result[photo.name] = {
+              content_type: photo.type,
+              data: photo
+            }
+            return result
+        }, {})
+
+        saveItem({ ...values, _id: values.number, uuid: v4(), timestamp: Date.now(), location: geoLocation, type: 'collection', _attachments: attachments })
         sendEvent({
           category: 'Collection',
           action: 'Created collection'

@@ -12,10 +12,17 @@ const SettingsUpdateForm: React.FC = () => {
 
   const sendStuff = async () => {
     setExporting(true)
+
+    // strip attachments out of data to reduce data size
+    const smallerData = Object.values(data).map(item => {
+      const { _attachments, ...rest } = item
+      return rest
+    })
+
     const response = await axios
       .post(
         ".netlify/functions/email",
-        { data, user },
+        { data: smallerData, user },
         {
           responseType: "json",
         }

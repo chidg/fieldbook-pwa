@@ -5,6 +5,7 @@ import {
   useUserContext
 } from "../../contexts"
 import { useCollectionInstance } from '../../hooks'
+import { PhotoGrid } from '../common'
 
 
 const layerStyle: LayerProps = {
@@ -48,7 +49,7 @@ export const ItemDetail: React.FC = () => {
       })
     }
   }, [instance, setMapDetails])
-
+  
   return (
     <div className="text-white rounded px-4">
       <div className="flex justify-between items-center">
@@ -80,8 +81,10 @@ export const ItemDetail: React.FC = () => {
         }
       </div>}
 
+      <PhotoGrid photos={instance?._attachments ? Object.values(instance?._attachments) : []} />
+
       {mapDetails &&
-        <div style={{ height: "400px" }}>
+        <div style={{ height: "400px" }} className="mt-2">
           <ReactMapGL
             { ...mapDetails.viewport }
             width="100%"
