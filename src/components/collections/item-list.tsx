@@ -44,33 +44,50 @@ const DataListItem = (item: DataItem) => {
   )
 }
 
+type DateBinnedCollections = { [date: string]: DataItem[] }
+
+const getDataByDate = (data: DataItem[]): DateBinnedCollections =>
+  data.reduce((result, dataItem) => {
+    const dateString = new Date(dataItem.timestamp).toLocaleDateString()
+    if (!result[dateString]) result[dateString] = []
+    result[dateString].push(dataItem)
+    return result
+  }, {} as DateBinnedCollections)
+
 export const DataList = () => {
   const { data } = useDataContext()
   const { name } = useUserContext().user!
-  const collectionsArray = React.useMemo(() => Object.values(data), [data])
-  const [displayData, setDisplayData] =
-    React.useState<CollectionDoc[]>(collectionsArray)
+  const [oldestFirst, setOldestFirst] = React.useState<boolean>(true)
+
+  const [displayData, setDisplayData] = React.useState<DateBinnedCollections>(
+    {}
+  )
   const [searchQuery, setSearchQuery] = React.useState<string>("")
-  const [fuse, setFuse] =
-    React.useState<Fuse<CollectionDoc> | undefined>(undefined)
+  const [fuse, setFuse] = React.useState<Fuse<CollectionDoc> | undefined>(undefined)
 
   useDeepCompareEffect(() => {
     let localfuse = fuse
     if (fuse === undefined) {
-      localfuse = new Fuse(collectionsArray, { keys: ["fieldName", "notes"] })
+      localfuse = new Fuse(Object.values(data), {
+        keys: ["fieldName", "notes"],
+      })
       setFuse(localfuse)
     }
-  }, [collectionsArray, fuse, setFuse])
+  }, [data, fuse, setFuse])
 
-  // useEffect for Search
+  // useEffect for Search and initialisation of display data
   useDeepCompareEffect(() => {
-    if (searchQuery.length === 0) {
-      setDisplayData(collectionsArray)
+    let collections: DataItem[] = []
+    if (searchQuery.trim().length === 0) {
+      collections = Object.values(data)
     } else {
       const results = fuse?.search(searchQuery)
-      if (results) setDisplayData(results.map((result) => result.item))
+      const resultItems = results?.map((result) => result.item)
+      if (resultItems) collections = resultItems
     }
-  }, [searchQuery, fuse, collectionsArray])
+    if (!oldestFirst) collections = collections.reverse()
+    setDisplayData(getDataByDate(collections))
+  }, [searchQuery, fuse, data, oldestFirst])
 
   const dataItemsCount = Object.keys(data).length
   const dataItemsExist = React.useMemo(
@@ -88,52 +105,69 @@ export const DataList = () => {
 
       {/* Search bar */}
       {dataItemsExist && (
-        <div className="flex items-center bg-white rounded-md mb-8">
-          <div className="px-2 py-2 ">
-            <svg
-              className="fill-current text-gray-500 w-6 h-6"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-            >
-              <path
-                className="heroicon-ui"
-                d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"
-              />
-            </svg>
-          </div>
-          <input
-            className="w-full text-gray-700 leading-tight focus:outline-none py-2"
-            id="search"
-            type="text"
-            autoCapitalize="false"
-            autoComplete="false"
-            autoCorrect="false"
-            autoFocus={true}
-            placeholder="Search"
-            value={searchQuery}
-            onChange={({ currentTarget }) =>
-              setSearchQuery(currentTarget.value)
-            }
-          />
-          {searchQuery && (
-            <div className="px-2 py-2">
+        <div className="mb-1">
+          <div className="flex items-center bg-white rounded-md mb-1">
+            <div className="px-2 py-2 flex">
               <svg
+                className="fill-current text-gray-500 w-6 h-6"
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-gray-500"
-                fill="none"
                 viewBox="0 0 24 24"
-                stroke="currentColor"
-                onClick={() => setSearchQuery("")}
               >
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
+                  className="heroicon-ui"
+                  d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"
                 />
               </svg>
             </div>
-          )}
+            <input
+              className="w-full text-gray-700 leading-tight focus:outline-none py-2"
+              id="search"
+              type="text"
+              autoCapitalize="false"
+              autoComplete="false"
+              autoCorrect="false"
+              aria-autocomplete="none"
+              autoFocus={false}
+              placeholder="Search"
+              value={searchQuery}
+              onChange={({ currentTarget }) =>
+                setSearchQuery(currentTarget.value)
+              }
+            />
+            {searchQuery && (
+              <div className="px-2 py-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-gray-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  onClick={() => setSearchQuery("")}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+            )}
+          </div>
+          <div
+            className="flex justify-end text-white text-sm px-1"
+            onClick={() => {!searchQuery && setOldestFirst(!oldestFirst)}}
+          >
+            <span className="rounded px-1 border-white border-2">
+              {searchQuery && <>Showing search results</>}
+              {!searchQuery && (
+                <>
+                  {oldestFirst && <>Showing oldest first</>}
+                  {!oldestFirst && <>Showing newest first</>}
+                </>
+              )}
+            </span>
+          </div>
         </div>
       )}
       {!dataItemsExist && (
@@ -144,8 +178,18 @@ export const DataList = () => {
           </div>
         </div>
       )}
-      {displayData.map((collection) => (
-        <DataListItem {...collection} key={collection._id} />
+      {Object.keys(displayData).map((dateString) => (
+        <>
+          <div
+            className="bg-white bg-opacity-80 text-gray-600 text-sm font-medium px-1"
+            key={`collection-${dateString}`}
+          >
+            {dateString}
+          </div>
+          {displayData[dateString].map((collection) => (
+            <DataListItem {...collection} key={collection._id} />
+          ))}
+        </>
       ))}
     </>
   )
