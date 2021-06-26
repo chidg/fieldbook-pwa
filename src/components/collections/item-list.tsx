@@ -3,11 +3,7 @@ import Fuse from "fuse.js"
 import { Link } from "react-router-dom"
 import useDeepCompareEffect from "use-deep-compare-effect"
 
-import {
-  DataItem,
-  useDataContext,
-  useUserContext,
-} from "../../contexts"
+import { DataItem, useDataContext, useUserContext } from "../../contexts"
 
 const DataListItem = (item: DataItem) => {
   const { initials } = useUserContext().user!
@@ -43,33 +39,49 @@ const DataListItem = (item: DataItem) => {
   )
 }
 
+type DateBinnedCollections = { [date: string]: DataItem[] }
+
+const getDataByDate = (data: DataItem[]): DateBinnedCollections =>
+  data.reduce((result, dataItem) => {
+    const dateString = new Date(dataItem.timestamp).toLocaleDateString()
+    if (!result[dateString]) result[dateString] = []
+    result[dateString].push(dataItem)
+    return result
+  }, {} as DateBinnedCollections)
+
 export const DataList = () => {
   const { data } = useDataContext()
   const { name } = useUserContext().user!
-  const collectionsArray = React.useMemo(() => Object.values(data), [data])
-  const [displayData, setDisplayData] =
-    React.useState<DataItem[]>(collectionsArray)
+  const collectionsByDate: DateBinnedCollections = React.useMemo(
+    () => getDataByDate(Object.values(data)),
+    [data]
+  )
+  const [displayData, setDisplayData] = React.useState<DateBinnedCollections>(
+    {}
+  )
   const [searchQuery, setSearchQuery] = React.useState<string>("")
-  const [fuse, setFuse] =
-    React.useState<Fuse<DataItem> | undefined>(undefined)
+  const [fuse, setFuse] = React.useState<Fuse<DataItem> | undefined>(undefined)
 
   useDeepCompareEffect(() => {
     let localfuse = fuse
     if (fuse === undefined) {
-      localfuse = new Fuse(collectionsArray, { keys: ["fieldName", "notes"] })
+      localfuse = new Fuse(Object.values(data), {
+        keys: ["fieldName", "notes"],
+      })
       setFuse(localfuse)
     }
-  }, [collectionsArray, fuse, setFuse])
+  }, [collectionsByDate, fuse, setFuse])
 
   // useEffect for Search
   useDeepCompareEffect(() => {
     if (searchQuery.length === 0) {
-      setDisplayData(collectionsArray)
+      setDisplayData(collectionsByDate)
     } else {
       const results = fuse?.search(searchQuery)
-      if (results) setDisplayData(results.map((result) => result.item))
+      const resultItems = results?.map((result) => result.item)
+      if (resultItems) setDisplayData(getDataByDate(resultItems))
     }
-  }, [searchQuery, fuse, collectionsArray])
+  }, [searchQuery, fuse, collectionsByDate])
 
   const dataItemsCount = Object.keys(data).length
   const dataItemsExist = React.useMemo(
@@ -107,7 +119,8 @@ export const DataList = () => {
             autoCapitalize="false"
             autoComplete="false"
             autoCorrect="false"
-            autoFocus={true}
+            aria-autocomplete="none"
+            autoFocus={false}
             placeholder="Search"
             value={searchQuery}
             onChange={({ currentTarget }) =>
@@ -143,8 +156,18 @@ export const DataList = () => {
           </div>
         </div>
       )}
-      {displayData.map((collection) => (
-        <DataListItem {...collection} key={collection.id} />
+      {Object.keys(displayData).map((dateString) => (
+        <>
+          <div
+            className="bg-white bg-opacity-70 text-gray-600 font-medium px-1"
+            key={`collectsion-${dateString}`}
+          >
+            {dateString}
+          </div>
+          {displayData[dateString].map((collection) => (
+            <DataListItem {...collection} key={collection.id} />
+          ))}
+        </>
       ))}
     </>
   )
