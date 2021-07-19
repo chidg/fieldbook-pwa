@@ -2,7 +2,6 @@ import React from "react"
 import { useLocalStorage } from "../hooks"
 
 interface UserDetails {
-  initials?: string
   name?: string
   email?: string
 }

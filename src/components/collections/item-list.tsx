@@ -1,20 +1,21 @@
 import React from "react"
-import Fuse from "fuse.js"
 import { Link } from "react-router-dom"
 import useDeepCompareEffect from "use-deep-compare-effect"
+import format from 'date-fns/format'
 
-import { DataItem, useDataContext, useUserContext } from "../../contexts"
+import { DataItem, Taxon, useDataContext, useUserContext } from "../../contexts"
 
-const DataListItem = (item: DataItem) => {
-  const { initials } = useUserContext().user!
-
+const DataListItem = ({ item, taxon }: { item: DataItem, taxon: Taxon }) => {
+  
   return (
     <div className="flex justify-start items-center bg-gray-200 bg-opacity-20 text-white focus:text-blue-400 focus:bg-blue-100 rounded-sm px-2 py-2 my-1">
       <div className="font-sm px-2">
-        {initials}
-        {item.number}
+        {format(new Date(item.timestamp), 'H:mm')}
       </div>
-      <div className="flex-grow font-medium px-2">{item.fieldName}</div>
+      <div className="font-sm font-semibold px-2">
+        {taxon.name}
+      </div>
+      <div className="flex-grow font-medium px-2">Density: {item.density}</div>
       <div className="font-normal tracking-wide">
         <Link
           to={{
@@ -50,39 +51,20 @@ const getDataByDate = (data: DataItem[]): DateBinnedCollections =>
   }, {} as DateBinnedCollections)
 
 export const DataList = () => {
-  const { data } = useDataContext()
+  const { data, taxa } = useDataContext()
   const { name } = useUserContext().user!
   const [oldestFirst, setOldestFirst] = React.useState<boolean>(true)
 
   const [displayData, setDisplayData] = React.useState<DateBinnedCollections>(
     {}
   )
-  const [searchQuery, setSearchQuery] = React.useState<string>("")
-  const [fuse, setFuse] = React.useState<Fuse<DataItem> | undefined>(undefined)
 
   useDeepCompareEffect(() => {
-    let localfuse = fuse
-    if (fuse === undefined) {
-      localfuse = new Fuse(Object.values(data), {
-        keys: ["fieldName", "notes"],
-      })
-      setFuse(localfuse)
-    }
-  }, [data, fuse, setFuse])
-
-  // useEffect for Search and initialisation of display data
-  useDeepCompareEffect(() => {
-    let collections: DataItem[] = []
-    if (searchQuery.trim().length === 0) {
-      collections = Object.values(data)
-    } else {
-      const results = fuse?.search(searchQuery)
-      const resultItems = results?.map((result) => result.item)
-      if (resultItems) collections = resultItems
-    }
-    if (!oldestFirst) collections = collections.reverse()
-    setDisplayData(getDataByDate(collections))
-  }, [searchQuery, fuse, data, oldestFirst])
+    let records: DataItem[] = []
+    records = Object.values(data)
+    if (!oldestFirst) records = records.reverse()
+    setDisplayData(getDataByDate(records))
+  }, [data, oldestFirst])
 
   const dataItemsCount = Object.keys(data).length
   const dataItemsExist = React.useMemo(
@@ -101,66 +83,15 @@ export const DataList = () => {
       {/* Search bar */}
       {dataItemsExist && (
         <div className="mb-1">
-          <div className="flex items-center bg-white rounded-md mb-1">
-            <div className="px-2 py-2 flex">
-              <svg
-                className="fill-current text-gray-500 w-6 h-6"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  className="heroicon-ui"
-                  d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"
-                />
-              </svg>
-            </div>
-            <input
-              className="w-full text-gray-700 leading-tight focus:outline-none py-2"
-              id="search"
-              type="text"
-              autoCapitalize="false"
-              autoComplete="false"
-              autoCorrect="false"
-              aria-autocomplete="none"
-              autoFocus={false}
-              placeholder="Search"
-              value={searchQuery}
-              onChange={({ currentTarget }) =>
-                setSearchQuery(currentTarget.value)
-              }
-            />
-            {searchQuery && (
-              <div className="px-2 py-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  onClick={() => setSearchQuery("")}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </div>
-            )}
-          </div>
           <div
             className="flex justify-end text-white text-sm px-1"
-            onClick={() => {!searchQuery && setOldestFirst(!oldestFirst)}}
+            onClick={() => {setOldestFirst(!oldestFirst)}}
           >
             <span className="rounded px-1 border-white border-2">
-              {searchQuery && <>Showing search results</>}
-              {!searchQuery && (
                 <>
                   {oldestFirst && <>Showing oldest first</>}
                   {!oldestFirst && <>Showing newest first</>}
                 </>
-              )}
             </span>
           </div>
         </div>
@@ -169,22 +100,22 @@ export const DataList = () => {
         <div className="grid row mx-10">
           <div className="border-2 border-white text-white rounded px-4 py-2">
             <p>Hi {name}, welcome to Fieldbook!</p>
-            <p>Hit the 🌱 below to start adding collection records.</p>
+            <p>Hit the 🌱 below to start adding weed records.</p>
           </div>
         </div>
       )}
       {Object.keys(displayData).map((dateString) => (
-        <>
+        <div key={`collection-${dateString}`}>
           <div
             className="bg-white bg-opacity-80 text-gray-600 text-sm font-medium px-1"
-            key={`collection-${dateString}`}
+            
           >
             {dateString}
           </div>
           {displayData[dateString].map((collection) => (
-            <DataListItem {...collection} key={collection.id} />
+            <DataListItem item={collection} taxon={taxa[collection.taxon]} key={collection.id} />
           ))}
-        </>
+        </div>
       ))}
     </>
   )

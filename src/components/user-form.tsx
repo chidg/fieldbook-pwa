@@ -18,7 +18,6 @@ const UserForm = () => {
   const initialValues = {
     ...{
       name: '',
-      initials: '',
       email: '',
     },
     ...user
@@ -54,11 +53,6 @@ const UserForm = () => {
           <label className="text-sm block font-bold pb-2" htmlFor="name">Name</label>
           <Field id="name" name="name" required={true} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300" />
         </div>
-        <div className="pb-4">
-          <label className="text-sm block font-bold pb-2" htmlFor="initials">Initials</label>
-          <Field id="initials" name="initials" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300" />
-        </div>
-
         <div className="pb-4">
           <label className="text-sm block font-bold pb-2" htmlFor="email">Email</label>
           <Field

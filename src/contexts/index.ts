@@ -1,3 +1,3 @@
-export { DataProvider, useDataContext } from "./data"
-export type { DataItem } from "./data"
+export { DataProvider, useDataContext, densityOptions } from "./data"
+export type { DataItem, Taxon, Taxa } from "./data"
 export { UserProvider, useUserContext } from "./user"

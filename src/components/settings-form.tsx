@@ -6,22 +6,28 @@ import { useUserContext, useDataContext } from "../contexts"
 const SettingsUpdateForm: React.FC = () => {
   const history = useHistory()
   const { user } = useUserContext()
-  const { data, setData } = useDataContext()
+  const { data, setData, taxa } = useDataContext()
   const [exporting, setExporting] = useState(false)
   const [clearing, setClearing] = useState(false)
 
   const sendStuff = async () => {
     setExporting(true)
-    const response = await axios
+    const formattedData = Object.values(data).map((d) => ({
+      ...d,
+      taxon: taxa[d.taxon].name,
+      date: new Date(d.timestamp).toLocaleDateString(),
+      time: new Date(d.timestamp).toLocaleTimeString(),
+    }))
+
+    await axios
       .post(
         ".netlify/functions/email",
-        { data, user },
+        { data: formattedData, user },
         {
           responseType: "json",
         }
       )
       .catch(() => setExporting(false))
-    console.log(response)
     setExporting(false)
   }
 

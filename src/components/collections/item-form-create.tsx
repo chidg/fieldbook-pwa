@@ -10,7 +10,7 @@ import ItemForm from './item-form'
 
 export const ItemFormCreate: React.FC = () => {
   const history = useHistory()
-  const { saveItem, data } = useDataContext()
+  const { saveItem, taxa } = useDataContext()
   const { sendEvent } = useGoogleAnalytics()
 
   const [geoLocation, setGeoLocation] = React.useState<GeolocationCoordinates | undefined>(undefined)
@@ -49,37 +49,24 @@ export const ItemFormCreate: React.FC = () => {
     return "Accessing location..."
   }, [geoLocation, geoLocationWarning])
 
-  const initialValues = React.useCallback(() => {
-    // calculate the initial collection number
-    let number = 1
-    const itemIds = Object.keys(data)
-    if (itemIds.length) {
-      const lastItem = data[itemIds[itemIds.length - 1]]
-      const numbStrings = lastItem.number.match(/\d+$/)
-      if (numbStrings) {
-        number = parseInt(numbStrings[numbStrings.length - 1]) + 1
-      }
-    }
-    
-    return {
-      fieldName: '',
-      notes: '',
-      number: number.toString().padStart(3, '0'),
-    }
-  }, [data])
+  console.log('Object.keys(taxa).length > 0', Object.keys(taxa).length > 0)
 
   return (
     <ItemForm
       locationDisplay={getLocationDisplay()}
-      initialValues={initialValues()}
+      initialValues={{
+        density: '0',
+        notes: '',
+        taxon: Object.keys(taxa).length > 0 ? Object.keys(taxa)[0] : ''
+      }}
       onSubmit={(values) => {
-        saveItem({ ...values, id: v4(), timestamp: Date.now(), location: geoLocation })
+        saveItem({ ...values, density: parseInt(values.density), id: v4(), timestamp: Date.now(), location: geoLocation })
         sendEvent({
-          category: 'Collection',
-          action: 'Created collection'
+          category: 'Observation',
+          action: 'Created weed observation'
         })
         history.replace('/')
       }}
-      title="New Item"
+      title="New Observation"
       />
 )}

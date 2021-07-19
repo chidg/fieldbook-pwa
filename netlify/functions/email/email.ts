@@ -1,22 +1,34 @@
 import { Handler } from "@netlify/functions"
 import formData from "form-data"
 import Mailgun from "mailgun.js"
+
 import { createObjectCsvStringifier } from "csv-writer"
 
 const mailgun = new Mailgun(formData)
+
+export interface DataItem {
+  id: string
+  taxon: string
+  notes: string
+  density: number
+  location?: GeolocationCoordinates
+  timestamp: number
+  date: string
+  time: string
+}
 
 function dontIndent(str: string): string {
   return ("" + str).replace(/(\n)\s+/g, "$1")
 }
 
-const sendEmail = async ({ user, data }) => {
+const sendEmail = async ({ user, data }: { user: any; data: DataItem[] }) => {
   return new Promise((resolve, reject) => {
     const mg = mailgun.client({ username: "api", key: process.env.MG_API_KEY })
 
     const csvStringifier = createObjectCsvStringifier({
       header: [
-        { id: "number", title: "Number" },
-        { id: "fieldName", title: "Field Name" },
+        { id: "taxon", title: "Species" },
+        { id: "density", title: "Density" },
         { id: "notes", title: "Notes" },
         { id: "latitude", title: "Latitude" },
         { id: "longitude", title: "Longitude" },
@@ -25,15 +37,11 @@ const sendEmail = async ({ user, data }) => {
       ],
     })
 
-    const records = Object.keys(data).map((key) => {
-      const item = data[key]
+    const records = data.map((item) => {
       return {
         ...item,
-        number: `${user.initials}${item.number}`,
         latitude: item.location?.latitude ? item.location?.latitude : "",
         longitude: item.location?.longitude ? item.location?.longitude : "",
-        date: new Date(item.timestamp).toLocaleDateString(),
-        time: new Date(item.timestamp).toLocaleTimeString(),
       }
     })
 
@@ -51,7 +59,7 @@ const sendEmail = async ({ user, data }) => {
           data:
             csvStringifier.getHeaderString() +
             csvStringifier.stringifyRecords(records),
-          filename: `fieldbook-${user.initials}-${Date.now()}.csv`,
+          filename: `fieldbook-${user.email}-${Date.now()}.csv`,
         },
       ],
     }
