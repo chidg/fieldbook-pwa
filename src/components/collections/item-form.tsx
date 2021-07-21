@@ -41,9 +41,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
   const history = useHistory()
   const { saveTaxon, taxa } = useDataContext()
   
-  console.log(taxa)
-  console.log("initialValues", initialValues)
-
   const saveNewTaxon = React.useCallback(
     (name: string) => {
       const newTaxon = { id: v4(), name }
@@ -55,7 +52,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
   
   const getTaxonById = React.useCallback((taxonId: string) => {
     const taxon = taxa[taxonId]
-    console.log("!!!", taxon, taxonId)
     return transformTaxonToSelect(taxon)
   }, [taxa])
 
@@ -89,7 +85,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
               value={
                 values.taxon && taxa[values.taxon]
                   ? getTaxonById(values.taxon)
-                  : getTaxonById(initialValues.taxon)
+                  : initialValues.taxon ? getTaxonById(initialValues.taxon) : null
               }
               options={creatableSelectOptions}
             />
