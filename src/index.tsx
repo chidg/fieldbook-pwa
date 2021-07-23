@@ -13,7 +13,7 @@ if (process.env.SENTRY_DSN) {
     dsn: process.env.SENTRY_DSN,
     integrations: [new Integrations.BrowserTracing()],
     tracesSampleRate: 0.1,
-    initialScope: { tags: { appVersion: 'main' } }
+    initialScope: { tags: { appVersion: 'weeds' } }
   })
 }
 
