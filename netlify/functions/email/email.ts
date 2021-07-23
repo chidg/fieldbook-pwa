@@ -32,7 +32,7 @@ const sendEmail = async ({ user, data }: { user: any; data: DataItem[] }) => {
         { id: "notes", title: "Notes" },
         { id: "latitude", title: "Latitude" },
         { id: "longitude", title: "Longitude" },
-        { id: "date", title: "Time" },
+        { id: "date", title: "Date" },
         { id: "time", title: "Time" },
       ],
     })
