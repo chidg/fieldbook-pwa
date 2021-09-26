@@ -73,15 +73,20 @@ export const DataList = () => {
   // useEffect for Search and initialisation of display data
   useDeepCompareEffect(() => {
     let collections: DataItem[] = []
+    let binByDate = false
     if (searchQuery.trim().length === 0) {
       collections = Object.values(data)
+      binByDate = true
+      // setDisplayData({ 'Results': collections })
     } else {
       const results = fuse?.search(searchQuery)
       const resultItems = results?.map((result) => result.item)
       if (resultItems) collections = resultItems
     }
     if (!oldestFirst) collections = collections.reverse()
-    setDisplayData(getDataByDate(collections))
+    
+    const result = binByDate ? getDataByDate(collections) : { "Results": collections }
+    setDisplayData(result)
   }, [searchQuery, fuse, data, oldestFirst])
 
   const dataItemsCount = Object.keys(data).length
@@ -173,7 +178,7 @@ export const DataList = () => {
           </div>
         </div>
       )}
-      {Object.keys(displayData).map((dateString) => (
+      {Object.keys(displayData as DateBinnedCollections).map((dateString) => (
         <>
           <div
             className="bg-white bg-opacity-80 text-gray-600 text-sm font-medium px-1"
@@ -181,7 +186,7 @@ export const DataList = () => {
           >
             {dateString}
           </div>
-          {displayData[dateString].map((collection) => (
+          {(displayData as DateBinnedCollections)[dateString].map((collection) => (
             <DataListItem {...collection} key={collection.id} />
           ))}
         </>
