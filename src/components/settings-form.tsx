@@ -5,7 +5,7 @@ import { useUserContext, useDataContext } from "../contexts"
 
 const SettingsUpdateForm: React.FC = () => {
   const history = useHistory()
-  const { user } = useUserContext()
+  const { user, settings: { watchLocation }, setSettings } = useUserContext()
   const { data, setData } = useDataContext()
   const [exporting, setExporting] = useState(false)
   const [clearing, setClearing] = useState(false)
@@ -56,6 +56,16 @@ const SettingsUpdateForm: React.FC = () => {
       </div>
 
       <div className="flex flex-col content-between">
+        <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
+          <h4>General</h4>
+          <div className="flex justify-center mt-2">
+            <label htmlFor="watch-location">
+              Watch location at all times (greater accuracy, more battery consumption)
+              <input type="checkbox" id="watch-location" checked={watchLocation} onChange={(event) => setSettings({ watchLocation: !watchLocation })} />
+              </label>
+          </div>
+        </div>
+        
         <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
           <h4>Update Your Details</h4>
           <div className="flex justify-center mt-2">

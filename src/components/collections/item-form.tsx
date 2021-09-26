@@ -25,6 +25,7 @@ interface ItemFormProps extends FormikConfig<ItemFormValues> {
 const ItemForm: React.FC<ItemFormProps> = ({ title, locationDisplay, initialValues, onSubmit }) => {
   const history = useHistory()
   const { initials } = useUserContext().user!
+  const { watchLocation } = useUserContext().settings
 
   return (
     <Formik
@@ -68,7 +69,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ title, locationDisplay, initialValu
 
           <div className="pb-4">
             <div className="flex justify-between items-center">
-              <label className="text-sm block font-bold pb-2" htmlFor="notes">Location</label>
+              <label className="text-sm block font-bold pb-2" htmlFor="notes">Location{watchLocation && !initialValues.fieldName && ' (watching...)'}</label>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" onClick={() => window.alert(locationDisplay)}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
