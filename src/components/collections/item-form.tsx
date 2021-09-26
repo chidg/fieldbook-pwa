@@ -1,4 +1,4 @@
-import { Field, FieldProps, Form, Formik, FormikConfig } from 'formik';
+import { Field, Form, Formik, FormikConfig } from 'formik';
 import React from 'react';
 import { useHistory } from "react-router-dom";
 import * as Yup from 'yup';
@@ -42,19 +42,17 @@ const ItemForm: React.FC<ItemFormProps> = ({ title, locationDisplay, initialValu
           <div className="pb-4">
             <label className="text-sm block font-bold pb-2" htmlFor="number">Number</label>
 
-            <Field id="number" name="number" component={({ field }: FieldProps) => (
               <div className="flex flex-wrap items-stretch w-full relative">
                 <div className="flex -mr-px">
                   <span className="flex items-center leading-normal bg-grey-lighter rounded rounded-r-none border border-r-0 border-blue-300 px-3 whitespace-no-wrap text-grey-dark text-sm">{initials}</span>
                 </div>	
-                <input type="text" className="flex-shrink flex-grow flex-auto leading-normal w-px border h-10 border-blue-300 rounded rounded-l-none px-3 relative focus:border-blue focus:shadow" {...field} />
+                <Field id="number" name="number" className="flex-shrink flex-grow flex-auto leading-normal w-px border h-10 border-blue-300 rounded rounded-l-none px-3 relative focus:border-blue focus:shadow" />
               </div>	
-            )} />
             </div>	
             
           <div className="pb-4">
             <label className="text-sm block font-bold pb-2" htmlFor="fieldName">Field Name</label>
-            <Field id="fieldName" autoFocus={true} name="fieldName" autoCorrect="off" autoCapitalize="off" spellCheck="false" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300" />
+            <Field id="fieldName" autoFocus={true} name="fieldName" autoCorrect="off" autoComplete="off" spellCheck="false" className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300" />
           </div>
 
           <div className="pb-4">
