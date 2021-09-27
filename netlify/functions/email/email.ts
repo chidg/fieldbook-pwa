@@ -36,7 +36,9 @@ const sendEmail = async ({ user, data }) => {
       ],
     })
 
-    const records = (data as DataItem[]).map((item) => {
+    const dataArray = Array.isArray(data) ? data : Object.values(data)
+
+    const records = (dataArray as DataItem[]).map((item) => {
       return {
         ...item,
         number: `${item.prefix ? item.prefix : user.initials}${item.number}`,
