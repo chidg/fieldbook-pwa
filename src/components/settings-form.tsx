@@ -89,7 +89,7 @@ const SettingsUpdateForm: React.FC = () => {
         <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
           <h4>Export</h4>
           <div className="text-sm text-gray-100 border-2 border-opacity-25 bg-opacity-20 bg-gray-200 border-gray-200 rounded p-2 my-2">
-            This button will send the data to the email address {user?.email}.
+            This button will send the data to the email address <span className="font-bold">{user?.email}</span>. <Link to="/settings/user">Update your email address</Link> to change this.
           </div>
           <div className="flex justify-center mt-2">
             <button
@@ -129,6 +129,9 @@ const SettingsUpdateForm: React.FC = () => {
             </button>
           </div>
         </div>
+        
+        <div className="flex-col bg-gray-400 bg-opacity-20 rounded px-2 py-2 my-1 text-sm">Fieldbook version: {process.env.COMMIT_REF}</div>
+        
       </div>
     </div>
   )
