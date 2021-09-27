@@ -11,7 +11,7 @@ const DataListItem = (item: DataItem) => {
   return (
     <div className="flex justify-start items-center bg-gray-200 bg-opacity-20 text-white focus:text-blue-400 focus:bg-blue-100 rounded-sm px-2 py-2 my-1">
       <div className="font-sm px-2">
-        {initials}
+        {item.prefix ? item.prefix : initials}
         {item.number}
       </div>
       <div className="flex-grow font-medium px-2">{item.fieldName}</div>
@@ -86,7 +86,7 @@ export const DataList = () => {
     const result = binByDate
       ? getDataByDate(collections)
       : { Results: collections }
-      
+
     setDisplayData(result)
   }, [searchQuery, fuse, data, oldestFirst])
 

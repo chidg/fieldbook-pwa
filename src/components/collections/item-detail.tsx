@@ -30,7 +30,7 @@ export const ItemDetail: React.FC = () => {
   const { user } = useUserContext()
   const { data } = useDataContext()
   const { id: instanceId }: { id: string } = useParams()
-  const [instance, setInstance] = React.useState<DataItem | undefined>(undefined)
+  const [instance, setInstance] = React.useState<DataItem>()
   
   const [mapDetails, setMapDetails] = React.useState<MapDetails | undefined>(undefined)
 
@@ -65,7 +65,7 @@ export const ItemDetail: React.FC = () => {
   return (
     <div className="text-white rounded px-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg flex-1">{ user?.initials }{ instance?.number } {instance?.fieldName}</h3>
+        <h3 className="text-lg flex-1">{ instance?.prefix ? instance?.prefix : user?.initials }{ instance?.number } {instance?.fieldName}</h3>
         <Link
           to={{
             pathname: `/${instance?.id}/edit`,
