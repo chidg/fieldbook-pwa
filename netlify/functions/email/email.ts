@@ -5,6 +5,17 @@ import { createObjectCsvStringifier } from "csv-writer"
 
 const mailgun = new Mailgun(formData)
 
+export interface DataItem {
+  id: string
+  number: string
+  prefix?: string
+  fieldName: string
+  notes: string
+  location?: GeolocationCoordinates
+  date: string
+  time: string
+}
+
 function dontIndent(str: string): string {
   return ("" + str).replace(/(\n)\s+/g, "$1")
 }
@@ -20,20 +31,17 @@ const sendEmail = async ({ user, data }) => {
         { id: "notes", title: "Notes" },
         { id: "latitude", title: "Latitude" },
         { id: "longitude", title: "Longitude" },
-        { id: "date", title: "Time" },
+        { id: "date", title: "Date" },
         { id: "time", title: "Time" },
       ],
     })
 
-    const records = Object.keys(data).map((key) => {
-      const item = data[key]
+    const records = (data as DataItem[]).map((item) => {
       return {
         ...item,
-        number: `${user.initials}${item.number}`,
+        number: `${item.prefix ? item.prefix : user.initials}${item.number}`,
         latitude: item.location?.latitude ? item.location?.latitude : "",
         longitude: item.location?.longitude ? item.location?.longitude : "",
-        date: new Date(item.timestamp).toLocaleDateString(),
-        time: new Date(item.timestamp).toLocaleTimeString(),
       }
     })
 

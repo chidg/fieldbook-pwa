@@ -12,10 +12,16 @@ const SettingsUpdateForm: React.FC = () => {
 
   const sendStuff = async () => {
     setExporting(true)
+    const formattedData = Object.values(data).map((d) => ({
+      ...d,
+      date: new Date(d.timestamp).toLocaleDateString(),
+      time: new Date(d.timestamp).toLocaleTimeString(),
+    }))
+
     const response = await axios
       .post(
         ".netlify/functions/email",
-        { data, user },
+        { data: formattedData, user },
         {
           responseType: "json",
         }
