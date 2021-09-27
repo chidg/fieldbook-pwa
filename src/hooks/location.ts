@@ -21,7 +21,6 @@ export const useGeoLocation = (): [
   useEffect(() => {
     let watchId: number
     if (watchLocation) {
-      console.log("getting location from watch")
       watchId = navigator.geolocation.watchPosition(
         ({ coords }) => {
           // Necessary to do this transformation because the coords object is a prototype with getters rather than a normal object
@@ -39,7 +38,6 @@ export const useGeoLocation = (): [
         { enableHighAccuracy: true }
       )
     } else {
-      console.log("getting location once")
       navigator.geolocation.getCurrentPosition(({ coords }) =>
         setGeoLocation({
           accuracy: coords.accuracy,

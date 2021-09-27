@@ -4,6 +4,7 @@ import { useLocalStorage } from "../hooks"
 export interface DataItem {
   id: string
   number: string
+  prefix?: string
   notes: string
   fieldName: string
   location?: GeolocationCoordinates

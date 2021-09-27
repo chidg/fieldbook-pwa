@@ -37,6 +37,7 @@ export const ItemFormUpdate: React.FC = () => {
   return (
     <ItemForm
       locationDisplay={getLocationDisplay()}
+      prefix={instance?.prefix}
       initialValues={{ fieldName: instance?.fieldName || "", number: instance?.number || "", notes: instance?.notes || "" }}
       onSubmit={onSubmit}
       title="Edit Item"

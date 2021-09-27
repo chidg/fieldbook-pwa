@@ -19,13 +19,16 @@ type ItemFormValues = {
 
 interface ItemFormProps extends FormikConfig<ItemFormValues> {
   title: string
+  prefix?: string
   locationDisplay?: string
 }
 
-const ItemForm: React.FC<ItemFormProps> = ({ title, locationDisplay, initialValues, onSubmit }) => {
+const ItemForm: React.FC<ItemFormProps> = ({ title, locationDisplay, prefix, initialValues, onSubmit }) => {
   const history = useHistory()
   const { initials } = useUserContext().user!
   const { watchLocation } = useUserContext().settings
+
+  const displayPrefix = React.useMemo(() => prefix ? prefix : initials, [initials, prefix])
 
   return (
     <Formik
@@ -44,7 +47,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ title, locationDisplay, initialValu
 
               <div className="flex flex-wrap items-stretch w-full relative">
                 <div className="flex -mr-px">
-                  <span className="flex items-center leading-normal bg-grey-lighter rounded rounded-r-none border border-r-0 border-blue-300 px-3 whitespace-no-wrap text-grey-dark text-sm">{initials}</span>
+                  <span className="flex items-center leading-normal bg-grey-lighter rounded rounded-r-none border border-r-0 border-blue-300 px-3 whitespace-no-wrap text-grey-dark text-sm">{displayPrefix}</span>
                 </div>	
                 <Field id="number" name="number" className="flex-shrink flex-grow flex-auto leading-normal w-px border h-10 border-blue-300 rounded rounded-l-none px-3 relative focus:border-blue focus:shadow" />
               </div>	

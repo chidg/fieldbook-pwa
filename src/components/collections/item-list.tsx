@@ -77,15 +77,16 @@ export const DataList = () => {
     if (searchQuery.trim().length === 0) {
       collections = Object.values(data)
       binByDate = true
-      // setDisplayData({ 'Results': collections })
     } else {
       const results = fuse?.search(searchQuery)
-      const resultItems = results?.map((result) => result.item)
-      if (resultItems) collections = resultItems
+      if (results) collections = results.map((result) => result.item)
     }
     if (!oldestFirst) collections = collections.reverse()
-    
-    const result = binByDate ? getDataByDate(collections) : { "Results": collections }
+
+    const result = binByDate
+      ? getDataByDate(collections)
+      : { Results: collections }
+      
     setDisplayData(result)
   }, [searchQuery, fuse, data, oldestFirst])
 
@@ -156,7 +157,9 @@ export const DataList = () => {
           </div>
           <div
             className="flex justify-end text-white text-sm px-1"
-            onClick={() => {!searchQuery && setOldestFirst(!oldestFirst)}}
+            onClick={() => {
+              !searchQuery && setOldestFirst(!oldestFirst)
+            }}
           >
             <span className="rounded px-1 border-white border-2">
               {searchQuery && <>Showing search results</>}
@@ -186,9 +189,11 @@ export const DataList = () => {
           >
             {dateString}
           </div>
-          {(displayData as DateBinnedCollections)[dateString].map((collection) => (
-            <DataListItem {...collection} key={collection.id} />
-          ))}
+          {(displayData as DateBinnedCollections)[dateString].map(
+            (collection) => (
+              <DataListItem {...collection} key={collection.id} />
+            )
+          )}
         </>
       ))}
     </>
