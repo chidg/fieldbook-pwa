@@ -23,7 +23,7 @@ interface ItemFormProps extends FormikConfig<ItemFormValues> {
   locationDisplay?: string
 }
 
-const ItemForm: React.FC<ItemFormProps> = ({ title, locationDisplay, prefix, initialValues, onSubmit }) => {
+const ItemForm: React.FC<ItemFormProps> = ({ title, locationDisplay, prefix, initialValues, onSubmit, children }) => {
   const history = useHistory()
   const { initials } = useUserContext().user!
   const { watchLocation } = useUserContext().settings
@@ -91,6 +91,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ title, locationDisplay, prefix, ini
             }}>Cancel</button>
             <button type="submit" className="border-2 border-blue-500 hover:bg-blue-500 hover:text-white text-blue-500 py-1 px-2 rounded focus:outline-none focus:shadow-outline">Save</button>
           </div>
+          {children}
         </Form>
       )}
     </Formik>

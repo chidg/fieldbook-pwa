@@ -19,6 +19,7 @@ interface DataState {
   data: Data
   setData: (arg0: Data) => void
   saveItem: (arg0: DataItem) => void
+  deleteItem: (id: string) => void
 }
 
 const DataContext = React.createContext<DataState | undefined>(undefined)
@@ -40,12 +41,21 @@ const DataProvider: React.FC = ({ children }) => {
     [data, setLocalStoredValue]
   )
 
+  const deleteItem = React.useCallback(
+    async (id: string) => {
+      const { [id]: deleted, ...newData } = data
+      setLocalStoredValue(newData)
+    },
+    [data, setLocalStoredValue]
+  )
+
   return (
     <DataContext.Provider
       value={{
         data,
         setData: setLocalStoredValue,
         saveItem,
+        deleteItem
       }}
     >
       {children}
