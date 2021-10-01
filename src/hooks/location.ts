@@ -16,8 +16,6 @@ export const useGeoLocation = (): [
     number | undefined
   >(undefined)
 
-  // const [watchId, setWatchId] = useState<number>()
-
   useEffect(() => {
     let watchId: number
     if (watchLocation) {
