@@ -33,7 +33,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
 }) => {
   const history = useHistory()
   const { initials } = useUserContext().user!
-  const { watchLocation } = useUserContext().settings
 
   const displayPrefix = React.useMemo(
     () => (prefix ? prefix : initials),
@@ -102,13 +101,9 @@ const ItemForm: React.FC<ItemFormProps> = ({
             <div className="flex justify-between items-center">
               <label className="text-sm block font-bold pb-2" htmlFor="notes">
                 Location
-                {watchLocation && !initialValues.fieldName && (
-                  <span className="font-light px-2">watching</span>
-                )}
                 {locationAccuracy && (
                   <span className="font-light px-2">
-                    {" "}
-                    - accuracy: {locationAccuracy}m
+                    accuracy: {locationAccuracy.toFixed(1)}m
                   </span>
                 )}
               </label>
