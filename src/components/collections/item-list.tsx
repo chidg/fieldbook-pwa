@@ -77,11 +77,11 @@ export const DataList = () => {
     if (searchQuery.trim().length === 0) {
       collections = Object.values(data)
       binByDate = true
+      if (!oldestFirst) collections = collections.reverse()
     } else {
       const results = fuse?.search(searchQuery)
       if (results) collections = results.map((result) => result.item)
     }
-    if (!oldestFirst) collections = collections.reverse()
 
     const result = binByDate
       ? getDataByDate(collections)
