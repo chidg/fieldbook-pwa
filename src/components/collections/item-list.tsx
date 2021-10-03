@@ -3,7 +3,7 @@ import Fuse from "fuse.js"
 import { Link } from "react-router-dom"
 import useDeepCompareEffect from "use-deep-compare-effect"
 
-import { DataItem, useDataContext, useUserContext } from "../../contexts"
+import { DataItem, useDataContext, useUserContext, useMetaContext } from "../../contexts"
 
 const DataListItem = (item: DataItem) => {
   const { initials } = useUserContext().user!
@@ -52,7 +52,7 @@ const getDataByDate = (data: DataItem[]): DateBinnedCollections =>
 export const DataList = () => {
   const { data } = useDataContext()
   const { name } = useUserContext().user!
-  const [oldestFirst, setOldestFirst] = React.useState<boolean>(true)
+  const { newestFirst, setNewestFirst } = useMetaContext()
 
   const [displayData, setDisplayData] = React.useState<DateBinnedCollections>(
     {}
@@ -77,7 +77,7 @@ export const DataList = () => {
     if (searchQuery.trim().length === 0) {
       collections = Object.values(data)
       binByDate = true
-      if (!oldestFirst) collections = collections.reverse()
+      if (!newestFirst) collections = collections.reverse()
     } else {
       const results = fuse?.search(searchQuery)
       if (results) collections = results.map((result) => result.item)
@@ -88,7 +88,7 @@ export const DataList = () => {
       : { Results: collections }
 
     setDisplayData(result)
-  }, [searchQuery, fuse, data, oldestFirst])
+  }, [searchQuery, fuse, data, newestFirst])
 
   const dataItemsCount = Object.keys(data).length
   const dataItemsExist = React.useMemo(
@@ -158,15 +158,15 @@ export const DataList = () => {
           <div
             className="flex justify-end text-white text-sm px-1"
             onClick={() => {
-              !searchQuery && setOldestFirst(!oldestFirst)
+              if (!searchQuery) setNewestFirst(!newestFirst) 
             }}
           >
             <span className="rounded px-1 border-white border-2">
               {searchQuery && <>Showing search results</>}
               {!searchQuery && (
                 <>
-                  {oldestFirst && <>Showing oldest first</>}
-                  {!oldestFirst && <>Showing newest first</>}
+                  {newestFirst && <>Showing oldest first</>}
+                  {!newestFirst && <>Showing newest first</>}
                 </>
               )}
             </span>

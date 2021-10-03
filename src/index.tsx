@@ -6,7 +6,7 @@ import * as serviceWorkerRegistration from "./serviceWorkerRegistration"
 import reportWebVitals from "./reportWebVitals"
 import * as Sentry from "@sentry/react"
 import { Integrations } from "@sentry/tracing"
-import { UserProvider, DataProvider } from "./contexts"
+import { UserProvider, DataProvider, MetaProvider } from "./contexts"
 
 if (process.env.SENTRY_DSN) {
   Sentry.init({
@@ -21,7 +21,9 @@ ReactDOM.render(
   <React.StrictMode>
     <UserProvider>
       <DataProvider>
-        <App />
+        <MetaProvider>
+          <App />
+        </MetaProvider>
       </DataProvider>
     </UserProvider>
   </React.StrictMode>,
