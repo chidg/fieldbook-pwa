@@ -1,24 +1,22 @@
-import React from 'react'
-import { v4 } from 'uuid'
+import React from "react"
+import { v4 } from "uuid"
 import { useHistory } from "react-router-dom"
-import {
-  useDataContext,
-  useUserContext
-} from "../../contexts"
-import { useGoogleAnalytics, useGeoLocation } from '../../hooks'
-import ItemForm from './item-form'
-
+import { useDataContext, useUserContext } from "../../contexts"
+import { useGoogleAnalytics, useGeoLocation } from "../../hooks"
+import ItemForm from "./item-form"
 
 export const ItemFormCreate: React.FC = () => {
   const history = useHistory()
-  const {initials} = useUserContext().user!
+  const { initials } = useUserContext().user!
   const { saveItem, data } = useDataContext()
   const { sendEvent } = useGoogleAnalytics()
   const [geoLocation, geoLocationWarning] = useGeoLocation()
 
   const getLocationDisplay = React.useCallback(() => {
     if (geoLocation) {
-      return `${geoLocation.latitude.toPrecision(6)}, ${geoLocation.longitude.toPrecision(7)}`
+      return `${geoLocation.latitude.toPrecision(
+        6
+      )}, ${geoLocation.longitude.toPrecision(7)}`
     } else if (geoLocationWarning) {
       switch (geoLocationWarning) {
         case 1:
@@ -41,11 +39,11 @@ export const ItemFormCreate: React.FC = () => {
         number = parseInt(numbStrings[numbStrings.length - 1]) + 1
       }
     }
-    
+
     return {
-      fieldName: '',
-      notes: '',
-      number: number.toString().padStart(3, '0'),
+      fieldName: "",
+      notes: "",
+      number: number.toString().padStart(3, "0"),
     }
   }, [data])
 
@@ -55,13 +53,20 @@ export const ItemFormCreate: React.FC = () => {
       locationAccuracy={geoLocation?.altitudeAccuracy}
       initialValues={initialValues()}
       onSubmit={(values) => {
-        saveItem({ ...values, id: v4(), prefix: initials, timestamp: Date.now(), location: geoLocation })
-        sendEvent({
-          category: 'Collection',
-          action: 'Created collection'
+        saveItem({
+          ...values,
+          id: v4(),
+          prefix: initials,
+          timestamp: Date.now(),
+          location: geoLocation,
         })
-        history.replace('/')
+        sendEvent({
+          category: "Collection",
+          action: "Created collection",
+        })
+        history.replace("/")
       }}
       title="New Item"
-      />
-)}
+    />
+  )
+}

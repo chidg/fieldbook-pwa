@@ -71,6 +71,21 @@ registerRoute(
     ],
   })
 )
+//https://api.mapbox.com/v4/mapbox.satellite/15/26925/19469@2x.webp?sku=101YN2FF2OTGl&access_token=pk.eyJ1IjoiY2hpZCIsImEiOiJja295NHR0NjkwbXE1MnBtcGRveHk0MG4zIn0.8w-R_XkUOHzVQ0B_UoDeGQ
+// cache map tiles
+registerRoute(
+  new RegExp(
+    /(https:\/\/api.mapbox.com\/v4\/mapbox.satellite)\/\d+\/\d+\/\d+(@2x?).webp/g
+  ),
+  new StaleWhileRevalidate({
+    cacheName: "maptiles",
+    plugins: [
+      // Ensure that once this runtime cache reaches a maximum size the
+      // least-recently used images are removed.
+      new ExpirationPlugin({ maxEntries: 100 }),
+    ],
+  })
+)
 
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
