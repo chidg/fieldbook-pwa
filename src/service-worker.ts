@@ -78,7 +78,7 @@ registerRoute(
   new RegExp(
     /(https:)?(\/\/([^/?#]*)?)(mapbox.com)([^?#]*)(\?([^#]*))?(#(.*))?/g
   ),
-  new CacheFirst({
+  new StaleWhileRevalidate({
     cacheName: "maptiles",
     plugins: [
       // Ensure that once this runtime cache reaches a maximum size the
