@@ -75,7 +75,9 @@ registerRoute(
 //https://api.mapbox.com/styles/v1/mapbox/satellite-v9?access_token=pk.eyJ1IjoiY2hpZCIsImEiOiJja295NHR0NjkwbXE1MnBtcGRveHk0MG4zIn0.8w-R_XkUOHzVQ0B_UoDeGQ
 // cache map tiles
 registerRoute(
-  new RegExp(/(https:\/\/(\w+\.?)(\w+?).mapbox.com\/)/g),
+  new RegExp(
+    /(https:)?(\/\/([^/?#]*)?)(mapbox.com)([^?#]*)(\?([^#]*))?(#(.*))?/g
+  ),
   new CacheFirst({
     cacheName: "maptiles",
     plugins: [
