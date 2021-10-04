@@ -13,6 +13,7 @@ import { ExpirationPlugin } from "workbox-expiration"
 import { precacheAndRoute, createHandlerBoundToURL } from "workbox-precaching"
 import { registerRoute } from "workbox-routing"
 import { CacheFirst, StaleWhileRevalidate } from "workbox-strategies"
+import { CacheableResponsePlugin } from "workbox-cacheable-response"
 import { initialize } from "workbox-google-analytics"
 
 declare const self: ServiceWorkerGlobalScope
@@ -84,6 +85,9 @@ registerRoute(
       // Ensure that once this runtime cache reaches a maximum size the
       // least-recently used images are removed.
       new ExpirationPlugin({ maxEntries: 100 }),
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
     ],
   })
 )
