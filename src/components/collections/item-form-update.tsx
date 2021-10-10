@@ -33,14 +33,12 @@ export const ItemFormUpdate: React.FC = () => {
   const onSubmit = React.useCallback(
     (values) => {
       saveItem({
+        ...instance,
         ...values,
-        id: instanceId,
-        timestamp: instance!.timestamp,
-        location: instance!.location,
       })
       history.replace("/")
     },
-    [history, instance, instanceId, saveItem]
+    [history, instance, saveItem]
   )
 
   return (
