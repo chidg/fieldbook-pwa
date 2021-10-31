@@ -23,5 +23,6 @@
   "include": [
     "src", 
     "netlify/functions/send-email/email.ts"
-  ]
+  ],
+  "baseUrl": "src",
 }

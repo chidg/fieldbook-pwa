@@ -1,20 +1,23 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import useDeepCompareEffect from "use-deep-compare-effect"
-import format from 'date-fns/format'
+import format from "date-fns/format"
 
-import { DataItem, Taxon, useDataContext, useUserContext } from "../../contexts"
+import {
+  DataItem,
+  Taxon,
+  useDataContext,
+  useUserContext,
+  useMetaContext,
+} from "../../contexts"
 
-const DataListItem = ({ item, taxon }: { item: DataItem, taxon: Taxon }) => {
-  
+const DataListItem = ({ item, taxon }: { item: DataItem; taxon: Taxon }) => {
   return (
     <div className="flex justify-start items-center bg-gray-200 bg-opacity-20 text-white focus:text-blue-400 focus:bg-blue-100 rounded-sm px-2 py-2 my-1">
       <div className="font-sm px-2">
-        {format(new Date(item.timestamp), 'H:mm')}
+        {format(new Date(item.timestamp), "H:mm")}
       </div>
-      <div className="font-sm font-semibold px-2">
-        {taxon.name}
-      </div>
+      <div className="font-sm font-semibold px-2">{taxon.name}</div>
       <div className="flex-grow font-medium px-2">Density: {item.density}</div>
       <div className="font-normal tracking-wide">
         <Link
@@ -53,7 +56,7 @@ const getDataByDate = (data: DataItem[]): DateBinnedCollections =>
 export const DataList = () => {
   const { data, taxa } = useDataContext()
   const { name } = useUserContext().user!
-  const [oldestFirst, setOldestFirst] = React.useState<boolean>(true)
+  const { setNewestFirst, newestFirst } = useMetaContext()
 
   const [displayData, setDisplayData] = React.useState<DateBinnedCollections>(
     {}
@@ -62,9 +65,9 @@ export const DataList = () => {
   useDeepCompareEffect(() => {
     let records: DataItem[] = []
     records = Object.values(data)
-    if (!oldestFirst) records = records.reverse()
+    if (newestFirst) records = records.reverse()
     setDisplayData(getDataByDate(records))
-  }, [data, oldestFirst])
+  }, [data, newestFirst])
 
   const dataItemsCount = Object.keys(data).length
   const dataItemsExist = React.useMemo(
@@ -85,13 +88,15 @@ export const DataList = () => {
         <div className="mb-1">
           <div
             className="flex justify-end text-white text-sm px-1"
-            onClick={() => {setOldestFirst(!oldestFirst)}}
+            onClick={() => {
+              setNewestFirst(!newestFirst)
+            }}
           >
             <span className="rounded px-1 border-white border-2">
-                <>
-                  {oldestFirst && <>Showing oldest first</>}
-                  {!oldestFirst && <>Showing newest first</>}
-                </>
+              <>
+                {newestFirst && <>Showing oldest first</>}
+                {!newestFirst && <>Showing newest first</>}
+              </>
             </span>
           </div>
         </div>
@@ -106,14 +111,15 @@ export const DataList = () => {
       )}
       {Object.keys(displayData).map((dateString) => (
         <div key={`collection-${dateString}`}>
-          <div
-            className="bg-white bg-opacity-80 text-gray-600 text-sm font-medium px-1"
-            
-          >
+          <div className="bg-white bg-opacity-80 text-gray-600 text-sm font-medium px-1">
             {dateString}
           </div>
           {displayData[dateString].map((collection) => (
-            <DataListItem item={collection} taxon={taxa[collection.taxon]} key={collection.id} />
+            <DataListItem
+              item={collection}
+              taxon={taxa[collection.taxon]}
+              key={collection.id}
+            />
           ))}
         </div>
       ))}

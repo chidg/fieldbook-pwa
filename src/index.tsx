@@ -6,14 +6,14 @@ import * as serviceWorkerRegistration from "./serviceWorkerRegistration"
 import reportWebVitals from "./reportWebVitals"
 import * as Sentry from "@sentry/react"
 import { Integrations } from "@sentry/tracing"
-import { UserProvider, DataProvider } from "./contexts"
+import { UserProvider, DataProvider, MetaProvider } from "./contexts"
 
 if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     integrations: [new Integrations.BrowserTracing()],
     tracesSampleRate: 0.1,
-    initialScope: { tags: { appVersion: 'weeds' } }
+    initialScope: { tags: { appVersion: "weeds" } },
   })
 }
 
@@ -21,7 +21,9 @@ ReactDOM.render(
   <React.StrictMode>
     <UserProvider>
       <DataProvider>
-        <App />
+        <MetaProvider>
+          <App />
+        </MetaProvider>
       </DataProvider>
     </UserProvider>
   </React.StrictMode>,

@@ -20,7 +20,7 @@
     "@types/yup": "^0.29.11",
     "axios": "^0.21.1",
     "csv-writer": "^1.6.0",
-    "date-fns": "^2.22.1",
+    "date-fns": "^2.25.0",
     "formik": "2.0.4",
     "fuse.js": "^6.4.6",
     "idb-keyval": "^5.0.5",
@@ -57,10 +57,7 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "extends": ["react-app", "react-app/jest"]
   },
   "browserslist": {
     "production": [

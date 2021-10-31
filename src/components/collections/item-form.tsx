@@ -20,6 +20,7 @@ type ItemFormValues = {
 interface ItemFormProps extends FormikConfig<ItemFormValues> {
   title: string
   locationDisplay?: string
+  locationAccuracy?: number | null
 }
 
 const transformTaxonToSelect = (taxon: Taxon) => ({
@@ -35,12 +36,13 @@ const transformDensityToSelect = (densityIdx: string) => ({
 const ItemForm: React.FC<ItemFormProps> = ({
   title,
   locationDisplay,
+  locationAccuracy,
   initialValues,
   onSubmit,
 }) => {
   const history = useHistory()
   const { saveTaxon, taxa } = useDataContext()
-  
+
   const saveNewTaxon = React.useCallback(
     (name: string) => {
       const newTaxon = { id: v4(), name }
@@ -49,11 +51,14 @@ const ItemForm: React.FC<ItemFormProps> = ({
     },
     [saveTaxon]
   )
-  
-  const getTaxonById = React.useCallback((taxonId: string) => {
-    const taxon = taxa[taxonId]
-    return transformTaxonToSelect(taxon)
-  }, [taxa])
+
+  const getTaxonById = React.useCallback(
+    (taxonId: string) => {
+      const taxon = taxa[taxonId]
+      return transformTaxonToSelect(taxon)
+    },
+    [taxa]
+  )
 
   const creatableSelectOptions = React.useMemo(
     () => Object.keys(taxa).map(getTaxonById),
@@ -85,7 +90,9 @@ const ItemForm: React.FC<ItemFormProps> = ({
               value={
                 values.taxon && taxa[values.taxon]
                   ? getTaxonById(values.taxon)
-                  : initialValues.taxon ? getTaxonById(initialValues.taxon) : null
+                  : initialValues.taxon
+                  ? getTaxonById(initialValues.taxon)
+                  : null
               }
               options={creatableSelectOptions}
             />
@@ -105,7 +112,10 @@ const ItemForm: React.FC<ItemFormProps> = ({
                 label: option,
                 value: index.toString(),
               }))}
-              onChange={(value) => {console.log('value ', value); setFieldValue('density', value?.value)}}
+              onChange={(value) => {
+                console.log("value ", value)
+                setFieldValue("density", value?.value)
+              }}
             />
             {/* <Field
               id="density"
@@ -137,7 +147,12 @@ const ItemForm: React.FC<ItemFormProps> = ({
           <div className="pb-4">
             <div className="flex justify-between items-center">
               <label className="text-sm block font-bold pb-2" htmlFor="notes">
-                Location
+                Location{" "}
+                {locationAccuracy && (
+                  <span className="font-light px-2">
+                    accuracy: {locationAccuracy.toFixed(1)}m
+                  </span>
+                )}
               </label>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
