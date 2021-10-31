@@ -50,7 +50,7 @@ export const ItemFormCreate: React.FC = () => {
   return (
     <ItemForm
       locationDisplay={getLocationDisplay()}
-      locationAccuracy={geoLocation?.altitudeAccuracy}
+      locationAccuracy={geoLocation?.accuracy}
       initialValues={initialValues()}
       onSubmit={(values) => {
         saveItem({
