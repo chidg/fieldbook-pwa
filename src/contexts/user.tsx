@@ -1,51 +1,75 @@
 import React from "react"
-import { useLocalStorage } from "../hooks"
-
-interface UserDetails {
-  initials?: string
-  name?: string
-  email?: string
-}
+import {
+  getAuth,
+  updateProfile,
+  User,
+  createUserWithEmailAndPassword,
+  UserCredential,
+  updateEmail,
+} from "firebase/auth"
+import {
+  useAuthState,
+  useSignInWithEmailAndPassword,
+} from "react-firebase-hooks/auth"
+import { useLocalStorage } from "app/hooks"
+import firebaseConfig from "../firebase-config"
 
 interface Settings {
+  collectionPrefix?: string
   watchLocation: boolean
 }
 
+type CreateUserOptions = {
+  email: string
+  password: string
+}
 interface UserContextState {
-  user?: UserDetails
+  user?: User | null
+  createUser: (args: CreateUserOptions) => Promise<UserCredential>
+  signInUser: (email: string, password: string) => Promise<void>
+  updateProfile: typeof updateProfile
+  updateEmail: typeof updateEmail
   settings: Settings
   loading: boolean
-  setUser: (arg0: UserDetails) => void
-  setSettings: (arg0: Settings) => void
-  logout: () => void
+  setSettings: (arg0: Partial<Settings>) => void
+  signOut: () => void
 }
 
-const UserContext = React.createContext<
-  UserContextState | undefined
->(undefined)
+const UserContext = React.createContext<UserContextState | undefined>(undefined)
 
 const UserProvider: React.FC = ({ children }) => {
-  const [user, setUser] = React.useState<UserDetails | undefined>(undefined)
-  const [settings, setSettings] = React.useState<Settings>({ watchLocation: false })
-  const [loading, setLoading] = React.useState<boolean>(true)
-  const [localStoredValue, setLocalStoredValue] = useLocalStorage('user', undefined)
-  const [settingsLocalStoredValue, setSettingsLocalStoredValue] = useLocalStorage('settings', { watchLocation: false })
+  const auth = getAuth(firebaseConfig)
+  const [user, loading, error] = useAuthState(auth)
+  const [settings, setSettings] = React.useState<Settings>({
+    watchLocation: true,
+  })
+
+  const [settingsLocalStoredValue, setSettingsLocalStoredValue] =
+    useLocalStorage("settings", { watchLocation: false })
+
+  const createUser = React.useCallback(
+    ({ email, password }) =>
+      createUserWithEmailAndPassword(auth, email, password),
+    [auth]
+  )
 
   React.useEffect(() => {
-    setUser(localStoredValue)
     setSettings(settingsLocalStoredValue)
-    setLoading(false)
-  }, [localStoredValue, settingsLocalStoredValue, setLoading, setUser])
-  
+  }, [settingsLocalStoredValue])
+
   return (
     <UserContext.Provider
       value={{
         user,
+        createUser,
+        signInUser: useSignInWithEmailAndPassword(auth)[0],
+        updateProfile,
+        updateEmail,
         settings,
-        setSettings: setSettingsLocalStoredValue,
+        setSettings: (newSettings) =>
+          setSettingsLocalStoredValue({ ...settings, ...newSettings }),
         loading,
-        setUser: setLocalStoredValue,
-        logout: () => setLocalStoredValue(undefined)
+        signOut: auth.signOut,
       }}
     >
       {children}
@@ -56,9 +80,7 @@ const UserProvider: React.FC = ({ children }) => {
 const useUserContext = () => {
   const context = React.useContext(UserContext)
   if (context === undefined) {
-    throw new Error(
-      "useUserContext must be used within a UserProvider"
-    )
+    throw new Error("useUserContext must be used within a UserProvider")
   }
   return context
 }

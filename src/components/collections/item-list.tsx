@@ -3,15 +3,20 @@ import Fuse from "fuse.js"
 import { Link } from "react-router-dom"
 import useDeepCompareEffect from "use-deep-compare-effect"
 
-import { DataItem, useDataContext, useUserContext, useMetaContext } from "../../contexts"
+import {
+  DataItem,
+  useDataContext,
+  useUserContext,
+  useMetaContext,
+} from "../../contexts"
 
 const DataListItem = (item: DataItem) => {
-  const { initials } = useUserContext().user!
+  const { collectionPrefix } = useUserContext().settings!
 
   return (
     <div className="flex justify-start items-center bg-gray-200 bg-opacity-20 text-white focus:text-blue-400 focus:bg-blue-100 rounded-sm px-2 py-2 my-1">
       <div className="font-sm px-2">
-        {item.prefix ? item.prefix : initials}
+        {item.prefix ? item.prefix : collectionPrefix}
         {item.number}
       </div>
       <div className="flex-grow font-medium px-2">{item.fieldName}</div>
@@ -51,7 +56,7 @@ const getDataByDate = (data: DataItem[]): DateBinnedCollections =>
 
 export const DataList = () => {
   const { data } = useDataContext()
-  const { name } = useUserContext().user!
+  const { user } = useUserContext()
   const { newestFirst, setNewestFirst } = useMetaContext()
 
   const [displayData, setDisplayData] = React.useState<DateBinnedCollections>(
@@ -158,7 +163,7 @@ export const DataList = () => {
           <div
             className="flex justify-end text-white text-sm px-1"
             onClick={() => {
-              if (!searchQuery) setNewestFirst(!newestFirst) 
+              if (!searchQuery) setNewestFirst(!newestFirst)
             }}
           >
             <span className="rounded px-1 border-white border-2">
@@ -176,7 +181,7 @@ export const DataList = () => {
       {!dataItemsExist && (
         <div className="grid row mx-10">
           <div className="border-2 border-white text-white rounded px-4 py-2">
-            <p>Hi {name}, welcome to Fieldbook!</p>
+            <p>Hi {user!.displayName}, welcome to Fieldbook!</p>
             <p>Hit the 🌱 below to start adding collection records.</p>
           </div>
         </div>

@@ -32,11 +32,11 @@ const ItemForm: React.FC<ItemFormProps> = ({
   children,
 }) => {
   const history = useHistory()
-  const { initials } = useUserContext().user!
+  const { collectionPrefix } = useUserContext().settings!
 
   const displayPrefix = React.useMemo(
-    () => (prefix ? prefix : initials),
-    [initials, prefix]
+    () => (prefix ? prefix : collectionPrefix),
+    [collectionPrefix, prefix]
   )
 
   return (

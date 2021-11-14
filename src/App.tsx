@@ -8,9 +8,14 @@ import {
   Link,
 } from "react-router-dom"
 
-import { useUserContext } from "./contexts"
-import { useGoogleAnalytics } from "./hooks"
-import UserForm from "./components/user-form"
+import { useUserContext, useMetaContext } from "app/contexts"
+import { useGoogleAnalytics } from "app/hooks"
+import {
+  UserForm,
+  SettingsUpdateForm,
+  SignupForm,
+  LoginForm,
+} from "./components/user"
 import {
   ItemList,
   ItemFormUpdate,
@@ -83,45 +88,73 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
   )
 }
 
-function App() {
+const UnauthenticatedRoute: React.FC<RouteProps> = ({ children, ...rest }) => (
+  <Route {...rest}>
+    <nav className="flex items-center justify-between flex-wrap p-4">
+      <div className="flex items-center flex-shrink-0 text-white mr-6">
+        <span className="font-semibold text-xl tracking-tight">
+          Fieldbook 📒
+        </span>
+      </div>
+    </nav>
+    {children}
+  </Route>
+)
+
+type FieldbookRouterSwitchProps = {
+  loading: boolean
+}
+
+const FieldbookRouterSwitch: React.FC<FieldbookRouterSwitchProps> = ({
+  loading,
+}) => {
+  if (loading) return <LoadingScreen />
+
   return (
-    <Router>
-      <Switch>
-        <Route path="/login">
-          <nav className="flex items-center justify-between flex-wrap bg-decorgreen-600 p-4">
-            <div className="flex items-center flex-shrink-0 text-white mr-6">
-              <span className="font-semibold text-xl tracking-tight">
-                Fieldbook 📒
-              </span>
-            </div>
-          </nav>
-          <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
-            <UserForm />
-          </div>
-        </Route>
-        <PrivateRoute exact path="/">
-          <ItemList />
-        </PrivateRoute>
-        <PrivateRoute exact path="/settings">
-          <SettingsUpdate />
-        </PrivateRoute>
-        <PrivateRoute exact path="/settings/user">
-          <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
-            <UserForm />
-          </div>
-        </PrivateRoute>
-        <PrivateRoute exact path="/new">
-          <ItemFormCreate />
-        </PrivateRoute>
-        <PrivateRoute exact path="/:id/">
-          <ItemDetail />
-        </PrivateRoute>
-        <PrivateRoute exact path="/:id/edit">
-          <ItemFormUpdate />
-        </PrivateRoute>
-      </Switch>
-    </Router>
+    <Switch>
+      <UnauthenticatedRoute path="/login">
+        <LoginForm />
+      </UnauthenticatedRoute>
+      <UnauthenticatedRoute path="/signup">
+        <SignupForm />
+      </UnauthenticatedRoute>
+      {/* <UnauthenticatedRoute path="/signup-convert">
+        <ConvertUserForm />
+      </UnauthenticatedRoute> */}
+      <PrivateRoute exact path="/">
+        <ItemList />
+      </PrivateRoute>
+      <PrivateRoute exact path="/settings">
+        <SettingsUpdateForm />
+      </PrivateRoute>
+      <PrivateRoute exact path="/settings/user">
+        <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
+          <UserForm />
+        </div>
+      </PrivateRoute>
+      <PrivateRoute exact path="/new">
+        <ItemFormCreate />
+      </PrivateRoute>
+      <PrivateRoute exact path="/:id/">
+        <ItemDetail />
+      </PrivateRoute>
+      <PrivateRoute exact path="/:id/edit">
+        <ItemFormUpdate />
+      </PrivateRoute>
+    </Switch>
   )
 }
 
+function App() {
+  const { loading } = useMetaContext()
+  const MemoisedRouterSwitch = React.memo(FieldbookRouterSwitch)
+
+  return (
+    <>
+      <Router>
+        <MemoisedRouterSwitch {...{ loading }} />
+      </Router>
+    </>
+  )
+}
 export default App

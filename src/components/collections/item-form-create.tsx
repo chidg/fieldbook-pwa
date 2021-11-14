@@ -7,7 +7,7 @@ import ItemForm from "./item-form"
 
 export const ItemFormCreate: React.FC = () => {
   const history = useHistory()
-  const { initials } = useUserContext().user!
+  const { collectionPrefix } = useUserContext().settings!
   const { saveItem, data } = useDataContext()
   const { sendEvent } = useGoogleAnalytics()
   const [geoLocation, geoLocationWarning] = useGeoLocation()
@@ -56,7 +56,7 @@ export const ItemFormCreate: React.FC = () => {
         saveItem({
           ...values,
           id: v4(),
-          prefix: initials,
+          prefix: collectionPrefix,
           timestamp: Date.now(),
           location: geoLocation,
         })
