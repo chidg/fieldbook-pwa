@@ -13,19 +13,19 @@ if (process.env.SENTRY_DSN) {
     dsn: process.env.SENTRY_DSN,
     integrations: [new Integrations.BrowserTracing()],
     tracesSampleRate: 0.1,
-    initialScope: { tags: { appVersion: 'main' } }
+    initialScope: { tags: { appVersion: "main" } },
   })
 }
 
 ReactDOM.render(
   <React.StrictMode>
-    <UserProvider>
-      <DataProvider>
-        <MetaProvider>
+    <MetaProvider>
+      <UserProvider>
+        <DataProvider>
           <App />
-        </MetaProvider>
-      </DataProvider>
-    </UserProvider>
+        </DataProvider>
+      </UserProvider>
+    </MetaProvider>
   </React.StrictMode>,
   document.getElementById("root")
 )

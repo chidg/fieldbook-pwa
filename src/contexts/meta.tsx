@@ -3,6 +3,7 @@ import React from "react"
 interface MetaState {
   newestFirst: boolean
   setNewestFirst: (value: boolean) => void
+  setLoading: (value: boolean) => void
   online: boolean
   loading: boolean
 }
@@ -32,6 +33,7 @@ const MetaProvider: React.FC = ({ children }) => {
       value={{
         newestFirst,
         setNewestFirst,
+        setLoading,
         ...memoisedState,
       }}
     >

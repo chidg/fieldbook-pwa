@@ -27,7 +27,7 @@ type MapDetails = {
 export const ItemDetail: React.FC = () => {
   const history = useHistory()
 
-  const { user, settings } = useUserContext()
+  const { settings } = useUserContext()
   const { data } = useDataContext()
   const { id: instanceId }: { id: string } = useParams()
   const [instance, setInstance] = React.useState<DataItem>()

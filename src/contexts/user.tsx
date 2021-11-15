@@ -12,7 +12,8 @@ import {
   useSignInWithEmailAndPassword,
 } from "react-firebase-hooks/auth"
 import { useLocalStorage } from "app/hooks"
-import firebaseConfig from "../firebase-config"
+import { firebaseApp } from "../firebase-config"
+import { useMetaContext } from "."
 
 interface Settings {
   collectionPrefix?: string
@@ -38,11 +39,16 @@ interface UserContextState {
 const UserContext = React.createContext<UserContextState | undefined>(undefined)
 
 const UserProvider: React.FC = ({ children }) => {
-  const auth = getAuth(firebaseConfig)
-  const [user, loading, error] = useAuthState(auth)
+  const auth = getAuth(firebaseApp)
+  const [user, loading] = useAuthState(auth)
+  const { setLoading } = useMetaContext()
   const [settings, setSettings] = React.useState<Settings>({
     watchLocation: true,
   })
+
+  React.useEffect(() => {
+    setLoading(loading)
+  }, [loading, setLoading])
 
   const [settingsLocalStoredValue, setSettingsLocalStoredValue] =
     useLocalStorage("settings", { watchLocation: false })
