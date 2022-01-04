@@ -5,6 +5,7 @@ import {
   useSyncingStatus,
   useUploadCollection,
 } from "../hooks"
+import { useUserContext } from "../contexts"
 import { useDelete } from "react-supabase"
 export interface DataItem {
   id: string
@@ -42,6 +43,7 @@ const DataProvider: React.FC = ({ children }) => {
     {}
   )
   const online = useOnlineStatus()
+  const { user } = useUserContext()
   const { syncing, setSyncing } = useSyncingStatus()
   const upload = useUploadCollection()
   const deleteCollection = useDelete("collections")[1]
@@ -51,7 +53,7 @@ const DataProvider: React.FC = ({ children }) => {
   // When the provider state changes, unsynchronised items are queued for upload.
 
   React.useEffect(() => {
-    if (!online || syncing) return
+    if (!online || !user || syncing) return
 
     const unsynchronised = Object.values(localStoredValue).filter(
       (item) => !item.synchronisedAt
@@ -83,6 +85,7 @@ const DataProvider: React.FC = ({ children }) => {
     }
   }, [
     online,
+    user,
     upload,
     setSyncing,
     syncing,
