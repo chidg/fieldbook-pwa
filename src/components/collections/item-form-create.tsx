@@ -3,16 +3,16 @@ import { v4 } from "uuid"
 import { useHistory } from "react-router-dom"
 import { useDataContext, useUserContext } from "../../contexts"
 import { useGoogleAnalytics, useGeoLocation } from "../../hooks"
-import ItemForm from "./item-form"
+import { ItemForm } from "./item-form"
 
-export const ItemFormCreate: React.FC = () => {
+const ItemFormCreate = () => {
   const history = useHistory()
   const { collectionPrefix } = useUserContext().settings!
   const { saveItem, data } = useDataContext()
   const { sendEvent } = useGoogleAnalytics()
   const [geoLocation, geoLocationWarning] = useGeoLocation()
 
-  const getLocationDisplay = React.useCallback(() => {
+  const getLocationDisplay = React.useMemo(() => {
     if (geoLocation) {
       return `${geoLocation.latitude.toPrecision(
         6
@@ -47,26 +47,34 @@ export const ItemFormCreate: React.FC = () => {
     }
   }, [data])
 
+  const onSubmit = React.useCallback(
+    async (values) => {
+      await saveItem({
+        ...values,
+        id: v4(),
+        prefix: collectionPrefix,
+        timestamp: new Date().toISOString(),
+        location: geoLocation || null,
+      })
+      sendEvent({
+        category: "Collection",
+        action: "Created collection",
+      })
+      history.replace("/")
+    },
+    [collectionPrefix, history, geoLocation, saveItem, sendEvent]
+  )
+
   return (
     <ItemForm
-      locationDisplay={getLocationDisplay()}
+      locationDisplay={getLocationDisplay}
       locationAccuracy={geoLocation?.accuracy}
       initialValues={initialValues()}
-      onSubmit={(values) => {
-        saveItem({
-          ...values,
-          id: v4(),
-          prefix: collectionPrefix,
-          timestamp: Date.now(),
-          location: geoLocation,
-        })
-        sendEvent({
-          category: "Collection",
-          action: "Created collection",
-        })
-        history.replace("/")
-      }}
+      onSubmit={onSubmit}
       title="New Item"
     />
   )
 }
+
+ItemFormCreate.whyDidYouRender = true
+export { ItemFormCreate }

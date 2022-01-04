@@ -1,11 +1,13 @@
 import React from "react"
 import { useHistory, useParams } from "react-router-dom"
 import { DataItem, useDataContext } from "../../contexts"
-import ItemForm from "./item-form"
+import { useCollections } from "../../hooks"
+import { ItemForm } from "./item-form"
 
 export const ItemFormUpdate: React.FC = () => {
   const history = useHistory()
-  const { saveItem, data, deleteItem } = useDataContext()
+  const { saveItem, deleteItem } = useDataContext()
+  const data = useCollections()
   const [instance, setInstance] = React.useState<DataItem | undefined>(
     undefined
   )

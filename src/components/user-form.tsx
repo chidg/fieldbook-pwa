@@ -5,7 +5,7 @@ import { useUserContext } from "app/contexts"
 import { useGoogleAnalytics } from "app/hooks"
 
 const UserForm = () => {
-  const { user, signInUser } = useUserContext()
+  const { user } = useUserContext()
   const { sendEvent } = useGoogleAnalytics()
   const history = useHistory()
 
@@ -21,8 +21,7 @@ const UserForm = () => {
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={(values) => {
-        // signInUser(values)
+      onSubmit={async (values) => {
         sendEvent({
           category: "User",
           action: `${user ? "Updated" : "Created"} user details`,

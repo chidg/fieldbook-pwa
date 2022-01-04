@@ -2,6 +2,7 @@ import React from "react"
 import { Formik, Field, Form } from "formik"
 import * as Yup from "yup"
 import axios from "axios"
+import { useSignUp } from "react-supabase"
 import { useHistory, Link } from "react-router-dom"
 
 import { useUserContext } from "app/contexts"
@@ -20,7 +21,8 @@ const schema = Yup.object().shape({
 })
 
 export const SignupForm = () => {
-  const { setSettings, createUser, user, updateProfile } = useUserContext()
+  const signUp = useSignUp()[1]
+  const { setSettings } = useUserContext()
   const { sendEvent } = useGoogleAnalytics()
   const history = useHistory()
   const initialValues = {
@@ -37,8 +39,19 @@ export const SignupForm = () => {
         initialValues={initialValues}
         validationSchema={schema}
         onSubmit={async (values) => {
-          createUser({ email: values.email, password: values.password })
-            .then((userCredentials) => {
+          signUp(
+            { email: values.email, password: values.password },
+            {
+              // function looks like this will work, even though it is not typed to handle it
+              // @ts-ignore
+              data: {
+                displayName: values.name,
+              },
+            }
+          )
+            .then(({ error, session, user }) => {
+              if (error) throw new Error(error.message)
+
               sendEvent({
                 category: "User",
                 action: "Converted user to Firebase User",
@@ -50,15 +63,13 @@ export const SignupForm = () => {
 
               axios.post(
                 ".netlify/functions/signedup",
-                { user: userCredentials.user },
+                { user: user },
                 {
                   responseType: "json",
                 }
               )
 
-              return updateProfile(userCredentials.user, {
-                displayName: values.name,
-              })
+              return user
             })
             .then(() => {
               history.push("/")

@@ -4,8 +4,9 @@ interface MetaState {
   newestFirst: boolean
   setNewestFirst: (value: boolean) => void
   setLoading: (value: boolean) => void
-  online: boolean
+  setSyncing: (value: boolean) => void
   loading: boolean
+  syncing: boolean
 }
 
 const MetaContext = React.createContext<MetaState | undefined>(undefined)
@@ -15,17 +16,14 @@ const MetaProvider: React.FC = ({ children }) => {
   // This prevents a race condition which would otherwise cause a redirect to the login screen
   const [loading, setLoading] = React.useState<boolean>(true)
   const [newestFirst, setNewestFirst] = React.useState<boolean>(false)
-  const [online, setOnline] = React.useState(window.navigator.onLine)
-
-  window.addEventListener("offline", () => setOnline(false))
-  window.addEventListener("online", () => setOnline(true))
+  const [syncing, setSyncing] = React.useState<boolean>(false)
 
   const memoisedState = React.useMemo(
     () => ({
       loading,
-      online: online,
+      syncing,
     }),
-    [loading, online]
+    [loading, syncing]
   )
 
   return (
@@ -34,6 +32,7 @@ const MetaProvider: React.FC = ({ children }) => {
         newestFirst,
         setNewestFirst,
         setLoading,
+        setSyncing,
         ...memoisedState,
       }}
     >

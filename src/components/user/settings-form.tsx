@@ -1,12 +1,15 @@
 import React, { useState } from "react"
 import { useHistory, Link } from "react-router-dom"
-import { useUserContext, useDataContext, useMetaContext } from "app/contexts"
+import { useUserContext } from "app/contexts"
+import { useOnlineStatus } from "app/hooks"
+import { useSignOut } from "react-supabase"
 
 export const SettingsUpdateForm: React.FC = () => {
   const history = useHistory()
-  const { online } = useMetaContext()
-  const { user, signOut } = useUserContext()
-  const [exporting, setExporting] = useState(false)
+  const online = useOnlineStatus()
+  const { user } = useUserContext()
+  const signOut = useSignOut()[1]
+  const [exporting] = useState(false)
   const [clearing, setClearing] = useState(false)
 
   const clearData = React.useCallback(async () => {
@@ -98,8 +101,7 @@ export const SettingsUpdateForm: React.FC = () => {
               type="button"
               className="border-2 bg-green-500 rounded px-4 py-2"
               onClick={() => {
-                signOut()
-                history.replace("/")
+                signOut().then(() => history.replace("/"))
               }}
               disabled={exporting}
             >

@@ -3,12 +3,9 @@ import Fuse from "fuse.js"
 import { Link } from "react-router-dom"
 import useDeepCompareEffect from "use-deep-compare-effect"
 
-import {
-  DataItem,
-  useDataContext,
-  useUserContext,
-  useMetaContext,
-} from "../../contexts"
+import { DataItem, useUserContext, useMetaContext } from "../../contexts"
+
+import { useCollections } from "../../hooks"
 
 const DataListItem = (item: DataItem) => {
   const { collectionPrefix } = useUserContext().settings!
@@ -20,6 +17,14 @@ const DataListItem = (item: DataItem) => {
         {item.number}
       </div>
       <div className="flex-grow font-medium px-2">{item.fieldName}</div>
+      {!item.synchronisedAt && (
+        <div
+          className="font-normal text-white tracking-wide mr-2"
+          title="Waiting for network access to upload"
+        >
+          🔜
+        </div>
+      )}
       <div className="font-normal tracking-wide">
         <Link
           to={{
@@ -55,7 +60,7 @@ const getDataByDate = (data: DataItem[]): DateBinnedCollections =>
   }, {} as DateBinnedCollections)
 
 export const DataList = () => {
-  const { data } = useDataContext()
+  const data = useCollections()
   const { user } = useUserContext()
   const { newestFirst, setNewestFirst } = useMetaContext()
 
@@ -181,28 +186,27 @@ export const DataList = () => {
       {!dataItemsExist && (
         <div className="grid row mx-10">
           <div className="border-2 border-white text-white rounded px-4 py-2">
-            <p>Hi {user!.displayName}, welcome to Fieldbook!</p>
+            <p>Hi {user!.user_metadata.displayName}, welcome to Fieldbook!</p>
             <p>Hit the 🌱 below to start adding collection records.</p>
           </div>
         </div>
       )}
-      {Object.keys(displayData as DateBinnedCollections).map((dateString) => (
-        <>
-          <div
-            className="bg-white bg-opacity-80 text-gray-600 text-sm font-medium px-1"
-            key={`collection-${dateString}`}
-          >
-            {dateString}
+      {Object.keys(displayData as DateBinnedCollections).map(
+        (dateString, i) => (
+          <div key={`collection-${dateString}-${i}`}>
+            <div className="bg-white bg-opacity-80 text-gray-600 text-sm font-medium px-1">
+              {dateString}
+            </div>
+            {(displayData as DateBinnedCollections)[dateString].map(
+              (collection, ii) => (
+                <DataListItem {...collection} key={`${collection.id}-${ii}`} />
+              )
+            )}
           </div>
-          {(displayData as DateBinnedCollections)[dateString].map(
-            (collection) => (
-              <DataListItem {...collection} key={collection.id} />
-            )
-          )}
-        </>
-      ))}
+        )
+      )}
     </>
   )
 }
 
-DataList.whyDidYouRender = true
+DataList.whyDidYouRender = false

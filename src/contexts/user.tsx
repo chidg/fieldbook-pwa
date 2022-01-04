@@ -1,83 +1,68 @@
 import React from "react"
-import {
-  getAuth,
-  updateProfile,
-  User,
-  createUserWithEmailAndPassword,
-  UserCredential,
-  updateEmail,
-} from "firebase/auth"
-import {
-  useAuthState,
-  useSignInWithEmailAndPassword,
-} from "react-firebase-hooks/auth"
+import { useAuthStateChange, useClient } from "react-supabase"
+import { User } from "@supabase/gotrue-js"
 import { useLocalStorage } from "app/hooks"
-import { firebaseApp } from "../firebase-config"
-import { useMetaContext } from "."
-
+import { useMetaContext } from "./meta"
 interface Settings {
   collectionPrefix?: string
   watchLocation: boolean
 }
 
-type CreateUserOptions = {
-  email: string
-  password: string
-}
 interface UserContextState {
   user?: User | null
-  createUser: (args: CreateUserOptions) => Promise<UserCredential>
-  signInUser: (email: string, password: string) => Promise<void>
-  updateProfile: typeof updateProfile
-  updateEmail: typeof updateEmail
   settings: Settings
-  loading: boolean
+  setUser: (user: User) => void
   setSettings: (arg0: Partial<Settings>) => void
-  signOut: () => void
 }
 
 const UserContext = React.createContext<UserContextState | undefined>(undefined)
 
 const UserProvider: React.FC = ({ children }) => {
-  const auth = getAuth(firebaseApp)
-  const [user, loading] = useAuthState(auth)
+  const [user, setUser] = React.useState<User>()
   const { setLoading } = useMetaContext()
-  const [settings, setSettings] = React.useState<Settings>({
+  const client = useClient()
+  const [settings, _setSettings] = React.useState<Settings>({
     watchLocation: true,
+  })
+  const [settingsLocalStoredValue, setSettingsLocalStoredValue] =
+    useLocalStorage<Settings>("settings", { watchLocation: false })
+
+  React.useEffect(() => {
+    const session = client.auth.session()
+    if (JSON.stringify(session?.user) !== JSON.stringify(user)) {
+      setUser(session?.user || undefined)
+    }
+    setLoading(false)
+  }, [client.auth, setLoading, user])
+
+  useAuthStateChange((event, session) => {
+    if (JSON.stringify(session?.user) !== JSON.stringify(user)) {
+      setUser(session?.user || undefined)
+    }
   })
 
   React.useEffect(() => {
-    setLoading(loading)
-  }, [loading, setLoading])
-
-  const [settingsLocalStoredValue, setSettingsLocalStoredValue] =
-    useLocalStorage("settings", { watchLocation: false })
-
-  const createUser = React.useCallback(
-    ({ email, password }) =>
-      createUserWithEmailAndPassword(auth, email, password),
-    [auth]
-  )
-
-  React.useEffect(() => {
-    setSettings(settingsLocalStoredValue)
+    _setSettings(settingsLocalStoredValue)
   }, [settingsLocalStoredValue])
 
+  const setSettings = React.useCallback(
+    (newSettings) =>
+      setSettingsLocalStoredValue({ ...settings, ...newSettings }),
+    [setSettingsLocalStoredValue, settings]
+  )
+
+  const memoisedState = React.useMemo(
+    () => ({
+      user,
+      setUser,
+      settings,
+      setSettings,
+    }),
+    [user, setUser, settings, setSettings]
+  )
+
   return (
-    <UserContext.Provider
-      value={{
-        user,
-        createUser,
-        signInUser: useSignInWithEmailAndPassword(auth)[0],
-        updateProfile,
-        updateEmail,
-        settings,
-        setSettings: (newSettings) =>
-          setSettingsLocalStoredValue({ ...settings, ...newSettings }),
-        loading,
-        signOut: auth.signOut,
-      }}
-    >
+    <UserContext.Provider value={memoisedState}>
       {children}
     </UserContext.Provider>
   )
@@ -90,5 +75,7 @@ const useUserContext = () => {
   }
   return context
 }
+
+UserProvider.whyDidYouRender = true
 
 export { UserProvider, useUserContext }

@@ -8,11 +8,16 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
-import { clientsClaim } from "workbox-core"
+import { clientsClaim, WorkboxPlugin } from "workbox-core"
 import { ExpirationPlugin } from "workbox-expiration"
 import { precacheAndRoute, createHandlerBoundToURL } from "workbox-precaching"
+import { BackgroundSyncPlugin } from "workbox-background-sync"
 import { registerRoute } from "workbox-routing"
-import { CacheFirst, StaleWhileRevalidate } from "workbox-strategies"
+import {
+  CacheFirst,
+  StaleWhileRevalidate,
+  NetworkOnly,
+} from "workbox-strategies"
 import { CacheableResponsePlugin } from "workbox-cacheable-response"
 import { initialize } from "workbox-google-analytics"
 
@@ -100,4 +105,51 @@ self.addEventListener("message", (event) => {
   }
 })
 
+self.addEventListener("fetch", (event) => {
+  console.log("FETCHING EVENT IN SW", { event })
+})
 // Any other custom service worker logic can go here.
+const bgSyncPlugin = new BackgroundSyncPlugin("fieldbookSupabaseUploads", {
+  onSync: (options) => {
+    console.log("bgSyncPlugin.onSync", { options })
+    options.queue
+      .getAll()
+      .then((entries) => console.log({ entries }))
+      .finally(() => options.queue.replayRequests())
+  },
+})
+
+// class UpdateSynchronisedPlugin implements WorkboxPlugin {
+//   constructor(name: string) {
+
+//     this.fetchDidSucceed: (request, response) => {
+//       console.log('got request and response in ')
+//     }
+//   }
+// }
+
+const testStuffPlugin: WorkboxPlugin = {
+  fetchDidSucceed: async ({ request, response }) => {
+    // Return `response` to use the network response as-is,
+    // or alternatively create and return a new `Response` object.
+    console.log({ fetchDidSucceed: { request, response } })
+    return response
+  },
+  fetchDidFail: async ({ originalRequest, request, error, event }) => {
+    // Return `response` to use the network response as-is,
+    // or alternatively create and return a new `Response` object.
+    console.log({
+      fetchDidFail: { originalRequest, request, error, event },
+    })
+  },
+}
+
+registerRoute(
+  new RegExp(
+    /https?:\/\/(xrmkgudqrqkaxawylvkt.supabase.co\/rest\/v1)?(.*)?\/?(.)*/g
+  ),
+  new NetworkOnly({
+    plugins: [bgSyncPlugin, testStuffPlugin],
+  }),
+  "POST"
+)

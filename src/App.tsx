@@ -26,7 +26,7 @@ import LoadingScreen from "./components/loading-screen"
 import SettingsUpdate from "./components/settings-form"
 
 const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
-  const { user, loading } = useUserContext()
+  const { user } = useUserContext()
   useGoogleAnalytics()
 
   return (
@@ -70,8 +70,8 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
         <Route
           {...rest}
           render={({ location }) => {
-            if (loading) return <LoadingScreen />
-            else if (user) return children
+            // if (loading) return <LoadingScreen />
+            if (user) return children
             else
               return (
                 <Redirect
@@ -150,11 +150,9 @@ function App() {
   const MemoisedRouterSwitch = React.memo(FieldbookRouterSwitch)
 
   return (
-    <>
-      <Router>
-        <MemoisedRouterSwitch {...{ loading }} />
-      </Router>
-    </>
+    <Router>
+      <MemoisedRouterSwitch {...{ loading }} />
+    </Router>
   )
 }
 export default App

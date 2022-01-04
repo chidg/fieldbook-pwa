@@ -5,6 +5,7 @@ import { useHistory, Link } from "react-router-dom"
 import { useUserContext } from "app/contexts"
 import { useGoogleAnalytics } from "app/hooks"
 import { SpinningSubmitFormButton } from "app/common"
+import { useSignIn } from "react-supabase"
 
 const schema = Yup.object().shape({
   password: Yup.string().required("This field is required").min(8),
@@ -12,7 +13,8 @@ const schema = Yup.object().shape({
 })
 
 export const LoginForm = () => {
-  const { user, signInUser } = useUserContext()
+  const { user: existingUser, setUser } = useUserContext()
+  const signIn = useSignIn()[1]
   const { sendEvent } = useGoogleAnalytics()
   const history = useHistory()
 
@@ -27,18 +29,20 @@ export const LoginForm = () => {
         initialValues={initialValues}
         validationSchema={schema}
         onSubmit={async ({ email, password }, { setStatus }) => {
-          if (user) {
+          if (existingUser) {
             console.log("user exists, replace history")
             history.replace("/")
           }
 
-          signInUser(email, password)
-            .then(() => {
+          signIn({ email, password })
+            .then(({ user }) => {
+              if (!user) throw new Error("Login failed")
               console.log("signed in user ")
               sendEvent({
                 category: "User",
                 action: "User logged in",
               })
+              // setUser(user)
               history.replace("/")
             })
             .catch((error) => {

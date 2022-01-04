@@ -1,19 +1,30 @@
 import React from "react"
 import { Formik, Field, Form } from "formik"
 import { useHistory } from "react-router-dom"
+import { useClient } from "react-supabase"
 
 import { useUserContext } from "../../contexts"
 
 import { useGoogleAnalytics } from "../../hooks"
 
 export const UserForm = () => {
-  const { user, settings, setSettings, updateProfile, updateEmail } =
-    useUserContext()
+  const { user, settings, setSettings } = useUserContext()
   const { sendEvent } = useGoogleAnalytics()
+  const { auth } = useClient()
+
+  const updateEmail = React.useCallback(
+    (email: string) => auth.update({ email }),
+    [auth]
+  )
+
+  const updateProfile = React.useCallback(
+    (displayName: string) => auth.update({ data: { displayName } }),
+    [auth]
+  )
   const history = useHistory()
 
   const initialValues = {
-    name: user?.displayName,
+    name: user?.user_metadata.displayName,
     prefix: settings.collectionPrefix,
     email: user?.email,
   }
@@ -24,10 +35,10 @@ export const UserForm = () => {
         initialValues={initialValues}
         onSubmit={async ({ email, prefix, name }) => {
           if (email && email !== user!.email) {
-            await updateEmail(user!, email)
+            await updateEmail(email)
           }
-          if (name && name !== user?.displayName) {
-            await updateProfile(user!, { displayName: name })
+          if (name && name !== user?.user_metadata.displayName) {
+            await updateProfile(name)
           }
           if (prefix && prefix !== settings.collectionPrefix) {
             setSettings({ collectionPrefix: prefix })

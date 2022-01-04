@@ -1,3 +1,4 @@
+import "./wdyr"
 import React from "react"
 import ReactDOM from "react-dom"
 import "./styles/tailwind.css"
@@ -7,6 +8,7 @@ import reportWebVitals from "./reportWebVitals"
 import * as Sentry from "@sentry/react"
 import { Integrations } from "@sentry/tracing"
 import { UserProvider, DataProvider, MetaProvider } from "./contexts"
+import SupabaseProvider from "./supabase"
 
 if (process.env.SENTRY_DSN) {
   Sentry.init({
@@ -19,13 +21,15 @@ if (process.env.SENTRY_DSN) {
 
 ReactDOM.render(
   <React.StrictMode>
-    <MetaProvider>
-      <UserProvider>
-        <DataProvider>
-          <App />
-        </DataProvider>
-      </UserProvider>
-    </MetaProvider>
+    <SupabaseProvider>
+      <MetaProvider>
+        <UserProvider>
+          <DataProvider>
+            <App />
+          </DataProvider>
+        </UserProvider>
+      </MetaProvider>
+    </SupabaseProvider>
   </React.StrictMode>,
   document.getElementById("root")
 )

@@ -1,6 +1,7 @@
 import React from "react"
 import { useHistory, useParams, Link } from "react-router-dom"
-import { DataItem, useDataContext, useUserContext } from "../../contexts"
+import { useUserContext } from "../../contexts"
+import { useCollectionById } from "../../hooks"
 import ReactMapGL, {
   ViewportProps,
   Source,
@@ -24,26 +25,13 @@ type MapDetails = {
   geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>
 }
 
-export const ItemDetail: React.FC = () => {
+const ItemDetail: React.FC = () => {
   const history = useHistory()
 
   const { settings } = useUserContext()
-  const { data } = useDataContext()
   const { id: instanceId }: { id: string } = useParams()
-  const [instance, setInstance] = React.useState<DataItem>()
-
-  const [mapDetails, setMapDetails] = React.useState<MapDetails | undefined>(
-    undefined
-  )
-
-  React.useEffect(() => {
-    const item = data[instanceId]
-    if (item) {
-      setInstance(item)
-    } else {
-      history.replace("/")
-    }
-  }, [setInstance, data, instanceId, history])
+  const instance = useCollectionById(instanceId)
+  const [mapDetails, setMapDetails] = React.useState<MapDetails>()
 
   React.useEffect(() => {
     if (instance?.location && Object.keys(instance?.location).length > 0) {
@@ -164,3 +152,6 @@ export const ItemDetail: React.FC = () => {
     </div>
   )
 }
+
+ItemDetail.whyDidYouRender = true
+export { ItemDetail }
