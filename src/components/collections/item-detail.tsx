@@ -29,9 +29,7 @@ export const ItemDetail: React.FC = () => {
 
   const { data, taxa } = useDataContext()
   const { id: instanceId }: { id: string } = useParams()
-  const [instance, setInstance] = React.useState<DataItem | undefined>(
-    undefined
-  )
+  const [instance, setInstance] = React.useState<DataItem>()
 
   const [mapDetails, setMapDetails] = React.useState<MapDetails | undefined>(
     undefined

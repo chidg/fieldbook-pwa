@@ -39,7 +39,6 @@ const UserProvider: React.FC = ({ children }) => {
     setSettings(settingsLocalStoredValue)
     setLoading(false)
   }, [localStoredValue, settingsLocalStoredValue, setLoading, setUser])
-
   return (
     <UserContext.Provider
       value={{

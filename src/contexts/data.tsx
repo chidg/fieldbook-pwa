@@ -1,7 +1,6 @@
 import React from "react"
 import { useLocalStorage } from "../hooks"
 
-
 export const densityOptions: Array<string> = [
   "Absent",
   "Light - isolated plants, individuals are scarce or scattered, small clumps may occur",
@@ -38,23 +37,30 @@ interface DataState {
   setTaxa: (arg0: Taxa) => void
   saveItem: (arg0: DataItem) => void
   saveTaxon: (arg0: Taxon) => void
+  deleteItem: (id: string) => void
 }
 
 const DataContext = React.createContext<DataState | undefined>(undefined)
 
 const DataProvider: React.FC = ({ children }) => {
-  const [localStoredDataValue, setLocalStoredDataValue] = useLocalStorage("data", {})
-  const [localStoredTaxaValue, setLocalStoredTaxaValue] = useLocalStorage("taxa", {})
+  const [localStoredDataValue, setLocalStoredDataValue] = useLocalStorage(
+    "data",
+    {}
+  )
+  const [localStoredTaxaValue, setLocalStoredTaxaValue] = useLocalStorage(
+    "taxa",
+    {}
+  )
   const [data, setData] = React.useState<Data>({})
   const [taxa, setTaxa] = React.useState<Taxa>({})
 
   React.useEffect(() => {
     setData(localStoredDataValue)
-  }, [setData, localStoredDataValue])
+  }, [localStoredDataValue])
 
   React.useEffect(() => {
     setTaxa(localStoredTaxaValue)
-  }, [setTaxa, localStoredTaxaValue])
+  }, [localStoredTaxaValue])
 
   const saveItem = React.useCallback(
     async (item: DataItem) => {
@@ -64,7 +70,7 @@ const DataProvider: React.FC = ({ children }) => {
     },
     [data, setLocalStoredDataValue]
   )
-  
+
   const saveTaxon = React.useCallback(
     async (taxon: Taxon) => {
       const newTaxa = { ...taxa, [taxon.id]: taxon }
@@ -72,6 +78,14 @@ const DataProvider: React.FC = ({ children }) => {
       // Results in update to `taxa` due to effect above
     },
     [taxa, setLocalStoredTaxaValue]
+  )
+
+  const deleteItem = React.useCallback(
+    async (id: string) => {
+      const { [id]: deleted, ...newData } = data
+      setLocalStoredDataValue(newData)
+    },
+    [data]
   )
 
   return (
@@ -83,6 +97,7 @@ const DataProvider: React.FC = ({ children }) => {
         setTaxa: setLocalStoredTaxaValue,
         saveItem,
         saveTaxon,
+        deleteItem,
       }}
     >
       {children}

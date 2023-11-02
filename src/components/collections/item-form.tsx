@@ -19,6 +19,7 @@ type ItemFormValues = {
 
 interface ItemFormProps extends FormikConfig<ItemFormValues> {
   title: string
+  prefix?: string
   locationDisplay?: string
   locationAccuracy?: number | null
 }
@@ -197,6 +198,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
               Save
             </button>
           </div>
+          {children}
         </Form>
       )}
     </Formik>

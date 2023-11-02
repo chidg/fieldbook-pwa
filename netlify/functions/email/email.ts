@@ -23,7 +23,10 @@ function dontIndent(str: string): string {
 
 const sendEmail = async ({ user, data }: { user: any; data: DataItem[] }) => {
   return new Promise((resolve, reject) => {
-    const mg = mailgun.client({ username: "api", key: process.env.MG_API_KEY })
+    const mg = mailgun.client({
+      username: "api",
+      key: process.env.MG_API_KEY || "",
+    })
 
     const csvStringifier = createObjectCsvStringifier({
       header: [

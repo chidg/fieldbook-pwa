@@ -12,7 +12,8 @@ import { clientsClaim } from "workbox-core"
 import { ExpirationPlugin } from "workbox-expiration"
 import { precacheAndRoute, createHandlerBoundToURL } from "workbox-precaching"
 import { registerRoute } from "workbox-routing"
-import { StaleWhileRevalidate } from "workbox-strategies"
+import { CacheFirst, StaleWhileRevalidate } from "workbox-strategies"
+import { CacheableResponsePlugin } from "workbox-cacheable-response"
 import { initialize } from "workbox-google-analytics"
 
 declare const self: ServiceWorkerGlobalScope
@@ -68,6 +69,25 @@ registerRoute(
       // Ensure that once this runtime cache reaches a maximum size the
       // least-recently used images are removed.
       new ExpirationPlugin({ maxEntries: 50 }),
+    ],
+  })
+)
+//https://api.mapbox.com/v4/mapbox.satellite/15/26925/19469@2x.webp?sku=101YN2FF2OTGl&access_token=pk.eyJ1IjoiY2hpZCIsImEiOiJja295NHR0NjkwbXE1MnBtcGRveHk0MG4zIn0.8w-R_XkUOHzVQ0B_UoDeGQ
+//https://api.mapbox.com/styles/v1/mapbox/satellite-v9?access_token=pk.eyJ1IjoiY2hpZCIsImEiOiJja295NHR0NjkwbXE1MnBtcGRveHk0MG4zIn0.8w-R_XkUOHzVQ0B_UoDeGQ
+// cache map tiles
+registerRoute(
+  new RegExp(
+    /(https:)?(\/\/([^/?#]*)?)(mapbox.com)([^?#]*)(\?([^#]*))?(#(.*))?/g
+  ),
+  new StaleWhileRevalidate({
+    cacheName: "maptiles",
+    plugins: [
+      // Ensure that once this runtime cache reaches a maximum size the
+      // least-recently used images are removed.
+      new ExpirationPlugin({ maxEntries: 100 }),
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
     ],
   })
 )
