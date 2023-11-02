@@ -1,10 +1,10 @@
 import { Handler } from "@netlify/functions"
-import formData from "form-data"
+import FormData from "form-data"
 import Mailgun from "mailgun.js"
 
 import { createObjectCsvStringifier } from "csv-writer"
 
-const mailgun = new Mailgun(formData)
+const mailgun = new Mailgun(FormData)
 
 export interface DataItem {
   id: string
@@ -21,11 +21,16 @@ function dontIndent(str: string): string {
   return ("" + str).replace(/(\n)\s+/g, "$1")
 }
 
+const apiKey = process.env.MG_API_KEY
+if (!apiKey) throw new Error("No mailgun api key present")
+const mgDomain = process.env.MG_DOMAIN
+if (!mgDomain) throw new Error("No mailgun domain present")
+
 const sendEmail = async ({ user, data }: { user: any; data: DataItem[] }) => {
   return new Promise((resolve, reject) => {
     const mg = mailgun.client({
       username: "api",
-      key: process.env.MG_API_KEY || "",
+      key: apiKey,
     })
 
     const csvStringifier = createObjectCsvStringifier({
@@ -67,15 +72,13 @@ const sendEmail = async ({ user, data }: { user: any; data: DataItem[] }) => {
       ],
     }
 
-    return mg.messages
-      .create(process.env.MG_DOMAIN, mailData)
-      .then(resolve)
-      .catch(reject)
+    return mg.messages.create(mgDomain, mailData).then(resolve).catch(reject)
   })
 }
 
 const handler: Handler = async (event) => {
   try {
+    if (!event.body) throw new Error("No data in event")
     const { data, user } = JSON.parse(event.body)
 
     await sendEmail({ data, user })

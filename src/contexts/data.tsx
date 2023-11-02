@@ -85,7 +85,7 @@ const DataProvider: React.FC = ({ children }) => {
       const { [id]: deleted, ...newData } = data
       setLocalStoredDataValue(newData)
     },
-    [data]
+    [data, setLocalStoredDataValue]
   )
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useUserContext } from "../contexts"
 
 export const useGeoLocation = (): [
@@ -32,7 +32,7 @@ export const useGeoLocation = (): [
             speed: coords.speed,
           })
         },
-        (positionError) => setGeoLocationWarning(positionError.code),
+        ({ code }) => setGeoLocationWarning(code),
         { enableHighAccuracy: true }
       )
     } else {
@@ -57,4 +57,24 @@ export const useGeoLocation = (): [
   }, [watchLocation])
 
   return [geoLocation, geoLocationWarning]
+}
+
+export const useGeoLocationDisplay = () => {
+  const [geoLocation, geoLocationWarning] = useGeoLocation()
+
+  return useMemo(() => {
+    if (geoLocation) {
+      return `${geoLocation.latitude.toPrecision(
+        6
+      )}, ${geoLocation.longitude.toPrecision(7)}`
+    } else if (geoLocationWarning) {
+      switch (geoLocationWarning) {
+        case 1:
+          return "Permission denied. Please check your permissions to use the location functionality."
+        default:
+          return "Unable to get location"
+      }
+    }
+    return "Accessing location..."
+  }, [geoLocation, geoLocationWarning])
 }

@@ -1,5 +1,5 @@
 import { Field, Form, Formik, FormikConfig } from "formik"
-import React from "react"
+import React, { ReactNode } from "react"
 import CreatableSelect from "react-select/creatable"
 import Select from "react-select"
 import { useHistory } from "react-router-dom"
@@ -22,6 +22,7 @@ interface ItemFormProps extends FormikConfig<ItemFormValues> {
   prefix?: string
   locationDisplay?: string
   locationAccuracy?: number | null
+  children?: ReactNode
 }
 
 const transformTaxonToSelect = (taxon: Taxon) => ({
@@ -40,6 +41,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
   locationAccuracy,
   initialValues,
   onSubmit,
+  children,
 }) => {
   const history = useHistory()
   const { saveTaxon, taxa } = useDataContext()
