@@ -1,13 +1,13 @@
-import React from "react"
-import { useHistory, useParams } from "react-router-dom"
-import { DataItem, useDataContext } from "../../contexts"
-import ItemForm from "./item-form"
+import React, { useCallback } from "react"
+import { useRouter } from "next/navigation"
+import { DataItem, useDataContext } from "@/contexts"
+import ItemForm, { ItemFormValues } from "./item-form"
 
-export const ItemFormUpdate: React.FC = () => {
-  const history = useHistory()
+export const ItemFormUpdate = ({ params }: { params: { id: string } }) => {
+  const history = useRouter()
   const { saveItem, data, deleteItem, taxa } = useDataContext()
   const [confirmingDelete, setConfirmingDelete] = React.useState<boolean>(false)
-  const { id: instanceId }: { id: string } = useParams()
+  const { id: instanceId } = params
   const [instance, setInstance] = React.useState<DataItem>(data[instanceId])
 
   console.log("Object.keys(taxa).length > 0", Object.keys(taxa).length > 0)
@@ -21,7 +21,7 @@ export const ItemFormUpdate: React.FC = () => {
     }
   }, [setInstance, data, instanceId, history])
 
-  const getLocationDisplay = React.useCallback(() => {
+  const getLocationDisplay = useCallback(() => {
     if (instance.location && Object.keys(instance.location).length > 0) {
       return `${instance.location.latitude.toPrecision(
         6
@@ -30,15 +30,15 @@ export const ItemFormUpdate: React.FC = () => {
     return "No location recorded"
   }, [instance])
 
-  const onSubmit = React.useCallback(
-    (values) => {
+  const onSubmit = useCallback(
+    (values: ItemFormValues) => {
       saveItem({
         ...values,
         id: instanceId,
         timestamp: instance!.timestamp,
         location: instance!.location,
       })
-      history.replace("/")
+      history.replace("/data")
     },
     [history, instance, instanceId, saveItem]
   )

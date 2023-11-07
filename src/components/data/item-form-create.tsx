@@ -1,13 +1,14 @@
+"use client"
 import React from "react"
 import { v4 } from "uuid"
-import { useHistory } from "react-router-dom"
 import { useDataContext } from "../../contexts"
 import { useGoogleAnalytics } from "../../hooks"
 import { useGeoLocation, useGeoLocationDisplay } from "../../hooks/location"
+import { useRouter } from "next/navigation"
 import ItemForm from "./item-form"
 
 export const ItemFormCreate: React.FC = () => {
-  const history = useHistory()
+  const { replace } = useRouter()
   const { saveItem, taxa } = useDataContext()
   const { sendEvent } = useGoogleAnalytics()
   const [geoLocation] = useGeoLocation()
@@ -28,7 +29,6 @@ export const ItemFormCreate: React.FC = () => {
       onSubmit={(values) => {
         saveItem({
           ...values,
-          density: parseInt(values.density),
           id: v4(),
           timestamp: Date.now(),
           location: geoLocation,
@@ -37,7 +37,7 @@ export const ItemFormCreate: React.FC = () => {
           category: "Observation",
           action: "Created weed observation",
         })
-        history.replace("/")
+        replace("/")
       }}
       title="New Observation"
     />

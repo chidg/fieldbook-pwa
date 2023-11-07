@@ -1,7 +1,7 @@
-import React from "react"
-import { useLocalStorage } from "../hooks"
+import { useLocalStorage } from "@uidotdev/usehooks"
+import React, { ReactNode } from "react"
 
-interface UserDetails {
+export interface UserDetails {
   name?: string
   email?: string
 }
@@ -21,29 +21,24 @@ interface UserContextState {
 
 const UserContext = React.createContext<UserContextState | undefined>(undefined)
 
-const UserProvider: React.FC = ({ children }) => {
-  const [user, setUser] = React.useState<UserDetails | undefined>(undefined)
-  const [settings, setSettings] = React.useState<Settings>({
-    watchLocation: false,
-  })
+const UserProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = React.useState<boolean>(true)
-  const [localStoredValue, setLocalStoredValue] = useLocalStorage(
-    "user",
-    undefined
-  )
+  const [localStoredValue, setLocalStoredValue] = useLocalStorage<
+    UserDetails | undefined
+  >("user", undefined)
+  console.log({ localStoredValue })
   const [settingsLocalStoredValue, setSettingsLocalStoredValue] =
-    useLocalStorage("settings", { watchLocation: false })
+    useLocalStorage<Settings>("settings", { watchLocation: false })
 
   React.useEffect(() => {
-    setUser(localStoredValue)
-    setSettings(settingsLocalStoredValue)
     setLoading(false)
-  }, [localStoredValue, settingsLocalStoredValue, setLoading, setUser])
+  }, [localStoredValue, settingsLocalStoredValue, setLoading])
+
   return (
     <UserContext.Provider
       value={{
-        user,
-        settings,
+        user: localStoredValue,
+        settings: settingsLocalStoredValue,
         setSettings: setSettingsLocalStoredValue,
         loading,
         setUser: setLocalStoredValue,

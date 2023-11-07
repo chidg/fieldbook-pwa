@@ -1,34 +1,32 @@
-import React from "react"
-import { useLocalStorage } from "../hooks"
+"use client"
+import React, { ReactNode } from "react"
+import { useLocalStorage } from "@uidotdev/usehooks"
 
-export const densityOptions: Array<string> = [
-  "Absent",
-  "Light - isolated plants, individuals are scarce or scattered, small clumps may occur",
-  "Medium - many plants scattered across a large area, large clumps",
-  "Heavy - large dense infestation (less than 1 hectare)",
-  "Heavy - very large dense infestation (greater than 1 hectare)",
-]
+export const densityOptions: Record<string, string> = {
+  "0": "Absent",
+  "1": "Light - isolated plants, individuals are scarce or scattered, small clumps may occur",
+  "2": "Medium - many plants scattered across a large area, large clumps",
+  "3": "Heavy - large dense infestation (less than 1 hectare)",
+  "4": "Heavy - very large dense infestation (greater than 1 hectare)",
+}
 
 export interface Taxon {
   id: string
   name: string
 }
 
-export interface Taxa {
-  [id: string]: Taxon
-}
+type Taxa = Record<string, Taxon>
+
 export interface DataItem {
   id: string
   taxon: string
   notes: string
-  density: number
+  density: string
   location?: GeolocationCoordinates
   timestamp: number
 }
 
-interface Data {
-  [id: string]: DataItem
-}
+type Data = Record<string, DataItem>
 
 interface DataState {
   data: Data
@@ -42,59 +40,42 @@ interface DataState {
 
 const DataContext = React.createContext<DataState | undefined>(undefined)
 
-const DataProvider: React.FC = ({ children }) => {
-  const [localStoredDataValue, setLocalStoredDataValue] = useLocalStorage(
-    "data",
-    {}
-  )
-  const [localStoredTaxaValue, setLocalStoredTaxaValue] = useLocalStorage(
-    "taxa",
-    {}
-  )
-  const [data, setData] = React.useState<Data>({})
-  const [taxa, setTaxa] = React.useState<Taxa>({})
-
-  React.useEffect(() => {
-    setData(localStoredDataValue)
-  }, [localStoredDataValue])
-
-  React.useEffect(() => {
-    setTaxa(localStoredTaxaValue)
-  }, [localStoredTaxaValue])
+const DataProvider = ({ children }: { children: ReactNode }) => {
+  const [data, setData] = useLocalStorage<Data>("data", {})
+  const [taxa, setTaxa] = useLocalStorage<Taxa>("taxa", {})
 
   const saveItem = React.useCallback(
     async (item: DataItem) => {
       const newData = { ...data, [item.id]: item }
-      setLocalStoredDataValue(newData)
-      // Results in update to `data` due to effect above
+      setData(newData)
     },
-    [data, setLocalStoredDataValue]
+    [data, setData]
   )
 
   const saveTaxon = React.useCallback(
     async (taxon: Taxon) => {
       const newTaxa = { ...taxa, [taxon.id]: taxon }
-      setLocalStoredTaxaValue(newTaxa)
+      setTaxa(newTaxa)
       // Results in update to `taxa` due to effect above
     },
-    [taxa, setLocalStoredTaxaValue]
+    [taxa, setTaxa]
   )
 
   const deleteItem = React.useCallback(
     async (id: string) => {
       const { [id]: deleted, ...newData } = data
-      setLocalStoredDataValue(newData)
+      setData(newData)
     },
-    [data, setLocalStoredDataValue]
+    [data, setData]
   )
 
   return (
     <DataContext.Provider
       value={{
         data,
-        setData: setLocalStoredDataValue,
+        setData,
         taxa,
-        setTaxa: setLocalStoredTaxaValue,
+        setTaxa,
         saveItem,
         saveTaxon,
         deleteItem,

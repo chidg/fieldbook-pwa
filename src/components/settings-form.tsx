@@ -1,10 +1,16 @@
+"use client"
 import React, { useState } from "react"
 import axios from "axios"
-import { useHistory, Link } from "react-router-dom"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { useUserContext, useDataContext } from "../contexts"
+import {
+  useGeoLocationDisplay,
+  useHasGeoLocationPermission,
+} from "@/hooks/location"
 
-const SettingsUpdateForm: React.FC = () => {
-  const history = useHistory()
+const SettingsUpdateForm = () => {
+  const { back } = useRouter()
   const {
     user,
     settings: { watchLocation },
@@ -13,6 +19,7 @@ const SettingsUpdateForm: React.FC = () => {
   const { data, setData, taxa } = useDataContext()
   const [exporting, setExporting] = useState(false)
   const [clearing, setClearing] = useState(false)
+  const hasGeoLocationPerm = useHasGeoLocationPermission()
 
   const sendStuff = async () => {
     setExporting(true)
@@ -41,13 +48,10 @@ const SettingsUpdateForm: React.FC = () => {
   }, [setData, setClearing])
 
   return (
-    <div className="text-white px-4 h-500">
+    <div className="text-white px-4 h-500 lg:mx-52">
       <h3 className="text-lg block">Settings</h3>
       <hr />
-      <div
-        onClick={() => history.goBack()}
-        className="flex pt-1 text-xs cursor-pointer"
-      >
+      <div onClick={() => back()} className="flex pt-1 text-xs cursor-pointer">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-4 w-4"
@@ -88,7 +92,7 @@ const SettingsUpdateForm: React.FC = () => {
         <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
           <h4>Update Your Details</h4>
           <div className="flex justify-center mt-2">
-            <Link to="/settings/user">
+            <Link href="/settings/user">
               <button
                 type="button"
                 className="border-2 bg-green-500 rounded px-4 py-2"
@@ -104,8 +108,8 @@ const SettingsUpdateForm: React.FC = () => {
           <div className="text-sm text-gray-100 border-2 border-opacity-25 bg-opacity-20 bg-gray-200 border-gray-200 rounded p-2 my-2">
             This button will send the data to the email address{" "}
             <span className="font-bold">{user?.email}</span>.{" "}
-            <Link to="/settings/user">Update your email address</Link> to change
-            this.
+            <Link href="/settings/user">Update your email address</Link> to
+            change this.
           </div>
           <div className="flex justify-center mt-2">
             <button

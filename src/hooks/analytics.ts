@@ -1,10 +1,11 @@
 import React from "react"
 import ReactGA from "react-ga"
-import { useLocation } from "react-router-dom"
 import { useUserContext } from "../contexts"
+import { useSearchParams, usePathname } from "next/navigation"
 
 export const useGoogleAnalytics = () => {
-  const location = useLocation()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
   const { user } = useUserContext()
 
   React.useEffect(() => {
@@ -20,12 +21,12 @@ export const useGoogleAnalytics = () => {
   }, [user?.email])
 
   React.useEffect(() => {
-    const currentPath = location.pathname + location.search
+    const currentPath = pathname + searchParams
     ReactGA.set({ page: currentPath })
     ReactGA.pageview(currentPath)
-  }, [location])
+  }, [pathname, searchParams])
 
-  const sendEvent = React.useCallback((payload) => {
+  const sendEvent = React.useCallback((payload: ReactGA.EventArgs) => {
     ReactGA.event(payload)
   }, [])
 

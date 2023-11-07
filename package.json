@@ -2,85 +2,39 @@
   "name": "fieldbook",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@craco/craco": "^6.1.2",
-    "@netlify/functions": "^0.7.2",
-    "@sentry/react": "^6.10.0",
-    "@sentry/tracing": "^6.10.0",
-    "axios": "^0.21.1",
-    "csv-writer": "^1.6.0",
-    "date-fns": "^2.25.0",
-    "form-data": "^4.0.0",
-    "formik": "2.0.4",
-    "fuse.js": "^6.4.6",
-    "idb-keyval": "^5.0.5",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-ga": "^3.3.0",
-    "react-map-gl": "^6.1.15",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "5.0.1",
-    "react-select": "^4.3.1",
-    "typescript": "^4.0.3",
-    "use-deep-compare-effect": "^1.6.1",
-    "web-vitals": "^0.2.4",
-    "workbox-background-sync": "^5.1.3",
-    "workbox-broadcast-update": "^5.1.3",
-    "workbox-cacheable-response": "^5.1.3",
-    "workbox-core": "^5.1.3",
-    "workbox-expiration": "^5.1.3",
-    "workbox-google-analytics": "^5.1.3",
-    "workbox-navigation-preload": "^5.1.3",
-    "workbox-precaching": "^5.1.3",
-    "workbox-range-requests": "^5.1.3",
-    "workbox-routing": "^5.1.3",
-    "workbox-strategies": "^5.1.3",
-    "workbox-streams": "^5.1.3",
-    "yup": "^0.32.9"
-  },
   "scripts": {
-    "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
-    "start": "HTTPS=true craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "eject": "react-scripts eject"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not ie 11",
-      "not chrome < 51",
-      "not safari < 10",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "dependencies": {
+    "@sentry/browser": "^7.77.0",
+    "@sentry/react": "^7.77.0",
+    "@uidotdev/usehooks": "^2.4.1",
+    "axios": "^1.6.0",
+    "date-fns": "^2.30.0",
+    "formik": "^2.4.5",
+    "mapbox-gl": "^2.15.0",
+    "next": "14.0.1",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-ga": "^3.3.1",
+    "react-map-gl": "^7.1.6",
+    "react-select": "^5.7.7",
+    "uuid": "^9.0.1",
+    "yup": "^1.3.2"
   },
   "devDependencies": {
-    "@tailwindcss/postcss7-compat": "npm:@tailwindcss/postcss7-compat",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "@types/jest": "^26.0.15",
-    "@types/node": "^12.0.0",
-    "@types/react": "^16.9.53",
-    "@types/react-dom": "^16.9.8",
-    "@types/react-router-dom": "^5.1.6",
-    "@types/react-select": "^4.0.17",
-    "@types/uuid": "^8.3.0",
-    "@types/yup": "^0.29.11",
-    "autoprefixer": "^9",
-    "postcss": "^7",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat"
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/uuid": "^9.0.6",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
   }
 }

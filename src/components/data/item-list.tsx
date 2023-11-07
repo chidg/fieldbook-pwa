@@ -1,6 +1,6 @@
+"use client"
 import React from "react"
-import { Link } from "react-router-dom"
-import useDeepCompareEffect from "use-deep-compare-effect"
+import Link from "next/link"
 import format from "date-fns/format"
 
 import {
@@ -9,7 +9,8 @@ import {
   useDataContext,
   useUserContext,
   useMetaContext,
-} from "../../contexts"
+} from "@/contexts"
+import { useDataByDate } from "@/hooks/useDataByDate"
 
 const DataListItem = ({ item, taxon }: { item: DataItem; taxon: Taxon }) => {
   return (
@@ -21,7 +22,7 @@ const DataListItem = ({ item, taxon }: { item: DataItem; taxon: Taxon }) => {
       <div className="flex-grow font-medium px-2">Density: {item.density}</div>
       <div className="font-normal tracking-wide">
         <Link
-          to={{
+          href={{
             pathname: `/${item.id}/`,
           }}
         >
@@ -43,48 +44,24 @@ const DataListItem = ({ item, taxon }: { item: DataItem; taxon: Taxon }) => {
   )
 }
 
-type DateBinnedCollections = { [date: string]: DataItem[] }
-
-const getDataByDate = (data: DataItem[]): DateBinnedCollections =>
-  data.reduce((result, dataItem) => {
-    const dateString = new Date(dataItem.timestamp).toLocaleDateString()
-    if (!result[dateString]) result[dateString] = []
-    result[dateString].push(dataItem)
-    return result
-  }, {} as DateBinnedCollections)
-
 export const DataList = () => {
   const { data, taxa } = useDataContext()
-  const { name } = useUserContext().user!
+  const { user } = useUserContext()
   const { setNewestFirst, newestFirst } = useMetaContext()
+  const displayData = useDataByDate(newestFirst)
 
-  const [displayData, setDisplayData] = React.useState<DateBinnedCollections>(
-    {}
-  )
-
-  useDeepCompareEffect(() => {
-    let records: DataItem[] = []
-    records = Object.values(data)
-    if (newestFirst) records = records.reverse()
-    setDisplayData(getDataByDate(records))
-  }, [data, newestFirst])
-
-  const dataItemsCount = Object.keys(data).length
-  const dataItemsExist = React.useMemo(
-    () => dataItemsCount > 0,
-    [dataItemsCount]
-  )
+  const dataItemsCount = Object.keys(data || {}).length
 
   return (
     <>
-      <Link to="/new">
+      <Link href="data/new">
         <div className="fab bg-gradient-to-br from-purple-800 to-purple-500">
           🌱
         </div>
       </Link>
 
       {/* Search bar */}
-      {dataItemsExist && (
+      {dataItemsCount > 0 && (
         <div className="mb-1">
           <div
             className="flex justify-end text-white text-sm px-1"
@@ -101,10 +78,10 @@ export const DataList = () => {
           </div>
         </div>
       )}
-      {!dataItemsExist && (
+      {!dataItemsCount && (
         <div className="grid row mx-10">
           <div className="border-2 border-white text-white rounded px-4 py-2">
-            <p>Hi {name}, welcome to Fieldbook!</p>
+            <p>Hi {user?.name}, welcome to Fieldbook!</p>
             <p>Hit the 🌱 below to start adding weed records.</p>
           </div>
         </div>

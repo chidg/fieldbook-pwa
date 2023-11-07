@@ -1,17 +1,18 @@
-import { Field, Form, Formik, FormikConfig } from "formik"
+"use client"
 import React, { ReactNode } from "react"
+import { Field, Form, Formik, FormikConfig } from "formik"
 import CreatableSelect from "react-select/creatable"
 import Select from "react-select"
-import { useHistory } from "react-router-dom"
+import { useRouter } from "next/navigation"
 import * as Yup from "yup"
-import { densityOptions, useDataContext, Taxon } from "../../contexts"
+import { densityOptions, useDataContext, Taxon } from "@/contexts"
 import { v4 } from "uuid"
 
 const ItemValidation = Yup.object().shape({
   density: Yup.string().required("Required"),
 })
 
-type ItemFormValues = {
+export type ItemFormValues = {
   taxon: string
   density: string
   notes: string
@@ -19,7 +20,6 @@ type ItemFormValues = {
 
 interface ItemFormProps extends FormikConfig<ItemFormValues> {
   title: string
-  prefix?: string
   locationDisplay?: string
   locationAccuracy?: number | null
   children?: ReactNode
@@ -43,7 +43,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
   onSubmit,
   children,
 }) => {
-  const history = useHistory()
+  const { back } = useRouter()
   const { saveTaxon, taxa } = useDataContext()
 
   const saveNewTaxon = React.useCallback(
@@ -111,9 +111,9 @@ const ItemForm: React.FC<ItemFormProps> = ({
                   ? transformDensityToSelect(values.density)
                   : transformDensityToSelect(initialValues.density)
               }
-              options={densityOptions.map((option, index) => ({
-                label: option,
-                value: index.toString(),
+              options={Object.entries(densityOptions).map(([value, label]) => ({
+                label,
+                value,
               }))}
               onChange={(value) => {
                 console.log("value ", value)
@@ -188,7 +188,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
               type="button"
               className="border-2 border-gray-500 hover:bg-gray-500 hover:text-white text-gray-500 py-1 px-2 rounded focus:outline-none focus:shadow-outline"
               onClick={() => {
-                history.goBack()
+                back()
               }}
             >
               Cancel

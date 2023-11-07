@@ -1,5 +1,7 @@
+"use client"
 import { useEffect, useState, useMemo } from "react"
-import { useUserContext } from "../contexts"
+import { useUserContext } from "@/contexts"
+import { useIsClient } from "./useIsClient"
 
 export const useGeoLocation = (): [
   GeolocationCoordinates | undefined,
@@ -8,6 +10,8 @@ export const useGeoLocation = (): [
   const {
     settings: { watchLocation },
   } = useUserContext()
+
+  const isClient = useIsClient()
 
   const [geoLocation, setGeoLocation] = useState<
     GeolocationCoordinates | undefined
@@ -18,6 +22,7 @@ export const useGeoLocation = (): [
 
   useEffect(() => {
     let watchId: number
+    if (!isClient) return
     if (watchLocation) {
       watchId = navigator.geolocation.watchPosition(
         ({ coords }) => {
@@ -61,8 +66,9 @@ export const useGeoLocation = (): [
 
 export const useGeoLocationDisplay = () => {
   const [geoLocation, geoLocationWarning] = useGeoLocation()
-
+  const isClient = useIsClient()
   return useMemo(() => {
+    if (!isClient) return
     if (geoLocation) {
       return `${geoLocation.latitude.toPrecision(
         6
@@ -76,5 +82,16 @@ export const useGeoLocationDisplay = () => {
       }
     }
     return "Accessing location..."
-  }, [geoLocation, geoLocationWarning])
+  }, [geoLocation, geoLocationWarning, isClient])
+}
+
+export const useHasGeoLocationPermission = () => {
+  const [geoLocation, geoLocationWarning] = useGeoLocation()
+  const isClient = useIsClient()
+  return useMemo(() => {
+    if (!isClient) return
+    if (geoLocation) return true
+    if (geoLocationWarning) return false
+    return null
+  }, [geoLocation, geoLocationWarning, isClient])
 }

@@ -1,12 +1,10 @@
+"use client"
 import React from "react"
-import { useHistory, useParams, Link } from "react-router-dom"
-import { DataItem, useDataContext, densityOptions } from "../../contexts"
-import ReactMapGL, {
-  ViewportProps,
-  Source,
-  Layer,
-  LayerProps,
-} from "react-map-gl"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+
+import { DataItem, useDataContext, densityOptions } from "@/contexts"
+import Map, { Source, Layer, LayerProps, ViewState } from "react-map-gl"
 
 const layerStyle: LayerProps = {
   id: "point",
@@ -20,15 +18,17 @@ const layerStyle: LayerProps = {
 }
 
 type MapDetails = {
-  viewport: ViewportProps
+  viewport: Partial<ViewState>
   geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>
 }
 
-export const ItemDetail: React.FC = () => {
-  const history = useHistory()
+export const ItemDetail: React.FC<{ params: { id: string } }> = ({
+  params,
+}) => {
+  const { back, replace } = useRouter()
 
   const { data, taxa } = useDataContext()
-  const { id: instanceId }: { id: string } = useParams()
+  const { id: instanceId } = params
   const [instance, setInstance] = React.useState<DataItem>()
 
   const [mapDetails, setMapDetails] = React.useState<MapDetails | undefined>(
@@ -40,7 +40,7 @@ export const ItemDetail: React.FC = () => {
     if (item) {
       setInstance(item)
     } else {
-      history.replace("/")
+      replace("/")
     }
   }, [setInstance, data, instanceId, history])
 
@@ -74,7 +74,7 @@ export const ItemDetail: React.FC = () => {
           {instance && taxa[instance?.taxon].name}
         </h3>
         <Link
-          to={{
+          href={{
             pathname: `/${instance?.id}/edit`,
           }}
         >
@@ -100,10 +100,7 @@ export const ItemDetail: React.FC = () => {
         </Link>
       </div>
       <hr />
-      <div
-        onClick={() => history.goBack()}
-        className="flex pt-2 text-xs cursor-pointer"
-      >
+      <div onClick={() => back()} className="flex pt-2 text-xs cursor-pointer">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-4 w-4"
@@ -147,14 +144,15 @@ export const ItemDetail: React.FC = () => {
 
         {mapDetails && (
           <div style={{ height: "400px" }}>
-            <ReactMapGL
-              {...mapDetails.viewport}
-              width="100%"
-              height="100%"
+            <Map
+              initialViewState={mapDetails.viewport}
+              // width="100%"
+              // height="100%"
               mapStyle="mapbox://styles/mapbox/satellite-v9"
-              onViewportChange={(viewport: ViewportProps) =>
-                setMapDetails({ ...mapDetails, viewport })
-              }
+
+              // onViewportChange={(viewport) =>
+              //   setMapDetails({ ...mapDetails, viewport })
+              // }
             >
               <Source
                 id="item-location"
@@ -163,7 +161,7 @@ export const ItemDetail: React.FC = () => {
               >
                 <Layer {...layerStyle} />
               </Source>
-            </ReactMapGL>
+            </Map>
           </div>
         )}
       </div>
