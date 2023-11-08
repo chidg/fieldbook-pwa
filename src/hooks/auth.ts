@@ -4,7 +4,7 @@ import { useUserContext } from "@/contexts/user"
 
 export const useRedirectToLogin = () => {
   const { user } = useUserContext()
-  console.log("user", user)
+
   const router = useRouter()
   useEffect(() => {
     if (!user) router.push("/login")

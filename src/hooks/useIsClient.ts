@@ -5,7 +5,6 @@ export const useIsClient = () => {
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    console.log("setting isClient to true")
     setIsClient(true)
   }, [])
 

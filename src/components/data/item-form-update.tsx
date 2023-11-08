@@ -10,8 +10,6 @@ export const ItemFormUpdate = ({ params }: { params: { id: string } }) => {
   const { id: instanceId } = params
   const [instance, setInstance] = React.useState<DataItem>(data[instanceId])
 
-  console.log("Object.keys(taxa).length > 0", Object.keys(taxa).length > 0)
-
   React.useEffect(() => {
     const item = data[instanceId]
     if (item) {

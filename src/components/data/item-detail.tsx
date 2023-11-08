@@ -3,8 +3,9 @@ import React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
-import { DataItem, useDataContext, densityOptions } from "@/contexts"
+import { DataItem, useDataContext } from "@/contexts"
 import Map, { Source, Layer, LayerProps, ViewState } from "react-map-gl"
+import config from "@/config.json"
 
 const layerStyle: LayerProps = {
   id: "point",
@@ -129,7 +130,7 @@ export const ItemDetail: React.FC<{ params: { id: string } }> = ({
               <>
                 <div>Density:</div>
                 <div className="col-span-2 justify-end">
-                  {densityOptions[instance.density]}
+                  {config.densities[parseInt(instance.density)]}
                 </div>
               </>
             )}

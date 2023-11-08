@@ -5,7 +5,8 @@ import CreatableSelect from "react-select/creatable"
 import Select from "react-select"
 import { useRouter } from "next/navigation"
 import * as Yup from "yup"
-import { densityOptions, useDataContext, Taxon } from "@/contexts"
+import { useDataContext, Taxon } from "@/contexts"
+import config from "@/config.json"
 import { v4 } from "uuid"
 
 const ItemValidation = Yup.object().shape({
@@ -31,7 +32,7 @@ const transformTaxonToSelect = (taxon: Taxon) => ({
 })
 
 const transformDensityToSelect = (densityIdx: string) => ({
-  label: densityOptions[parseInt(densityIdx)],
+  label: config.densities[parseInt(densityIdx)],
   value: densityIdx,
 })
 
@@ -98,6 +99,9 @@ const ItemForm: React.FC<ItemFormProps> = ({
                   : null
               }
               options={creatableSelectOptions}
+              onChange={(value) => {
+                setFieldValue("taxon", value?.value)
+              }}
             />
           </div>
 
@@ -106,33 +110,17 @@ const ItemForm: React.FC<ItemFormProps> = ({
               Density
             </label>
             <Select
-              value={
-                values.density
-                  ? transformDensityToSelect(values.density)
-                  : transformDensityToSelect(initialValues.density)
-              }
-              options={Object.entries(densityOptions).map(([value, label]) => ({
+              value={transformDensityToSelect(
+                values.density ? values.density : initialValues.density
+              )}
+              options={config.densities.map((label, index) => ({
                 label,
-                value,
+                value: index.toString(),
               }))}
               onChange={(value) => {
-                console.log("value ", value)
                 setFieldValue("density", value?.value)
               }}
             />
-            {/* <Field
-              id="density"
-              autoFocus={true}
-              name="density"
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300"
-              type="select"
-            >
-              {densityOptions.map((option, index) => (
-                <option value={index} key={option}>
-                  {option}
-                </option>
-              ))}
-            </Field> */}
           </div>
 
           <div className="pb-4">
@@ -179,7 +167,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
               name="location"
               type="text"
               className="appearance-none border rounded w-full py-2 px-3 text-gray-900 bg-gray-100 leading-tight cursor-pointer"
-              value={locationDisplay}
+              value={locationDisplay ?? "No location available"}
             />
           </div>
 

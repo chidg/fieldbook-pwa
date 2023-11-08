@@ -26,7 +26,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
   const [localStoredValue, setLocalStoredValue] = useLocalStorage<
     UserDetails | undefined
   >("user", undefined)
-  console.log({ localStoredValue })
+
   const [settingsLocalStoredValue, setSettingsLocalStoredValue] =
     useLocalStorage<Settings>("settings", { watchLocation: false })
 

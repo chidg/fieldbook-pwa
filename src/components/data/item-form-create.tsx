@@ -6,25 +6,24 @@ import { useGoogleAnalytics } from "../../hooks"
 import { useGeoLocation, useGeoLocationDisplay } from "../../hooks/location"
 import { useRouter } from "next/navigation"
 import ItemForm from "./item-form"
+import { useLatestDataItem } from "@/hooks/useLatestDataItem"
 
 export const ItemFormCreate: React.FC = () => {
   const { replace } = useRouter()
-  const { saveItem, taxa } = useDataContext()
+  const { saveItem } = useDataContext()
   const { sendEvent } = useGoogleAnalytics()
   const [geoLocation] = useGeoLocation()
-
   const locationDisplay = useGeoLocationDisplay()
-
-  console.log("Object.keys(taxa).length > 0", Object.keys(taxa).length > 0)
+  const latestItem = useLatestDataItem()
 
   return (
     <ItemForm
       locationDisplay={locationDisplay}
       locationAccuracy={geoLocation?.accuracy}
       initialValues={{
-        density: "0",
+        density: "1",
         notes: "",
-        taxon: Object.keys(taxa).length > 0 ? Object.keys(taxa)[0] : "",
+        taxon: latestItem?.taxon || "0",
       }}
       onSubmit={(values) => {
         saveItem({

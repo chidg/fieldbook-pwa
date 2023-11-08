@@ -1,5 +1,5 @@
 "use client"
-export { DataProvider, useDataContext, densityOptions } from "./data"
+export { DataProvider, useDataContext } from "./data"
 export type { DataItem, Taxon } from "./data"
 export { UserProvider, useUserContext } from "./user"
 export { MetaProvider, useMetaContext } from "./meta"

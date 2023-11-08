@@ -1,0 +1,30 @@
+{
+    "taxa": [
+        "Asparagus Fern (Asparagus virgatus)",
+        "Blackberry",
+        "Blackwood (Blackwood Wattle)",
+        "Broom (Genista species)",
+        "Dolichos",
+        "Fig",
+        "Flinders Range Wattle",
+        "Olive",
+        "Polygala",
+        "Sweet Pittosporum",
+        "Sydney Golden Wattle",
+        "Victorian Teatree"
+    ],
+    "densities": [
+        "Absent",
+        "Individual plant",
+        "Isolated or few scattered plants ",
+        "Many scattered or clumped plants",
+        "Large dense infestation, less than 20 x 20 m",
+        "Extensive dense infestation, greater than 20 x 20 m"
+    ],
+    "sizes": [
+        "Mostly small young plants",
+        "Mixed aged plants",
+        "Mostly large mature plants"
+    ]
+
+}

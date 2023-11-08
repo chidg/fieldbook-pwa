@@ -1,14 +1,7 @@
 "use client"
 import React, { ReactNode } from "react"
 import { useLocalStorage } from "@uidotdev/usehooks"
-
-export const densityOptions: Record<string, string> = {
-  "0": "Absent",
-  "1": "Light - isolated plants, individuals are scarce or scattered, small clumps may occur",
-  "2": "Medium - many plants scattered across a large area, large clumps",
-  "3": "Heavy - large dense infestation (less than 1 hectare)",
-  "4": "Heavy - very large dense infestation (greater than 1 hectare)",
-}
+import config from "@/config.json"
 
 export interface Taxon {
   id: string
@@ -16,6 +9,10 @@ export interface Taxon {
 }
 
 type Taxa = Record<string, Taxon>
+
+export const taxaOptions: Taxa = Object.fromEntries(
+  config.taxa.map((t, i) => [i.toString(), { name: t, id: i.toString() }])
+)
 
 export interface DataItem {
   id: string
@@ -42,7 +39,7 @@ const DataContext = React.createContext<DataState | undefined>(undefined)
 
 const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useLocalStorage<Data>("data", {})
-  const [taxa, setTaxa] = useLocalStorage<Taxa>("taxa", {})
+  const [taxa, setTaxa] = useLocalStorage<Taxa>("taxa", taxaOptions)
 
   const saveItem = React.useCallback(
     async (item: DataItem) => {
@@ -54,9 +51,7 @@ const DataProvider = ({ children }: { children: ReactNode }) => {
 
   const saveTaxon = React.useCallback(
     async (taxon: Taxon) => {
-      const newTaxa = { ...taxa, [taxon.id]: taxon }
-      setTaxa(newTaxa)
-      // Results in update to `taxa` due to effect above
+      setTaxa({ ...taxa, [taxon.id]: taxon })
     },
     [taxa, setTaxa]
   )
