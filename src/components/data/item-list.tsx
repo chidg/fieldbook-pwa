@@ -23,7 +23,7 @@ const DataListItem = ({ item, taxon }: { item: DataItem; taxon: Taxon }) => {
       <div className="font-normal tracking-wide">
         <Link
           href={{
-            pathname: `/${item.id}/`,
+            pathname: `/data/${item.id}/`,
           }}
         >
           <svg

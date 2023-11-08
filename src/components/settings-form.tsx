@@ -1,13 +1,48 @@
 "use client"
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useUserContext, useDataContext } from "../contexts"
-import {
-  useGeoLocationDisplay,
-  useHasGeoLocationPermission,
-} from "@/hooks/location"
+import { useHasGeoLocationPermission } from "@/hooks/location"
+
+const GeoLocationInfoPanel = () => {
+  const hasGeoLocationPerm = useHasGeoLocationPermission()
+  const text = useMemo(() => {
+    switch (hasGeoLocationPerm) {
+      case "granted":
+        return "✅ You have given Fieldbook permission to access your location."
+      case "denied":
+        return "⚠️ You have not given Fieldbook permission to access your location. Please grant permission to use this feature."
+      case "prompt":
+        return (
+          <div className="flex gap-2 items-center">
+            <span>
+              ⏳ Fieldbook is waiting for you to grant permission to access your
+              location.
+            </span>
+            <button
+              type="button"
+              className="border-2 bg-green-500 rounded px-4 py-2"
+              onClick={() => {
+                navigator.geolocation.getCurrentPosition(() => {})
+              }}
+            >
+              Try again 🌎
+            </button>
+          </div>
+        )
+      default:
+        return "⚠️ Fieldbook is unable to access your location. Please check your browser settings."
+    }
+  }, [hasGeoLocationPerm])
+
+  return (
+    <div className="text-sm text-gray-100 border-2 border-opacity-25 bg-opacity-20 bg-gray-200 border-gray-200 rounded p-2 my-2">
+      {text}
+    </div>
+  )
+}
 
 const SettingsUpdateForm = () => {
   const { back } = useRouter()
@@ -19,7 +54,6 @@ const SettingsUpdateForm = () => {
   const { data, setData, taxa } = useDataContext()
   const [exporting, setExporting] = useState(false)
   const [clearing, setClearing] = useState(false)
-  const hasGeoLocationPerm = useHasGeoLocationPermission()
 
   const sendStuff = async () => {
     setExporting(true)
@@ -49,29 +83,33 @@ const SettingsUpdateForm = () => {
 
   return (
     <div className="text-white px-4 h-500 lg:mx-52">
-      <h3 className="text-lg block">Settings</h3>
-      <hr />
-      <div onClick={() => back()} className="flex pt-1 text-xs cursor-pointer">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4"
-          fill="none"
-          viewBox="4 0 24 24"
-          stroke="currentColor"
+      <div className="mb-2">
+        <h3 className="text-lg block">Settings</h3>
+        <hr />
+        <div
+          onClick={() => back()}
+          className="flex pt-1 text-xs cursor-pointer"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>{" "}
-        Back
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="4 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>{" "}
+          Back
+        </div>
       </div>
-
-      <div className="flex flex-col content-between">
-        <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
-          <h4>General</h4>
+      <div className="flex flex-col gap-2 content-between">
+        <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6">
+          <h4>Location</h4>
           <div className="flex justify-center mt-2">
             <label htmlFor="watch-location">
               Watch location at all times (greater accuracy, more battery
@@ -87,9 +125,10 @@ const SettingsUpdateForm = () => {
               />
             </label>
           </div>
+          <GeoLocationInfoPanel />
         </div>
 
-        <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
+        <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6">
           <h4>Update Your Details</h4>
           <div className="flex justify-center mt-2">
             <Link href="/settings/user">
@@ -103,7 +142,7 @@ const SettingsUpdateForm = () => {
           </div>
         </div>
 
-        <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-1">
+        <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6">
           <h4>Export</h4>
           <div className="text-sm text-gray-100 border-2 border-opacity-25 bg-opacity-20 bg-gray-200 border-gray-200 rounded p-2 my-2">
             This button will send the data to the email address{" "}
@@ -124,7 +163,7 @@ const SettingsUpdateForm = () => {
           </div>
         </div>
 
-        <div className="flex-col bg-red-400 bg-opacity-20 rounded px-2 pb-6 my-1">
+        <div className="flex-col bg-red-400 bg-opacity-20 rounded px-2 pb-6">
           <h4>Danger Zone</h4>
           <div className="flex justify-center mt-2">
             <button

@@ -23,6 +23,7 @@ export const useGeoLocation = (): [
   useEffect(() => {
     let watchId: number
     if (!isClient) return
+
     if (watchLocation) {
       watchId = navigator.geolocation.watchPosition(
         ({ coords }) => {
@@ -86,12 +87,26 @@ export const useGeoLocationDisplay = () => {
 }
 
 export const useHasGeoLocationPermission = () => {
-  const [geoLocation, geoLocationWarning] = useGeoLocation()
   const isClient = useIsClient()
-  return useMemo(() => {
+  const [permStatus, setPermStatus] = useState<
+    "granted" | "denied" | "prompt"
+  >()
+
+  useEffect(() => {
     if (!isClient) return
-    if (geoLocation) return true
-    if (geoLocationWarning) return false
-    return null
-  }, [geoLocation, geoLocationWarning, isClient])
+    const eventListener: EventListener = (e) =>
+      setPermStatus((e.target as PermissionStatus).state)
+    navigator.permissions.query({ name: "geolocation" }).then((x) => {
+      setPermStatus(x.state)
+      x.addEventListener("change", eventListener)
+    })
+
+    return () => {
+      navigator.permissions
+        .query({ name: "geolocation" })
+        .then((x) => x.removeEventListener("change", eventListener))
+    }
+  }, [isClient])
+
+  return permStatus
 }
