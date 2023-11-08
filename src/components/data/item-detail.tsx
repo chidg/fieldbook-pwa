@@ -76,7 +76,7 @@ export const ItemDetail: React.FC<{ params: { id: string } }> = ({
         </h3>
         <Link
           href={{
-            pathname: `/${instance?.id}/edit`,
+            pathname: `/data/${instance?.id}/edit`,
           }}
         >
           <button

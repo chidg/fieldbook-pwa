@@ -1,3 +1,4 @@
+"use client"
 import React, { useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { DataItem, useDataContext } from "@/contexts"
