@@ -1,10 +1,12 @@
 import { Handler } from "@netlify/functions"
 import FormData from "form-data"
-import Mailgun from "mailgun.js"
+import Mailgun, { MailgunMessageData } from "mailgun.js"
 
 import { createObjectCsvStringifier } from "csv-writer"
 
 const mailgun = new Mailgun(FormData)
+
+const RECIPIENT_EMAIL = "data@natureconservation.org.au"
 
 export interface DataItem {
   id: string
@@ -53,12 +55,13 @@ const sendEmail = async ({ user, data }: { user: any; data: DataItem[] }) => {
       }
     })
 
-    const mailData = {
+    const mailData: MailgunMessageData = {
       from: `Fieldbook <${process.env.FROM_EMAIL}>`,
-      to: [user.email],
+      to: [RECIPIENT_EMAIL],
       subject: "Data from Fieldbook",
-      text: dontIndent(`Hi ${user.name}, \n
-      Here's some fresh data for you from your latest work with Fieldbook. \n\n
+      text: dontIndent(`Hi, \n
+      Here's some fresh data sent from ${user.name}'s latest work with Fieldbook. \n\n
+      To get in touch with ${user.name}, you can email them at ${user.email}. \n\n
       Enjoy! \n
       🌱
       `),
@@ -86,14 +89,14 @@ const handler: Handler = async (event) => {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Let's become serverless conductors!!!",
+        message: "Data export sent successfully",
       }),
     }
   } catch (e) {
     console.log(e)
     return {
       statusCode: 500,
-      body: e.message,
+      body: (e as Error).message,
     }
   }
 }

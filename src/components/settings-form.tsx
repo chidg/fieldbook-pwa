@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useUserContext, useDataContext } from "../contexts"
 import { useHasGeoLocationPermission } from "@/hooks/location"
+import { useNetworkState } from "@uidotdev/usehooks"
 
 const GeoLocationInfoPanel = () => {
   const hasGeoLocationPerm = useHasGeoLocationPermission()
@@ -46,6 +47,7 @@ const GeoLocationInfoPanel = () => {
 
 const SettingsUpdateForm = () => {
   const { back } = useRouter()
+  const { online } = useNetworkState()
   const {
     user,
     settings: { watchLocation },
@@ -145,17 +147,23 @@ const SettingsUpdateForm = () => {
         <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6">
           <h4>Export</h4>
           <div className="text-sm text-gray-100 border-2 border-opacity-25 bg-opacity-20 bg-gray-200 border-gray-200 rounded p-2 my-2">
-            This button will send the data to the email address{" "}
-            <span className="font-bold">{user?.email}</span>.{" "}
-            <Link href="/settings/user">Update your email address</Link> to
-            change this.
+            <p>
+              This button will send your data to Nature Conservation Margaret
+              River Region.
+            </p>{" "}
+            {!online && (
+              <p className="text-orange-200">
+                ⛔️ It appears your device is offline. Please make sure you have
+                internet reception before attempting to send.
+              </p>
+            )}
           </div>
           <div className="flex justify-center mt-2">
             <button
               type="button"
-              className="border-2 bg-green-500 rounded px-4 py-2"
+              className="border-2 bg-green-500 rounded px-4 py-2 disabled:bg-green-200"
               onClick={sendStuff}
-              disabled={exporting}
+              disabled={exporting || !online}
             >
               {!exporting && <span>Export Data 🎉</span>}
               {exporting && <span>Exporting...</span>}
