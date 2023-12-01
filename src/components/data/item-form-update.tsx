@@ -1,28 +1,33 @@
 import React from "react"
-import { useHistory, useParams } from "react-router-dom"
-import { DataItem, useDataContext } from "../../contexts"
+import { useNavigate, useParams } from "react-router-dom"
+import { DataItem, useDataContext } from "@/contexts"
 import ItemForm from "./item-form"
 
 export const ItemFormUpdate: React.FC = () => {
-  const history = useHistory()
-  const { saveItem, data, deleteItem } = useDataContext()
-  const [instance, setInstance] = React.useState<DataItem | undefined>(
-    undefined
-  )
+  const nav = useNavigate()
+  const { saveItem, data, deleteItem, taxa } = useDataContext()
   const [confirmingDelete, setConfirmingDelete] = React.useState<boolean>(false)
-  const { id: instanceId }: { id: string } = useParams()
+  const { id: instanceId } = useParams()
+  const [instance, setInstance] = React.useState<DataItem | undefined>(
+    instanceId ? data[instanceId] : undefined
+  )
+
+  console.log("Object.keys(taxa).length > 0", Object.keys(taxa).length > 0)
 
   React.useEffect(() => {
+    if (!instanceId) return
     const item = data[instanceId]
     if (item) {
       setInstance(item)
     } else {
-      history.replace("/")
+      nav("/")
     }
   }, [setInstance, data, instanceId, history])
 
   const getLocationDisplay = React.useCallback(() => {
-    if (instance?.location && Object.keys(instance?.location).length > 0) {
+    if (!instance) return "No record available"
+
+    if (instance.location && Object.keys(instance.location).length > 0) {
       return `${instance.location.latitude.toPrecision(
         6
       )}, ${instance.location.longitude.toPrecision(7)}`
@@ -33,22 +38,25 @@ export const ItemFormUpdate: React.FC = () => {
   const onSubmit = React.useCallback(
     (values) => {
       saveItem({
-        ...instance,
         ...values,
+        id: instanceId,
+        timestamp: instance!.timestamp,
+        location: instance!.location,
       })
-      history.replace("/")
+      nav("/")
     },
-    [history, instance, saveItem]
+    [history, instance, instanceId, saveItem]
   )
+
+  if (!instance) return <></>
 
   return (
     <ItemForm
       locationDisplay={getLocationDisplay()}
-      prefix={instance?.prefix}
       initialValues={{
-        fieldName: instance?.fieldName || "",
-        number: instance?.number || "",
-        notes: instance?.notes || "",
+        density: instance.density.toString(),
+        taxon: instance.taxon,
+        notes: instance.notes || "",
       }}
       onSubmit={onSubmit}
       title="Edit Item"
@@ -65,7 +73,7 @@ export const ItemFormUpdate: React.FC = () => {
                 const confirm = window.confirm(
                   "This will permanently delete this record. Are you sure?"
                 )
-                if (confirm) deleteItem(instanceId)
+                if (confirm && instanceId) deleteItem(instanceId)
                 else {
                   setConfirmingDelete(false)
                 }

@@ -1,20 +1,20 @@
-import React from "react"
+import { ReactNode, createContext, useState, useContext } from "react"
 
 interface MetaState {
-  newestFirst: boolean,
+  newestFirst: boolean
   setNewestFirst: (value: boolean) => void
 }
 
-const MetaContext = React.createContext<MetaState | undefined>(undefined)
+const MetaContext = createContext<MetaState | undefined>(undefined)
 
-const MetaProvider: React.FC = ({ children }) => {
-  const [newestFirst, setNewestFirst] = React.useState<boolean>(false)
+const MetaProvider = ({ children }: { children: ReactNode }) => {
+  const [newestFirst, setNewestFirst] = useState<boolean>(false)
 
   return (
     <MetaContext.Provider
       value={{
         newestFirst,
-        setNewestFirst
+        setNewestFirst,
       }}
     >
       {children}
@@ -23,7 +23,7 @@ const MetaProvider: React.FC = ({ children }) => {
 }
 
 const useMetaContext = () => {
-  const context = React.useContext(MetaContext)
+  const context = useContext(MetaContext)
   if (context === undefined) {
     throw new Error("useMetaContext must be used within a MetaProvider")
   }

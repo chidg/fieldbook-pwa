@@ -1,28 +1,29 @@
 import React from "react"
 import {
   BrowserRouter as Router,
-  Switch,
   Route,
-  Redirect,
+  Routes,
   RouteProps,
   Link,
+  Outlet,
 } from "react-router-dom"
 
-import { useUserContext } from "./contexts"
-import { useGoogleAnalytics } from "./hooks"
-import UserForm from "./components/user-form"
+import { useUserContext } from "@/contexts"
+import { useGoogleAnalytics, useRedirectToLogin } from "@/hooks"
+import UserForm from "@/components/user-form"
 import {
   ItemList,
   ItemFormUpdate,
   ItemFormCreate,
   ItemDetail,
-} from "./components/collections/"
-import LoadingScreen from "./components/loading-screen"
-import SettingsUpdate from "./components/settings-form"
+} from "@/components/data"
 
-const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
-  const { user, loading } = useUserContext()
+import LoadingScreen from "@/components/loading-screen"
+import SettingsUpdate from "@/components/settings-form"
+
+const AuthWrapper = () => {
   useGoogleAnalytics()
+  useRedirectToLogin()
 
   return (
     <>
@@ -62,22 +63,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
       </nav>
 
       <div className="container mx-auto lg:px-10 mt-2">
-        <Route
-          {...rest}
-          render={({ location }) => {
-            if (loading) return <LoadingScreen />
-            else if (user) return children
-            else
-              return (
-                <Redirect
-                  to={{
-                    pathname: "/login",
-                    state: { from: location },
-                  }}
-                />
-              )
-          }}
-        />
+        <Outlet />
       </div>
     </>
   )
@@ -86,40 +72,44 @@ const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
 function App() {
   return (
     <Router>
-      <Switch>
-        <Route path="/login">
-          <nav className="flex items-center justify-between flex-wrap bg-decorgreen-600 p-4">
-            <div className="flex items-center flex-shrink-0 text-white mr-6">
-              <span className="font-semibold text-xl tracking-tight">
-                Fieldbook 📒
-              </span>
-            </div>
-          </nav>
-          <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
-            <UserForm />
-          </div>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <>
+              <nav className="flex items-center justify-between flex-wrap bg-decorgreen-600 p-4">
+                <div className="flex items-center flex-shrink-0 text-white mr-6">
+                  <span className="font-semibold text-xl tracking-tight">
+                    Fieldbook 📒
+                  </span>
+                </div>
+              </nav>
+              <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
+                <UserForm />
+              </div>
+            </>
+          }
+        />
+        <Route path="/" element={<AuthWrapper />}>
+          <Route index element={<ItemList />} />
+          <Route path="settings">
+            <Route index element={<SettingsUpdate />} />
+            <Route
+              path="user"
+              element={
+                <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
+                  <UserForm />
+                </div>
+              }
+            />
+          </Route>
+          <Route path="data">
+            <Route path="new" element={<ItemFormCreate />} />
+            <Route path=":id/" element={<ItemDetail />} />
+            <Route path=":id/edit" element={<ItemFormUpdate />} />
+          </Route>
         </Route>
-        <PrivateRoute exact path="/">
-          <ItemList />
-        </PrivateRoute>
-        <PrivateRoute exact path="/settings">
-          <SettingsUpdate />
-        </PrivateRoute>
-        <PrivateRoute exact path="/settings/user">
-          <div className="md:w-2/3 sm:w-screen mx-auto lg:px-10 mt-2">
-            <UserForm />
-          </div>
-        </PrivateRoute>
-        <PrivateRoute exact path="/new">
-          <ItemFormCreate />
-        </PrivateRoute>
-        <PrivateRoute exact path="/:id/">
-          <ItemDetail />
-        </PrivateRoute>
-        <PrivateRoute exact path="/:id/edit">
-          <ItemFormUpdate />
-        </PrivateRoute>
-      </Switch>
+      </Routes>
     </Router>
   )
 }

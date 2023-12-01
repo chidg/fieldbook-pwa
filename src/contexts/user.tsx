@@ -1,8 +1,7 @@
-import React from "react"
-import { useLocalStorage } from "../hooks"
+import { useLocalStorage } from "@uidotdev/usehooks"
+import React, { ReactNode } from "react"
 
-interface UserDetails {
-  initials?: string
+export interface UserDetails {
   name?: string
   email?: string
 }
@@ -20,32 +19,30 @@ interface UserContextState {
   logout: () => void
 }
 
-const UserContext = React.createContext<
-  UserContextState | undefined
->(undefined)
+const UserContext = React.createContext<UserContextState | undefined>(undefined)
 
-const UserProvider: React.FC = ({ children }) => {
-  const [user, setUser] = React.useState<UserDetails | undefined>(undefined)
-  const [settings, setSettings] = React.useState<Settings>({ watchLocation: false })
+const UserProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = React.useState<boolean>(true)
-  const [localStoredValue, setLocalStoredValue] = useLocalStorage('user', undefined)
-  const [settingsLocalStoredValue, setSettingsLocalStoredValue] = useLocalStorage('settings', { watchLocation: false })
+  const [localStoredValue, setLocalStoredValue] = useLocalStorage<
+    UserDetails | undefined
+  >("user", undefined)
+
+  const [settingsLocalStoredValue, setSettingsLocalStoredValue] =
+    useLocalStorage<Settings>("settings", { watchLocation: false })
 
   React.useEffect(() => {
-    setUser(localStoredValue)
-    setSettings(settingsLocalStoredValue)
     setLoading(false)
-  }, [localStoredValue, settingsLocalStoredValue, setLoading, setUser])
-  
+  }, [localStoredValue, settingsLocalStoredValue, setLoading])
+
   return (
     <UserContext.Provider
       value={{
-        user,
-        settings,
+        user: localStoredValue,
+        settings: settingsLocalStoredValue,
         setSettings: setSettingsLocalStoredValue,
         loading,
         setUser: setLocalStoredValue,
-        logout: () => setLocalStoredValue(undefined)
+        logout: () => setLocalStoredValue(undefined),
       }}
     >
       {children}
@@ -56,9 +53,7 @@ const UserProvider: React.FC = ({ children }) => {
 const useUserContext = () => {
   const context = React.useContext(UserContext)
   if (context === undefined) {
-    throw new Error(
-      "useUserContext must be used within a UserProvider"
-    )
+    throw new Error("useUserContext must be used within a UserProvider")
   }
   return context
 }

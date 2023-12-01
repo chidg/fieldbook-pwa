@@ -1,17 +1,22 @@
 import { Field, Form, Formik, FormikConfig } from "formik"
-import React from "react"
-import { useHistory } from "react-router-dom"
+import React, { ReactNode } from "react"
+import CreatableSelect from "react-select/creatable"
+import Select from "react-select"
 import * as Yup from "yup"
-import { useUserContext } from "../../contexts"
+import { useDataContext, Taxon } from "@/contexts"
+import { v4 } from "uuid"
+import config from "@/config.json"
+import { useBack } from "@/hooks/useBack"
+
+const densityOptions = config.densities
 
 const ItemValidation = Yup.object().shape({
-  fieldName: Yup.string().required("Required"),
-  number: Yup.string().required("Required"),
+  density: Yup.string().required("Required"),
 })
 
 type ItemFormValues = {
-  fieldName: string
-  number: string
+  taxon: string
+  density: string
   notes: string
 }
 
@@ -20,23 +25,50 @@ interface ItemFormProps extends FormikConfig<ItemFormValues> {
   prefix?: string
   locationDisplay?: string
   locationAccuracy?: number | null
+  children?: ReactNode
 }
+
+const transformTaxonToSelect = (taxon: Taxon) => ({
+  label: taxon.name,
+  value: taxon.id,
+})
+
+const transformDensityToSelect = (densityIdx: string) => ({
+  label: densityOptions[parseInt(densityIdx)],
+  value: densityIdx,
+})
 
 const ItemForm: React.FC<ItemFormProps> = ({
   title,
   locationDisplay,
   locationAccuracy,
-  prefix,
   initialValues,
   onSubmit,
   children,
 }) => {
-  const history = useHistory()
-  const { initials } = useUserContext().user!
+  const back = useBack()
+  const { saveTaxon, taxa } = useDataContext()
 
-  const displayPrefix = React.useMemo(
-    () => (prefix ? prefix : initials),
-    [initials, prefix]
+  const saveNewTaxon = React.useCallback(
+    (name: string) => {
+      const newTaxon = { id: v4(), name }
+      saveTaxon(newTaxon)
+      return newTaxon
+    },
+    [saveTaxon]
+  )
+
+  const getTaxonById = React.useCallback(
+    (taxonId: string) => {
+      const taxon = taxa[taxonId]
+      return transformTaxonToSelect(taxon)
+    },
+    [taxa]
+  )
+
+  const creatableSelectOptions = React.useMemo(
+    () => Object.keys(taxa).map(getTaxonById),
+    [taxa, getTaxonById]
   )
 
   return (
@@ -46,43 +78,64 @@ const ItemForm: React.FC<ItemFormProps> = ({
       validationSchema={ItemValidation}
       onSubmit={onSubmit}
     >
-      {() => (
+      {({ setFieldValue, values }) => (
         <Form className=" bg-white shadow-md rounded px-12 py-8 pt-8">
           <div className="pb-4">
             <h3 className="text-lg block">🌱 {title}</h3>
           </div>
-          <div className="pb-4">
-            <label className="text-sm block font-bold pb-2" htmlFor="number">
-              Number
-            </label>
 
-            <div className="flex flex-wrap items-stretch w-full relative">
-              <div className="flex -mr-px">
-                <span className="flex items-center leading-normal bg-grey-lighter rounded rounded-r-none border border-r-0 border-blue-300 px-3 whitespace-no-wrap text-grey-dark text-sm">
-                  {displayPrefix}
-                </span>
-              </div>
-              <Field
-                id="number"
-                name="number"
-                className="flex-shrink flex-grow flex-auto leading-normal w-px border h-10 border-blue-300 rounded rounded-l-none px-3 relative focus:border-blue focus:shadow"
-              />
-            </div>
+          <div className="pb-4">
+            <label className="text-sm block font-bold pb-2" htmlFor="taxon">
+              Species
+            </label>
+            <CreatableSelect
+              onCreateOption={(value) => {
+                const newTaxon = saveNewTaxon(value)
+                setFieldValue("taxon", newTaxon.id)
+              }}
+              value={
+                values.taxon && taxa[values.taxon]
+                  ? getTaxonById(values.taxon)
+                  : initialValues.taxon
+                  ? getTaxonById(initialValues.taxon)
+                  : null
+              }
+              options={creatableSelectOptions}
+            />
           </div>
 
           <div className="pb-4">
-            <label className="text-sm block font-bold pb-2" htmlFor="fieldName">
-              Field Name
+            <label className="text-sm block font-bold pb-2" htmlFor="density">
+              Density
             </label>
-            <Field
-              id="fieldName"
-              autoFocus={true}
-              name="fieldName"
-              autoCorrect="off"
-              autoComplete="off"
-              spellCheck="false"
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300"
+            <Select
+              value={
+                values.density
+                  ? transformDensityToSelect(values.density)
+                  : transformDensityToSelect(initialValues.density)
+              }
+              options={densityOptions.map((option, index) => ({
+                label: option,
+                value: index.toString(),
+              }))}
+              onChange={(value) => {
+                console.log("value ", value)
+                setFieldValue("density", value?.value)
+              }}
             />
+            {/* <Field
+              id="density"
+              autoFocus={true}
+              name="density"
+              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300"
+              type="select"
+            >
+              {densityOptions.map((option, index) => (
+                <option value={index} key={option}>
+                  {option}
+                </option>
+              ))}
+            </Field> */}
           </div>
 
           <div className="pb-4">
@@ -100,7 +153,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
           <div className="pb-4">
             <div className="flex justify-between items-center">
               <label className="text-sm block font-bold pb-2" htmlFor="notes">
-                Location
+                Location{" "}
                 {locationAccuracy && (
                   <span className="font-light px-2">
                     accuracy: {locationAccuracy.toFixed(1)}m
@@ -137,9 +190,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
             <button
               type="button"
               className="border-2 border-gray-500 hover:bg-gray-500 hover:text-white text-gray-500 py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-              onClick={() => {
-                history.goBack()
-              }}
+              onClick={back}
             >
               Cancel
             </button>

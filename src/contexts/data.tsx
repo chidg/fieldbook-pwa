@@ -1,61 +1,78 @@
-import React from "react"
-import { useLocalStorage } from "../hooks"
+import React, { ReactNode } from "react"
+import { useLocalStorage } from "@uidotdev/usehooks"
+import config from "@/config.json"
+
+export interface Taxon {
+  id: string
+  name: string
+}
+
+type Taxa = Record<string, Taxon>
+
+export const taxaOptions: Taxa = Object.fromEntries(
+  config.taxa.map((t, i) => [i.toString(), { name: t, id: i.toString() }])
+)
 
 export interface DataItem {
   id: string
-  number: string
-  prefix?: string
+  taxon: string
   notes: string
-  fieldName: string
+  density: string
   location?: GeolocationCoordinates
   timestamp: number
 }
 
-interface Data {
-  [id: string]: DataItem
-}
+type Data = Record<string, DataItem>
 
 interface DataState {
   data: Data
   setData: (arg0: Data) => void
+  taxa: Taxa
+  setTaxa: (arg0: Taxa) => void
   saveItem: (arg0: DataItem) => void
+  saveTaxon: (arg0: Taxon) => void
   deleteItem: (id: string) => void
 }
 
 const DataContext = React.createContext<DataState | undefined>(undefined)
 
-const DataProvider: React.FC = ({ children }) => {
-  const [localStoredValue, setLocalStoredValue] = useLocalStorage("data", {})
-  const [data, setData] = React.useState<Data>({})
-
-  React.useEffect(() => {
-    setData(localStoredValue)
-  }, [setData, localStoredValue])
+const DataProvider = ({ children }: { children: ReactNode }) => {
+  const [data, setData] = useLocalStorage<Data>("data", {})
+  const [taxa, setTaxa] = useLocalStorage<Taxa>("taxa", taxaOptions)
 
   const saveItem = React.useCallback(
     async (item: DataItem) => {
       const newData = { ...data, [item.id]: item }
-      setLocalStoredValue(newData)
-      // Results in update to `data` due to effect above
+      setData(newData)
     },
-    [data, setLocalStoredValue]
+    [data, setData]
+  )
+
+  const saveTaxon = React.useCallback(
+    async (taxon: Taxon) => {
+      setTaxa({ ...taxa, [taxon.id]: taxon })
+    },
+    [taxa, setTaxa]
   )
 
   const deleteItem = React.useCallback(
     async (id: string) => {
       const { [id]: deleted, ...newData } = data
-      setLocalStoredValue(newData)
+      setData(newData)
     },
-    [data, setLocalStoredValue]
+    [data, setData]
   )
 
   return (
     <DataContext.Provider
       value={{
         data,
-        setData: setLocalStoredValue,
+        setData,
+        taxa,
+        setTaxa,
         saveItem,
-        deleteItem
+        saveTaxon,
+        deleteItem,
       }}
     >
       {children}
