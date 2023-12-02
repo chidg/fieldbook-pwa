@@ -1,11 +1,13 @@
 import { useEffect } from "react"
-import { redirect } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useUserContext } from "@/contexts/user"
 
 export const useRedirectToLogin = () => {
   const { user } = useUserContext()
+  const nav = useNavigate()
 
   useEffect(() => {
-    if (!user) redirect("/login")
+    console.log("effect ", user)
+    if (!user) nav("/login")
   }, [user])
 }
