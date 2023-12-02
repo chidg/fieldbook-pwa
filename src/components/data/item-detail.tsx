@@ -143,9 +143,10 @@ export const ItemDetail = () => {
         {mapDetails && (
           <div style={{ height: "400px" }}>
             <Map
+              reuseMaps
+              mapboxAccessToken={import.meta.env.VITE_APP_MAPBOX_ACCESS_TOKEN}
               initialViewState={mapDetails.viewport}
-              // width="100%"
-              // height="100%"
+              style={{ width: "100%", height: "100%" }}
               mapStyle="mapbox://styles/mapbox/satellite-v9"
 
               // onViewportChange={(viewport) =>

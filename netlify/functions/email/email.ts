@@ -29,7 +29,7 @@ const sendEmail = async ({
   return new Promise((resolve, reject) => {
     const mg = mailgun.client({
       username: "api",
-      key: import.meta.env.VITE_APP_MG_DOMAIN,
+      key: import.meta.env.VITE_APP_MG_API_KEY,
     })
 
     const csvStringifier = createObjectCsvStringifier({
@@ -48,7 +48,7 @@ const sendEmail = async ({
 
     const dataArray = Array.isArray(data) ? data : Object.values(data)
 
-    const records = (dataArray as DataItem[]).map((item) => {
+    const records = dataArray.map((item) => {
       return {
         ...item,
         recorder: user.email,
