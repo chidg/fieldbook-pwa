@@ -14,7 +14,7 @@ const ItemValidation = Yup.object().shape({
   density: Yup.string().required("Required"),
 })
 
-type ItemFormValues = {
+export type ItemFormValues = {
   taxon: string
   density: string
   notes: string

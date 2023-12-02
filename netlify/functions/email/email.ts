@@ -7,9 +7,8 @@ const mailgun = new Mailgun(formData)
 
 export interface DataItem {
   id: string
-  number: string
-  prefix?: string
-  fieldName: string
+  taxon: string
+  density: string
   notes: string
   location?: GeolocationCoordinates
   date: string
@@ -20,14 +19,25 @@ function dontIndent(str: string): string {
   return ("" + str).replace(/(\n)\s+/g, "$1")
 }
 
-const sendEmail = async ({ user, data }) => {
+const sendEmail = async ({
+  user,
+  data,
+}: {
+  user: { email: string; name: string }
+  data: DataItem[] | Record<string, DataItem>
+}) => {
   return new Promise((resolve, reject) => {
-    const mg = mailgun.client({ username: "api", key: process.env.MG_API_KEY })
+    const mg = mailgun.client({
+      username: "api",
+      key: import.meta.env.VITE_APP_MG_DOMAIN,
+    })
 
     const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: "number", title: "Number" },
-        { id: "fieldName", title: "Field Name" },
+        { id: "recorder", title: "Recorder" },
+        { id: "taxon", title: "Species" },
+        { id: "density", title: "Density" },
         { id: "notes", title: "Notes" },
         { id: "latitude", title: "Latitude" },
         { id: "longitude", title: "Longitude" },
@@ -41,7 +51,9 @@ const sendEmail = async ({ user, data }) => {
     const records = (dataArray as DataItem[]).map((item) => {
       return {
         ...item,
-        number: `${item.prefix ? item.prefix : user.initials}${item.number}`,
+        recorder: user.email,
+        taxon: item.taxon ? item.taxon : "",
+        density: item.density ? item.density : "",
         latitude: item.location?.latitude ? item.location?.latitude : "",
         longitude: item.location?.longitude ? item.location?.longitude : "",
       }
@@ -51,8 +63,8 @@ const sendEmail = async ({ user, data }) => {
       from: `Fieldbook <${process.env.FROM_EMAIL}>`,
       to: [user.email],
       subject: "Data from Fieldbook",
-      text: dontIndent(`Hi ${user.name}, \n
-      Here's some fresh data for you from your latest work with Fieldbook. \n\n
+      text: dontIndent(`Hi, \n
+      Here's some fresh data for from ${user.name}'s latest work with Fieldbook. \n\n
       Enjoy! \n
       🌱
       `),
@@ -61,13 +73,13 @@ const sendEmail = async ({ user, data }) => {
           data:
             csvStringifier.getHeaderString() +
             csvStringifier.stringifyRecords(records),
-          filename: `fieldbook-${user.initials}-${Date.now()}.csv`,
+          filename: `fieldbook-${user.email}-${Date.now()}.csv`,
         },
       ],
     }
 
     return mg.messages
-      .create(process.env.MG_DOMAIN, mailData)
+      .create(import.meta.env.VITE_APP_MG_DOMAIN, mailData)
       .then(resolve)
       .catch(reject)
   })
@@ -75,6 +87,7 @@ const sendEmail = async ({ user, data }) => {
 
 const handler: Handler = async (event) => {
   try {
+    if (!event.body) throw new Error("No email body provided")
     const { data, user } = JSON.parse(event.body)
 
     await sendEmail({ data, user })
@@ -89,7 +102,7 @@ const handler: Handler = async (event) => {
     console.log(e)
     return {
       statusCode: 500,
-      body: e.message,
+      body: (e as Error).message,
     }
   }
 }

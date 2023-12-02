@@ -1,7 +1,7 @@
 import React from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { DataItem, useDataContext } from "@/contexts"
-import ItemForm from "./item-form"
+import ItemForm, { ItemFormValues } from "./item-form"
 
 export const ItemFormUpdate: React.FC = () => {
   const nav = useNavigate()
@@ -36,7 +36,8 @@ export const ItemFormUpdate: React.FC = () => {
   }, [instance])
 
   const onSubmit = React.useCallback(
-    (values) => {
+    (values: ItemFormValues) => {
+      if (!instanceId) return
       saveItem({
         ...values,
         id: instanceId,

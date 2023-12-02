@@ -1,12 +1,11 @@
-"use client"
 import React from "react"
 import ReactGA from "react-ga"
-import { useSearchParams, usePathname } from "next/navigation"
 import { useUser } from "./useUser"
+import { useLocation, useSearchParams } from "react-router-dom"
 
 export const useGoogleAnalytics = () => {
   const searchParams = useSearchParams()
-  const pathname = usePathname()
+  const { pathname } = useLocation()
   const { user } = useUser()
 
   React.useEffect(() => {
