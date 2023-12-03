@@ -16,6 +16,7 @@ export const taxaOptions: Taxa = Object.fromEntries(
 export interface DataItem {
   id: string
   taxon: string
+  idConfidence: number
   notes: string
   density: string
   location?: GeolocationCoordinates

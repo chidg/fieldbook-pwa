@@ -131,6 +131,14 @@ export const ItemDetail = () => {
                 </div>
               </>
             )}
+            {instance.idConfidence !== undefined && (
+              <>
+                <div>ID Confidence:</div>
+                <div className="col-span-2 justify-end">
+                  {config.idConfidenceLevels[instance.idConfidence]}
+                </div>
+              </>
+            )}
             {instance.notes && (
               <>
                 <div>Notes:</div>

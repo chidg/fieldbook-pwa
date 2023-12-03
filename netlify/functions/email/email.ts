@@ -8,6 +8,7 @@ const mailgun = new Mailgun(formData)
 export interface DataItem {
   id: string
   taxon: string
+  idConfidence: number
   density: string
   notes: string
   location?: GeolocationCoordinates
@@ -37,6 +38,7 @@ const sendEmail = async ({
         { id: "number", title: "Number" },
         { id: "recorder", title: "Recorder" },
         { id: "taxon", title: "Species" },
+        { id: "idConfidence", title: "ID Confidence" },
         { id: "density", title: "Density" },
         { id: "notes", title: "Notes" },
         { id: "locationDescription", title: "Location Description" },
@@ -54,6 +56,7 @@ const sendEmail = async ({
         ...item,
         recorder: user.email,
         taxon: item.taxon ? item.taxon : "",
+        idConfidence: item.idConfidence ?? "",
         density: item.density ? item.density : "",
         latitude: item.location?.latitude ? item.location?.latitude : "",
         longitude: item.location?.longitude ? item.location?.longitude : "",

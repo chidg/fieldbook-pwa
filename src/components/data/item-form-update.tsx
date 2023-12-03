@@ -38,6 +38,7 @@ export const ItemFormUpdate: React.FC = () => {
       if (!instanceId) return
       saveItem({
         ...values,
+        idConfidence: parseInt(values.idConfidence),
         id: instanceId,
         timestamp: instance!.timestamp,
         location: instance!.location,
@@ -55,6 +56,7 @@ export const ItemFormUpdate: React.FC = () => {
       initialValues={{
         density: instance.density.toString(),
         taxon: instance.taxon,
+        idConfidence: instance.idConfidence.toString(),
         locationDescription: instance.locationDescription || "",
         notes: instance.notes || "",
       }}

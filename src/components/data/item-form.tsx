@@ -9,13 +9,16 @@ import config from "@/config.json"
 import { useBack } from "@/hooks/useBack"
 
 const densityOptions = config.densities
+const idConfidenceOptions = config.idConfidenceLevels
 
 const ItemValidation = Yup.object().shape({
   density: Yup.string().required("Required"),
+  idConfidence: Yup.string(),
 })
 
 export type ItemFormValues = {
   taxon: string
+  idConfidence: string
   density: string
   locationDescription: string
   notes: string
@@ -103,6 +106,29 @@ const ItemForm: React.FC<ItemFormProps> = ({
               }
               options={creatableSelectOptions}
               onChange={(value) => setFieldValue("taxon", value?.value)}
+            />
+          </div>
+
+          <div className="pb-4">
+            <label
+              className="text-sm block font-bold pb-2"
+              htmlFor="idConfidence"
+            >
+              ID Confidence
+            </label>
+            <Select
+              value={{
+                label: idConfidenceOptions[parseInt(values.idConfidence)],
+                value: values.idConfidence,
+              }}
+              // options={idConfidenceOptions.map((option) => option)}
+              options={idConfidenceOptions.map((option, index) => ({
+                label: option,
+                value: index.toString(),
+              }))}
+              onChange={(value) => {
+                setFieldValue("idConfidence", value?.value)
+              }}
             />
           </div>
 

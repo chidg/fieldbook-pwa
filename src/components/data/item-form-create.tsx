@@ -19,6 +19,7 @@ export const ItemFormCreate: React.FC = () => {
     (values: ItemFormValues) => {
       saveItem({
         ...values,
+        idConfidence: parseInt(values.idConfidence),
         id: v4(),
         timestamp: Date.now(),
         location: geoLocation,
@@ -39,6 +40,7 @@ export const ItemFormCreate: React.FC = () => {
       initialValues={{
         density: "0",
         notes: "",
+        idConfidence: "2",
         locationDescription: "",
         taxon: latest
           ? latest.taxon

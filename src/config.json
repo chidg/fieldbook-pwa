@@ -21,6 +21,11 @@
         "Large dense infestation, less than 20 x 20 m",
         "Extensive dense infestation, greater than 20 x 20 m"
     ],
+    "idConfidenceLevels": [
+        "Unsure",
+        "Reasonably sure",
+        "Certain"
+    ],
     "sizes": [
         "Mostly small young plants",
         "Mixed aged plants",
