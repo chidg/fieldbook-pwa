@@ -1,19 +1,23 @@
 import React, { useState, useMemo } from "react"
 import axios from "axios"
 import { useUserContext, useDataContext } from "@/contexts"
-import { useHasGeoLocationPermission } from "@/hooks/location"
+import { useGeoLocation, useHasGeoLocationPermission } from "@/hooks/location"
 import { useNetworkState } from "@uidotdev/usehooks"
 import { useNavigate, Link } from "react-router-dom"
 
 const GeoLocationInfoPanel = () => {
   const hasGeoLocationPerm = useHasGeoLocationPermission()
+  const [location] = useGeoLocation()
   const text = useMemo(() => {
     switch (hasGeoLocationPerm) {
       case "granted":
-        return "✅ You have given Fieldbook permission to access your location."
+        return "🌏 You have given Fieldbook permission to access your location."
       case "denied":
         return "⚠️ You have not given Fieldbook permission to access your location. Please grant permission to use this feature."
       case "prompt":
+        if (location)
+          return "🌏 You have given Fieldbook permission to access your location."
+
         return (
           <div className="flex gap-2 items-center">
             <span>
@@ -34,7 +38,7 @@ const GeoLocationInfoPanel = () => {
       default:
         return "⚠️ Fieldbook is unable to access your location. Please check your browser settings."
     }
-  }, [hasGeoLocationPerm])
+  }, [hasGeoLocationPerm, location])
 
   return (
     <div className="text-sm text-gray-100 border-2 border-opacity-25 bg-opacity-20 bg-gray-200 border-gray-200 rounded p-2 my-2">
