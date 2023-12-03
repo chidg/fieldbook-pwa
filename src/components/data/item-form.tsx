@@ -17,6 +17,7 @@ const ItemValidation = Yup.object().shape({
 export type ItemFormValues = {
   taxon: string
   density: string
+  locationDescription: string
   notes: string
 }
 
@@ -124,19 +125,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
                 setFieldValue("density", value?.value)
               }}
             />
-            {/* <Field
-              id="density"
-              autoFocus={true}
-              name="density"
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300"
-              type="select"
-            >
-              {densityOptions.map((option, index) => (
-                <option value={index} key={option}>
-                  {option}
-                </option>
-              ))}
-            </Field> */}
           </div>
 
           <div className="pb-4">
@@ -152,8 +140,26 @@ const ItemForm: React.FC<ItemFormProps> = ({
           </div>
 
           <div className="pb-4">
+            <label
+              className="text-sm block font-bold pb-2"
+              htmlFor="locationDescription"
+            >
+              Location Description
+            </label>
+            <Field
+              id="locationDescription"
+              name="locationDescription"
+              type="text"
+              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300"
+            />
+          </div>
+
+          <div className="pb-4">
             <div className="flex justify-between items-center">
-              <label className="text-sm block font-bold pb-2" htmlFor="notes">
+              <label
+                className="text-sm block font-bold pb-2"
+                htmlFor="location"
+              >
                 Location{" "}
                 {locationAccuracy && (
                   <span className="font-light px-2">

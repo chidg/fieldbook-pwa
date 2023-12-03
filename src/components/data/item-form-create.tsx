@@ -39,6 +39,7 @@ export const ItemFormCreate: React.FC = () => {
       initialValues={{
         density: "0",
         notes: "",
+        locationDescription: "",
         taxon: latest
           ? latest.taxon
           : Object.keys(taxa).length > 0

@@ -19,6 +19,7 @@ export interface DataItem {
   notes: string
   density: string
   location?: GeolocationCoordinates
+  locationDescription?: string
   timestamp: number
 }
 

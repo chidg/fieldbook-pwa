@@ -137,6 +137,14 @@ export const ItemDetail = () => {
                 <div className="col-span-2 justify-end">{instance.notes}</div>
               </>
             )}
+            {instance.locationDescription && (
+              <>
+                <div>Location Description:</div>
+                <div className="col-span-2 justify-end">
+                  {instance.locationDescription}
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -148,10 +156,6 @@ export const ItemDetail = () => {
               initialViewState={mapDetails.viewport}
               style={{ width: "100%", height: "100%" }}
               mapStyle="mapbox://styles/mapbox/satellite-v9"
-
-              // onViewportChange={(viewport) =>
-              //   setMapDetails({ ...mapDetails, viewport })
-              // }
             >
               <Source
                 id="item-location"

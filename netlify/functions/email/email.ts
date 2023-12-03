@@ -39,6 +39,7 @@ const sendEmail = async ({
         { id: "taxon", title: "Species" },
         { id: "density", title: "Density" },
         { id: "notes", title: "Notes" },
+        { id: "locationDescription", title: "Location Description" },
         { id: "latitude", title: "Latitude" },
         { id: "longitude", title: "Longitude" },
         { id: "date", title: "Date" },

@@ -12,8 +12,6 @@ export const ItemFormUpdate: React.FC = () => {
     instanceId ? data[instanceId] : undefined
   )
 
-  console.log("Object.keys(taxa).length > 0", Object.keys(taxa).length > 0)
-
   React.useEffect(() => {
     if (!instanceId) return
     const item = data[instanceId]
@@ -57,6 +55,7 @@ export const ItemFormUpdate: React.FC = () => {
       initialValues={{
         density: instance.density.toString(),
         taxon: instance.taxon,
+        locationDescription: instance.locationDescription || "",
         notes: instance.notes || "",
       }}
       onSubmit={onSubmit}
