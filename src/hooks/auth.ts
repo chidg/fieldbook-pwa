@@ -7,7 +7,6 @@ export const useRedirectToLogin = () => {
   const nav = useNavigate()
 
   useEffect(() => {
-    console.log("effect ", user)
     if (!user) nav("/login")
   }, [user])
 }

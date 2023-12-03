@@ -101,6 +101,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
                   : null
               }
               options={creatableSelectOptions}
+              onChange={(value) => setFieldValue("taxon", value?.value)}
             />
           </div>
 

@@ -6,6 +6,7 @@ import {
   RouteProps,
   Link,
   Outlet,
+  Navigate,
 } from "react-router-dom"
 
 import { useUserContext } from "@/contexts"
@@ -109,6 +110,7 @@ function App() {
             <Route path=":id/edit" element={<ItemFormUpdate />} />
           </Route>
         </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   )

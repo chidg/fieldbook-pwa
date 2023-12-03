@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from "react"
 import { useUserContext } from "@/contexts"
-import { useIsClient } from "./useIsClient"
 
 export const useGeoLocation = (): [
   GeolocationCoordinates | undefined,
@@ -10,48 +9,36 @@ export const useGeoLocation = (): [
     settings: { watchLocation },
   } = useUserContext()
 
-  const isClient = useIsClient()
+  const [geoLocation, setGeoLocation] = useState<GeolocationCoordinates>()
 
-  const [geoLocation, setGeoLocation] = useState<
-    GeolocationCoordinates | undefined
-  >(undefined)
   const [geoLocationWarning, setGeoLocationWarning] = useState<
     number | undefined
   >(undefined)
 
   useEffect(() => {
     let watchId: number
-    if (!isClient) return
+
+    const onSuccess: PositionCallback = ({ coords }) => {
+      setGeoLocation({
+        accuracy: coords.accuracy,
+        altitude: coords.altitude,
+        altitudeAccuracy: coords.altitudeAccuracy,
+        heading: coords.heading,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        speed: coords.speed,
+      })
+    }
+
+    const onError: PositionErrorCallback = ({ code }) =>
+      setGeoLocationWarning(code)
 
     if (watchLocation) {
-      watchId = navigator.geolocation.watchPosition(
-        ({ coords }) => {
-          // Necessary to do this transformation because the coords object is a prototype with getters rather than a normal object
-          setGeoLocation({
-            accuracy: coords.accuracy,
-            altitude: coords.altitude,
-            altitudeAccuracy: coords.altitudeAccuracy,
-            heading: coords.heading,
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-            speed: coords.speed,
-          })
-        },
-        ({ code }) => setGeoLocationWarning(code),
-        { enableHighAccuracy: true }
-      )
+      watchId = navigator.geolocation.watchPosition(onSuccess, onError, {
+        enableHighAccuracy: true,
+      })
     } else {
-      navigator.geolocation.getCurrentPosition(({ coords }) =>
-        setGeoLocation({
-          accuracy: coords.accuracy,
-          altitude: coords.altitude,
-          altitudeAccuracy: coords.altitudeAccuracy,
-          heading: coords.heading,
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          speed: coords.speed,
-        })
-      )
+      navigator.geolocation.getCurrentPosition(onSuccess, onError)
     }
 
     return () => {
@@ -66,9 +53,8 @@ export const useGeoLocation = (): [
 
 export const useGeoLocationDisplay = () => {
   const [geoLocation, geoLocationWarning] = useGeoLocation()
-  const isClient = useIsClient()
+
   return useMemo(() => {
-    if (!isClient) return
     if (geoLocation) {
       return `${geoLocation.latitude.toPrecision(
         6
@@ -82,17 +68,15 @@ export const useGeoLocationDisplay = () => {
       }
     }
     return "Accessing location..."
-  }, [geoLocation, geoLocationWarning, isClient])
+  }, [geoLocation, geoLocationWarning])
 }
 
 export const useHasGeoLocationPermission = () => {
-  const isClient = useIsClient()
   const [permStatus, setPermStatus] = useState<
     "granted" | "denied" | "prompt"
   >()
 
   useEffect(() => {
-    if (!isClient) return
     const eventListener: EventListener = (e) =>
       setPermStatus((e.target as PermissionStatus).state)
     navigator.permissions.query({ name: "geolocation" }).then((x) => {
@@ -105,7 +89,7 @@ export const useHasGeoLocationPermission = () => {
         .query({ name: "geolocation" })
         .then((x) => x.removeEventListener("change", eventListener))
     }
-  }, [isClient])
+  }, [])
 
   return permStatus
 }

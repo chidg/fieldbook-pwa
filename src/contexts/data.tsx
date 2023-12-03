@@ -43,6 +43,7 @@ const DataProvider = ({ children }: { children: ReactNode }) => {
   const saveItem = React.useCallback(
     async (item: DataItem) => {
       const newData = { ...data, [item.id]: item }
+      console.log("saving item", item)
       setData(newData)
     },
     [data, setData]
