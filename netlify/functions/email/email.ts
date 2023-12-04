@@ -1,11 +1,15 @@
 import { Handler } from "@netlify/functions"
 import formData from "form-data"
-import Mailgun from "mailgun.js"
+import Mailgun, { MailgunMessageData } from "mailgun.js"
 import { createObjectCsvStringifier } from "csv-writer"
+import config from "@/config.json"
+import { Blob } from "buffer"
+
+const RECIPENT_EMAIL = process.env.DATA_RECIPIENT_EMAIL
 
 const mailgun = new Mailgun(formData)
 
-export interface DataItem {
+interface DataItem {
   id: string
   taxon: string
   idConfidence: number
@@ -28,14 +32,16 @@ const sendEmail = async ({
   data: DataItem[] | Record<string, DataItem>
 }) => {
   return new Promise((resolve, reject) => {
+    if (!process.env.MG_API_KEY) reject(new Error("No API Key provided"))
+    if (!process.env.MG_DOMAIN) reject(new Error("No Mailgun Domain provided"))
+
     const mg = mailgun.client({
       username: "api",
-      key: import.meta.env.VITE_APP_MG_API_KEY,
+      key: process.env.MG_API_KEY!,
     })
 
     const csvStringifier = createObjectCsvStringifier({
       header: [
-        { id: "number", title: "Number" },
         { id: "recorder", title: "Recorder" },
         { id: "taxon", title: "Species" },
         { id: "idConfidence", title: "ID Confidence" },
@@ -56,34 +62,35 @@ const sendEmail = async ({
         ...item,
         recorder: user.email,
         taxon: item.taxon ? item.taxon : "",
-        idConfidence: item.idConfidence ?? "",
-        density: item.density ? item.density : "",
+        idConfidence: config.idConfidenceLevels[item.idConfidence] ?? "",
+        density: item.density ? config.densities[parseInt(item.density)] : "",
         latitude: item.location?.latitude ? item.location?.latitude : "",
         longitude: item.location?.longitude ? item.location?.longitude : "",
       }
     })
 
-    const mailData = {
+    const mailData: MailgunMessageData = {
       from: `Fieldbook <${process.env.FROM_EMAIL}>`,
-      to: [user.email],
+      to: [RECIPENT_EMAIL ?? ""],
       subject: "Data from Fieldbook",
       text: dontIndent(`Hi, \n
       Here's some fresh data for from ${user.name}'s latest work with Fieldbook. \n\n
       Enjoy! \n
-      🌱
+      🌱 \n\n
       `),
       attachment: [
         {
-          data:
+          data: Buffer.from(
             csvStringifier.getHeaderString() +
-            csvStringifier.stringifyRecords(records),
+              csvStringifier.stringifyRecords(records)
+          ),
           filename: `fieldbook-${user.email}-${Date.now()}.csv`,
         },
       ],
     }
 
     return mg.messages
-      .create(import.meta.env.VITE_APP_MG_DOMAIN, mailData)
+      .create(process.env.MG_DOMAIN!, mailData)
       .then(resolve)
       .catch(reject)
   })
@@ -99,7 +106,7 @@ const handler: Handler = async (event) => {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Let's become serverless conductors!!!",
+        message: "Email sent successfully",
       }),
     }
   } catch (e) {
