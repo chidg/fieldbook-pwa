@@ -1,5 +1,5 @@
 import { Field, Form, Formik, FormikConfig } from "formik"
-import React, { ReactNode } from "react"
+import React, { ChangeEvent, ReactNode } from "react"
 import CreatableSelect from "react-select/creatable"
 import Select from "react-select"
 import * as Yup from "yup"
@@ -89,10 +89,24 @@ const ItemForm: React.FC<ItemFormProps> = ({
           </div>
 
           <div className="pb-4">
-            <label className="text-sm block font-bold pb-2" htmlFor="taxon">
-              Species
-            </label>
+            <div className="flex gap-2 align-middle mb-2">
+              <label className="text-sm block font-bold" htmlFor="taxon">
+                Species
+              </label>
+              <span className="text-xs bg-gray-100 border border-gray-400 rounded px-2">
+                ℹ️ Select existing or type to add new
+              </span>
+            </div>
             <CreatableSelect
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  // create new
+                  const newTaxon = saveNewTaxon(
+                    (e.currentTarget as HTMLInputElement).value
+                  )
+                  setFieldValue("taxon", newTaxon.id)
+                }
+              }}
               onCreateOption={(value) => {
                 const newTaxon = saveNewTaxon(value)
                 setFieldValue("taxon", newTaxon.id)

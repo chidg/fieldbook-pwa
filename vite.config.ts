@@ -13,7 +13,7 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        short_name: "Fieldbook",
+        short_name: "Fieldbook NCMRR",
         name: "Fieldbook for NCMRR",
         icons: [
           {
