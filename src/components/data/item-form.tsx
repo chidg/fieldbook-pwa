@@ -161,7 +161,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
                 value: index.toString(),
               }))}
               onChange={(value) => {
-                console.log("value ", value)
                 setFieldValue("density", value?.value)
               }}
             />

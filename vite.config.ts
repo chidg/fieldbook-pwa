@@ -6,13 +6,17 @@ import { VitePWA } from "vite-plugin-pwa"
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  build: { outDir: "./build" },
+  build: {
+    outDir: "./build",
+  },
   plugins: [
     react(),
     tsconfigPaths(),
     VitePWA({
       registerType: "autoUpdate",
       strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
       manifest: {
         short_name: "Fieldbook NCMRR",
         name: "Fieldbook for NCMRR",

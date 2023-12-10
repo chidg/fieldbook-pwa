@@ -14,8 +14,9 @@ import { precacheAndRoute, createHandlerBoundToURL } from "workbox-precaching"
 import { registerRoute, NavigationRoute } from "workbox-routing"
 import { StaleWhileRevalidate } from "workbox-strategies"
 import { CacheableResponsePlugin } from "workbox-cacheable-response"
+import config from "./config.json"
 
-// declare const self
+declare const self: ServiceWorkerGlobalScope
 
 clientsClaim()
 
@@ -78,13 +79,3 @@ self.addEventListener("message", (event) => {
     self.skipWaiting()
   }
 })
-
-// Any other custom service worker logic can go here.
-// self.oninstall = async (event) => {
-//   console.log("installing service worker")
-//   const config = await import("./config.json")
-//   const taxaOptions = Object.fromEntries(
-//     config.taxa.map((t, i) => [i.toString(), { name: t, id: i.toString() }])
-//   )
-//   window.localStorage.setItem("taxa", JSON.stringify(taxaOptions))
-// }

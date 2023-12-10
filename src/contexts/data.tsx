@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react"
+import React, { ReactNode, useEffect } from "react"
 import { useLocalStorage } from "@uidotdev/usehooks"
 import config from "@/config.json"
 
@@ -41,6 +41,18 @@ const DataContext = React.createContext<DataState | undefined>(undefined)
 const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useLocalStorage<Data>("data", {})
   const [customTaxa, setCustomTaxa] = useLocalStorage<Taxa>("taxa", {})
+  const initialisedRef = React.useRef<boolean>(false)
+
+  useEffect(() => {
+    // migration to remove standard taxa from the custom taxa
+    if (initialisedRef.current) return
+    // delete taxa that are now provided by the config
+    const newTaxa = Object.fromEntries(
+      Object.entries(customTaxa).filter(([id]) => !(id in taxaOptions))
+    )
+    setCustomTaxa(newTaxa)
+    initialisedRef.current = true
+  }, [data, setData, customTaxa, setCustomTaxa])
 
   const saveItem = React.useCallback(
     (item: DataItem) => {
