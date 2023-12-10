@@ -2,7 +2,6 @@
 
 interface ImportMetaEnv {
   readonly VITE_APP_MG_DOMAIN: string
-  readonly VITE_APP_PUBLIC_URL: string
   readonly VITE_APP_GA_TRACKING_ID: string
   readonly VITE_APP_MAPBOX_ACCESS_TOKEN_SECRET: string
   readonly VITE_APP_MAPBOX_ACCESS_TOKEN: string

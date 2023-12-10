@@ -32,12 +32,15 @@ const sendEmail = async ({
   data: DataItem[] | Record<string, DataItem>
 }) => {
   return new Promise((resolve, reject) => {
-    if (!process.env.MG_API_KEY) reject(new Error("No API Key provided"))
-    if (!process.env.MG_DOMAIN) reject(new Error("No Mailgun Domain provided"))
+    const MG_API_KEY = process.env.MG_API_KEY
+    const MG_DOMAIN = process.env.MG_DOMAIN
+
+    if (!MG_API_KEY) return reject(new Error("No API Key provided"))
+    if (!MG_DOMAIN) return reject(new Error("No Mailgun Domain provided"))
 
     const mg = mailgun.client({
       username: "api",
-      key: process.env.MG_API_KEY!,
+      key: MG_API_KEY,
     })
 
     const csvStringifier = createObjectCsvStringifier({
@@ -89,10 +92,7 @@ const sendEmail = async ({
       ],
     }
 
-    return mg.messages
-      .create(process.env.MG_DOMAIN!, mailData)
-      .then(resolve)
-      .catch(reject)
+    return mg.messages.create(MG_DOMAIN, mailData).then(resolve).catch(reject)
   })
 }
 

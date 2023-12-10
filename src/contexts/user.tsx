@@ -28,7 +28,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
   >("user", undefined)
 
   const [settingsLocalStoredValue, setSettingsLocalStoredValue] =
-    useLocalStorage<Settings>("settings", { watchLocation: false })
+    useLocalStorage<Settings>("settings", { watchLocation: true })
 
   React.useEffect(() => {
     setLoading(false)

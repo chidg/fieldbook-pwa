@@ -12,6 +12,7 @@ export default defineConfig({
     tsconfigPaths(),
     VitePWA({
       registerType: "autoUpdate",
+      strategies: "injectManifest",
       manifest: {
         short_name: "Fieldbook NCMRR",
         name: "Fieldbook for NCMRR",

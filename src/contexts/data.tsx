@@ -40,22 +40,23 @@ const DataContext = React.createContext<DataState | undefined>(undefined)
 
 const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useLocalStorage<Data>("data", {})
-  const [taxa, setTaxa] = useLocalStorage<Taxa>("taxa", taxaOptions)
+  const [customTaxa, setCustomTaxa] = useLocalStorage<Taxa>("taxa", {})
 
   const saveItem = React.useCallback(
-    async (item: DataItem) => {
-      const newData = { ...data, [item.id]: item }
-      console.log("saving item", item)
-      setData(newData)
+    (item: DataItem) => {
+      setData((existing) => ({ ...existing, [item.id]: item }))
     },
     [data, setData]
   )
 
   const saveTaxon = React.useCallback(
-    async (taxon: Taxon) => {
-      setTaxa({ ...taxa, [taxon.id]: taxon })
+    (taxon: Taxon) => {
+      setCustomTaxa((existing) => ({
+        ...existing,
+        [taxon.id]: taxon,
+      }))
     },
-    [taxa, setTaxa]
+    [setCustomTaxa]
   )
 
   const deleteItem = React.useCallback(
@@ -66,13 +67,15 @@ const DataProvider = ({ children }: { children: ReactNode }) => {
     [data, setData]
   )
 
+  const taxa = { ...taxaOptions, ...customTaxa }
+
   return (
     <DataContext.Provider
       value={{
         data,
         setData,
         taxa,
-        setTaxa,
+        setTaxa: setCustomTaxa,
         saveItem,
         saveTaxon,
         deleteItem,
