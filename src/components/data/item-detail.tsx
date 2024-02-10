@@ -145,14 +145,6 @@ export const ItemDetail = () => {
                 <div className="col-span-2 justify-end">{instance.notes}</div>
               </>
             )}
-            {instance.locationDescription && (
-              <>
-                <div>Location Description:</div>
-                <div className="col-span-2 justify-end">
-                  {instance.locationDescription}
-                </div>
-              </>
-            )}
           </div>
         )}
 

@@ -50,7 +50,6 @@ const sendEmail = async ({
         { id: "idConfidence", title: "ID Confidence" },
         { id: "density", title: "Density" },
         { id: "notes", title: "Notes" },
-        { id: "locationDescription", title: "Location Description" },
         { id: "latitude", title: "Latitude" },
         { id: "longitude", title: "Longitude" },
         { id: "date", title: "Date" },

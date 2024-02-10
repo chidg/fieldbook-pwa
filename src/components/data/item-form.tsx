@@ -20,7 +20,6 @@ export type ItemFormValues = {
   taxon: string
   idConfidence: string
   density: string
-  locationDescription: string
   notes: string
 }
 
@@ -173,21 +172,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
             <Field
               id="notes"
               name="notes"
-              type="text"
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300"
-            />
-          </div>
-
-          <div className="pb-4">
-            <label
-              className="text-sm block font-bold pb-2"
-              htmlFor="locationDescription"
-            >
-              Location Description
-            </label>
-            <Field
-              id="locationDescription"
-              name="locationDescription"
               type="text"
               className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300"
             />
