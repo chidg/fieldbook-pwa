@@ -9,6 +9,7 @@ import config from "@/config.json"
 import { useBack } from "@/hooks/useBack"
 
 const densityOptions = config.densities
+const sizeOptions = config.sizes
 const idConfidenceOptions = config.idConfidenceLevels
 
 const ItemValidation = Yup.object().shape({
@@ -20,6 +21,7 @@ export type ItemFormValues = {
   taxon: string
   idConfidence: string
   density: string
+  size: (typeof config.sizes)[number]
   notes: string
 }
 
@@ -39,6 +41,11 @@ const transformTaxonToSelect = (taxon: Taxon) => ({
 const transformDensityToSelect = (densityIdx: string) => ({
   label: densityOptions[parseInt(densityIdx)],
   value: densityIdx,
+})
+
+const transformSizeToSelect = (sizeIdx: string) => ({
+  label: sizeOptions[parseInt(sizeIdx)],
+  value: sizeIdx,
 })
 
 const ItemForm: React.FC<ItemFormProps> = ({
@@ -161,6 +168,26 @@ const ItemForm: React.FC<ItemFormProps> = ({
               }))}
               onChange={(value) => {
                 setFieldValue("density", value?.value)
+              }}
+            />
+          </div>
+
+          <div className="pb-4">
+            <label className="text-sm block font-bold pb-2" htmlFor="size">
+              Size
+            </label>
+            <Select
+              value={transformSizeToSelect(
+                values.density !== undefined
+                  ? values.density
+                  : initialValues.density
+              )}
+              options={sizeOptions.map((option, index) => ({
+                label: option,
+                value: index.toString(),
+              }))}
+              onChange={(value) => {
+                setFieldValue("size", value?.value)
               }}
             />
           </div>

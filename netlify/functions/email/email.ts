@@ -3,7 +3,6 @@ import formData from "form-data"
 import Mailgun, { MailgunMessageData } from "mailgun.js"
 import { createObjectCsvStringifier } from "csv-writer"
 import config from "@/config.json"
-import { Blob } from "buffer"
 
 const RECIPENT_EMAIL = process.env.DATA_RECIPIENT_EMAIL
 
@@ -13,7 +12,8 @@ interface DataItem {
   id: string
   taxon: string
   idConfidence: number
-  density: string
+  density: (typeof config.densities)[number]
+  size: (typeof config.sizes)[number]
   notes: string
   location?: GeolocationCoordinates
   date: string
@@ -49,6 +49,7 @@ const sendEmail = async ({
         { id: "taxon", title: "Species" },
         { id: "idConfidence", title: "ID Confidence" },
         { id: "density", title: "Density" },
+        { id: "size", title: "Size" },
         { id: "notes", title: "Notes" },
         { id: "latitude", title: "Latitude" },
         { id: "longitude", title: "Longitude" },
@@ -66,6 +67,7 @@ const sendEmail = async ({
         taxon: item.taxon ? item.taxon : "",
         idConfidence: config.idConfidenceLevels[item.idConfidence] ?? "",
         density: item.density ? config.densities[parseInt(item.density)] : "",
+        size: item.size ? config.densities[parseInt(item.size)] : "",
         latitude: item.location?.latitude ? item.location?.latitude : "",
         longitude: item.location?.longitude ? item.location?.longitude : "",
       }

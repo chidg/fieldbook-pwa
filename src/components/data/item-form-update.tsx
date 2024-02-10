@@ -57,6 +57,7 @@ export const ItemFormUpdate: React.FC = () => {
         density: instance.density.toString(),
         taxon: instance.taxon,
         idConfidence: instance.idConfidence.toString(),
+        size: instance.size,
         notes: instance.notes || "",
       }}
       onSubmit={onSubmit}

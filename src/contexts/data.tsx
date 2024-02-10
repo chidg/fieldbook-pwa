@@ -19,6 +19,7 @@ export interface DataItem {
   idConfidence: number
   notes: string
   density: string
+  size: (typeof config.sizes)[number]
   location?: GeolocationCoordinates
   timestamp: number
 }
