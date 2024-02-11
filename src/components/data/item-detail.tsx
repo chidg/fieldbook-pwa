@@ -1,9 +1,10 @@
-import React from "react"
+import React, { useMemo } from "react"
 
 import { DataItem, useDataContext } from "@/contexts"
 import Map, { Source, Layer, LayerProps, ViewState } from "react-map-gl"
 import config from "@/config.json"
 import { useNavigate, Link, useParams } from "react-router-dom"
+import { useTaxonName } from "@/hooks/useTaxonName"
 
 const layerStyle: LayerProps = {
   id: "point",
@@ -65,12 +66,15 @@ export const ItemDetail = () => {
     }
   }, [instance, setMapDetails])
 
+  const taxonName = useTaxonName(instance)
+
+  if (!instance) return null
+
+  console.log({ tx: instance.taxon })
   return (
     <div className="text-white rounded px-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg flex-1">
-          {instance && taxa[instance?.taxon].name}
-        </h3>
+        <h3 className="text-lg flex-1">{taxonName}</h3>
         <Link
           to={{
             pathname: `/data/${instance?.id}/edit`,

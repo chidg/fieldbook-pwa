@@ -10,7 +10,8 @@ const mailgun = new Mailgun(formData)
 
 interface DataItem {
   id: string
-  taxon: string
+  taxon: (typeof config.taxa)[number]
+  otherTaxon?: string
   idConfidence: number
   density: (typeof config.densities)[number]
   size: (typeof config.sizes)[number]
@@ -47,6 +48,7 @@ const sendEmail = async ({
       header: [
         { id: "recorder", title: "Recorder" },
         { id: "taxon", title: "Species" },
+        { id: "otherTaxon", title: "Species - Other" },
         { id: "idConfidence", title: "ID Confidence" },
         { id: "density", title: "Density" },
         { id: "size", title: "Size" },
@@ -65,6 +67,7 @@ const sendEmail = async ({
         ...item,
         recorder: user.email,
         taxon: item.taxon ? item.taxon : "",
+        otherTaxon: item.otherTaxon ? item.otherTaxon : "",
         idConfidence: config.idConfidenceLevels[item.idConfidence] ?? "",
         density: item.density ? config.densities[parseInt(item.density)] : "",
         size: item.size ? config.sizes[parseInt(item.size)] : "",

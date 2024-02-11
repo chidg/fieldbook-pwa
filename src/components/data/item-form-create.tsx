@@ -7,9 +7,11 @@ import { useGeoLocation, useGeoLocationDisplay } from "@/hooks/location"
 import ItemForm, { ItemFormValues } from "./item-form"
 import { useLatestDataItem } from "@/hooks/useLatestDataItem"
 
+import { taxa } from "@/config.json"
+
 export const ItemFormCreate: React.FC = () => {
   const navigate = useNavigate()
-  const { saveItem, taxa } = useDataContext()
+  const { saveItem } = useDataContext()
   const { sendEvent } = useGoogleAnalytics()
   const [geoLocation] = useGeoLocation()
   const locationDisplay = useGeoLocationDisplay()
@@ -42,11 +44,11 @@ export const ItemFormCreate: React.FC = () => {
         notes: "",
         idConfidence: "2",
         size: "0",
-        taxon: latest
-          ? latest.taxon
-          : Object.keys(taxa).length > 0
-          ? Object.keys(taxa)[0]
-          : "",
+        taxon:
+          latest && parseInt(latest.taxon) !== taxa.length - 1
+            ? latest.taxon
+            : "0",
+        otherTaxon: "",
       }}
       onSubmit={onSubmit}
       title="New Observation"

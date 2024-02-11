@@ -56,6 +56,7 @@ export const ItemFormUpdate: React.FC = () => {
       initialValues={{
         density: instance.density.toString(),
         taxon: instance.taxon,
+        otherTaxon: instance.otherTaxon || "",
         idConfidence: instance.idConfidence.toString(),
         size: instance.size,
         notes: instance.notes || "",

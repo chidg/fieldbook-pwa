@@ -16,6 +16,7 @@ export const taxaOptions: Taxa = Object.fromEntries(
 export interface DataItem {
   id: string
   taxon: string
+  otherTaxon?: string
   idConfidence: number
   notes: string
   density: (typeof config.densities)[number]

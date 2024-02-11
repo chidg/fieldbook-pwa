@@ -3,23 +3,24 @@ import format from "date-fns/format"
 
 import {
   DataItem,
-  Taxon,
   useDataContext,
   useUserContext,
   useMetaContext,
 } from "@/contexts"
 import { useDataByDate } from "@/hooks/useDataByDate"
 import { useDensityOptions } from "@/hooks/useDensity"
+import { useTaxonName } from "@/hooks/useTaxonName"
 
-const DataListItem = ({ item, taxon }: { item: DataItem; taxon: Taxon }) => {
+const DataListItem = ({ item }: { item: DataItem }) => {
   const densities = useDensityOptions()
+  const taxonName = useTaxonName(item)
 
   return (
     <div className="flex justify-start items-center bg-gray-200 bg-opacity-20 text-white focus:text-blue-400 focus:bg-blue-100 rounded-sm px-2 py-2 my-1">
       <div className="font-sm px-2">
         {format(new Date(item.timestamp), "H:mm")}
       </div>
-      <div className="font-sm font-semibold px-2">{taxon.name}</div>
+      <div className="font-sm font-semibold px-2">{taxonName}</div>
       <div className="flex-grow font-medium px-2">
         {item.density && <span>{densities[parseInt(item.density)]}</span>}
       </div>
@@ -48,7 +49,7 @@ const DataListItem = ({ item, taxon }: { item: DataItem; taxon: Taxon }) => {
 }
 
 export const DataList = () => {
-  const { data, taxa } = useDataContext()
+  const { data } = useDataContext()
   const { user } = useUserContext()
   const { setNewestFirst, newestFirst } = useMetaContext()
   const displayData = useDataByDate(newestFirst)
@@ -95,11 +96,7 @@ export const DataList = () => {
             {dateString}
           </div>
           {displayData[dateString].map((collection) => (
-            <DataListItem
-              item={collection}
-              taxon={taxa[collection.taxon]}
-              key={collection.id}
-            />
+            <DataListItem item={collection} key={collection.id} />
           ))}
         </div>
       ))}
