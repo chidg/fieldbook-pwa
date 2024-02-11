@@ -41,23 +41,32 @@ const DataContext = React.createContext<DataState | undefined>(undefined)
 
 const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useLocalStorage<Data>("data", {})
-  const [customTaxa, setCustomTaxa] = useLocalStorage<Taxa>("taxa", {})
+  const [customTaxa, setCustomTaxa] = useLocalStorage<Taxa | undefined>(
+    "taxa",
+    undefined
+  )
   const [hasNewData, setHasNewData] = React.useState<boolean>(false)
   const initialisedRef = React.useRef<boolean>(false)
 
   useEffect(() => {
     if (initialisedRef.current) return
+    if (!customTaxa) return
     // migration to remove custom taxa entirely
     const newTaxa = Object.fromEntries(
       Object.entries(customTaxa).filter(([id]) => !(id in taxaOptions))
     )
 
-    Object.values(data).forEach((item) => {
-      if (item.taxon in Object.keys(newTaxa)) {
-        item.otherTaxon = newTaxa[item.taxon].name
-        item.taxon = (config.taxa.length - 1).toString()
-      }
-    })
+    const newData = Object.fromEntries(
+      Object.entries(data).map(([id, item]) => {
+        if (item.taxon in newTaxa) {
+          item.otherTaxon = newTaxa[item.taxon].name
+          item.taxon = (config.taxa.length - 1).toString()
+        }
+        return [id, item]
+      })
+    )
+    setData(newData)
+    setCustomTaxa(undefined)
 
     initialisedRef.current = true
   }, [data, setData, customTaxa, setCustomTaxa])
