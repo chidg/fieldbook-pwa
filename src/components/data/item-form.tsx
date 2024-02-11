@@ -192,7 +192,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
 
           <div className="pb-4">
             <label className="text-sm block font-bold pb-2" htmlFor="notes">
-              Notes
+              Notes (Optional)
             </label>
             <Field
               id="notes"
