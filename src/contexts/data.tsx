@@ -18,7 +18,7 @@ export interface DataItem {
   taxon: string
   idConfidence: number
   notes: string
-  density: string
+  density: (typeof config.densities)[number]
   size: (typeof config.sizes)[number]
   location?: GeolocationCoordinates
   timestamp: number

@@ -131,6 +131,14 @@ export const ItemDetail = () => {
                 </div>
               </>
             )}
+            {instance.size && (
+              <>
+                <div>Size:</div>
+                <div className="col-span-2 justify-end">
+                  {config.sizes[parseInt(instance.size)]}
+                </div>
+              </>
+            )}
             {instance.idConfidence !== undefined && (
               <>
                 <div>ID Confidence:</div>

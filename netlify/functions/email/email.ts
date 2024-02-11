@@ -67,7 +67,7 @@ const sendEmail = async ({
         taxon: item.taxon ? item.taxon : "",
         idConfidence: config.idConfidenceLevels[item.idConfidence] ?? "",
         density: item.density ? config.densities[parseInt(item.density)] : "",
-        size: item.size ? config.densities[parseInt(item.size)] : "",
+        size: item.size ? config.sizes[parseInt(item.size)] : "",
         latitude: item.location?.latitude ? item.location?.latitude : "",
         longitude: item.location?.longitude ? item.location?.longitude : "",
       }

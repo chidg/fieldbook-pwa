@@ -1,5 +1,5 @@
 import { Field, Form, Formik, FormikConfig } from "formik"
-import React, { ChangeEvent, ReactNode } from "react"
+import React, { ReactNode } from "react"
 import CreatableSelect from "react-select/creatable"
 import Select from "react-select"
 import * as Yup from "yup"
@@ -178,9 +178,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
             </label>
             <Select
               value={transformSizeToSelect(
-                values.density !== undefined
-                  ? values.density
-                  : initialValues.density
+                values.size !== undefined ? values.size : initialValues.size
               )}
               options={sizeOptions.map((option, index) => ({
                 label: option,
