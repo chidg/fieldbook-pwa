@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React from "react"
 
 import { DataItem, useDataContext } from "@/contexts"
 import Map, { Source, Layer, LayerProps, ViewState } from "react-map-gl"
@@ -25,7 +25,7 @@ type MapDetails = {
 export const ItemDetail = () => {
   const nav = useNavigate()
 
-  const { data, taxa } = useDataContext()
+  const { data } = useDataContext()
   const { id: instanceId } = useParams()
   const [instance, setInstance] = React.useState<DataItem>()
 
@@ -70,7 +70,6 @@ export const ItemDetail = () => {
 
   if (!instance) return null
 
-  console.log({ tx: instance.taxon })
   return (
     <div className="text-white rounded px-4">
       <div className="flex justify-between items-center">

@@ -49,7 +49,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
   children,
 }) => {
   const back = useBack()
-  console.log({ initialValues })
+
   return (
     <Formik
       initialValues={initialValues}

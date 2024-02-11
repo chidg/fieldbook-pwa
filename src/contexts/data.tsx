@@ -30,8 +30,8 @@ type Data = Record<string, DataItem>
 interface DataState {
   data: Data
   setData: (arg0: Data) => void
-  taxa: Taxa
-  setTaxa: (arg0: Taxa) => void
+  hasNewData: boolean
+  setHasNewData: (arg0: boolean) => void
   saveItem: (arg0: DataItem) => void
   saveTaxon: (arg0: Taxon) => void
   deleteItem: (id: string) => void
@@ -42,21 +42,29 @@ const DataContext = React.createContext<DataState | undefined>(undefined)
 const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useLocalStorage<Data>("data", {})
   const [customTaxa, setCustomTaxa] = useLocalStorage<Taxa>("taxa", {})
+  const [hasNewData, setHasNewData] = React.useState<boolean>(false)
   const initialisedRef = React.useRef<boolean>(false)
 
   useEffect(() => {
-    // migration to remove standard taxa from the custom taxa
     if (initialisedRef.current) return
-    // delete taxa that are now provided by the config
+    // migration to remove custom taxa entirely
     const newTaxa = Object.fromEntries(
       Object.entries(customTaxa).filter(([id]) => !(id in taxaOptions))
     )
-    setCustomTaxa(newTaxa)
+
+    Object.values(data).forEach((item) => {
+      if (item.taxon in Object.keys(newTaxa)) {
+        item.otherTaxon = newTaxa[item.taxon].name
+        item.taxon = (config.taxa.length - 1).toString()
+      }
+    })
+
     initialisedRef.current = true
   }, [data, setData, customTaxa, setCustomTaxa])
 
   const saveItem = React.useCallback(
     (item: DataItem) => {
+      setHasNewData(true)
       setData((existing) => ({ ...existing, [item.id]: item }))
     },
     [data, setData]
@@ -80,15 +88,13 @@ const DataProvider = ({ children }: { children: ReactNode }) => {
     [data, setData]
   )
 
-  const taxa = { ...taxaOptions, ...customTaxa }
-
   return (
     <DataContext.Provider
       value={{
         data,
         setData,
-        taxa,
-        setTaxa: setCustomTaxa,
+        hasNewData,
+        setHasNewData,
         saveItem,
         saveTaxon,
         deleteItem,

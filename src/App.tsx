@@ -1,15 +1,12 @@
-import React from "react"
 import {
   BrowserRouter as Router,
   Route,
   Routes,
-  RouteProps,
   Link,
   Outlet,
   Navigate,
 } from "react-router-dom"
 
-import { useUserContext } from "@/contexts"
 import { useGoogleAnalytics, useRedirectToLogin } from "@/hooks"
 import UserForm from "@/components/user-form"
 import {
@@ -19,12 +16,13 @@ import {
   ItemDetail,
 } from "@/components/data"
 
-import LoadingScreen from "@/components/loading-screen"
 import SettingsUpdate from "@/components/settings-form"
+import { useDataContext } from "./contexts"
 
 const AuthWrapper = () => {
   useGoogleAnalytics()
   useRedirectToLogin()
+  const { hasNewData } = useDataContext()
 
   return (
     <>
@@ -34,10 +32,33 @@ const AuthWrapper = () => {
             Fieldbook 📒
           </span>
         </div>
-        <div className="items-right align-middle">
+        <div className="flex gap-2 items-right align-middle">
+          {hasNewData && (
+            <Link
+              to="/settings?export"
+              className="inline-flex items-center text-lg px-2 py-2 leading-none border rounded text-green-300 border-green-300 hover:border-transparent hover:bg-purple-600"
+              title="New data reminder"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="feather feather-send"
+              >
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </Link>
+          )}
           <Link
             to="/settings"
-            className="inline-flex items-center text-lg px-2 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:bg-gray-400"
+            className="inline-flex items-center text-lg px-2 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:bg-purple-600"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

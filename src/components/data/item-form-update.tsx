@@ -5,7 +5,7 @@ import ItemForm, { ItemFormValues } from "./item-form"
 
 export const ItemFormUpdate: React.FC = () => {
   const nav = useNavigate()
-  const { saveItem, data, deleteItem, taxa } = useDataContext()
+  const { saveItem, data, deleteItem } = useDataContext()
   const [confirmingDelete, setConfirmingDelete] = React.useState<boolean>(false)
   const { id: instanceId } = useParams()
   const [instance, setInstance] = React.useState<DataItem | undefined>(

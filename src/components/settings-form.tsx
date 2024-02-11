@@ -3,7 +3,8 @@ import axios from "axios"
 import { useUserContext, useDataContext } from "@/contexts"
 import { useGeoLocation, useHasGeoLocationPermission } from "@/hooks/location"
 import { useNetworkState } from "@uidotdev/usehooks"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate, Link, useSearchParams } from "react-router-dom"
+import { taxa } from "@/config.json"
 
 const GeoLocationInfoPanel = () => {
   const hasGeoLocationPerm = useHasGeoLocationPermission()
@@ -49,13 +50,16 @@ const GeoLocationInfoPanel = () => {
 
 const SettingsUpdateForm = () => {
   const nav = useNavigate()
+
   const { online } = useNetworkState()
   const {
     user,
     settings: { watchLocation },
     setSettings,
   } = useUserContext()
-  const { data, setData, taxa } = useDataContext()
+  const { data, setData, setHasNewData, hasNewData } = useDataContext()
+  const [params] = useSearchParams()
+  const highlightExport = params.get("export") !== null && hasNewData
   const [exporting, setExporting] = useState(false)
   const [clearing, setClearing] = useState(false)
 
@@ -63,21 +67,27 @@ const SettingsUpdateForm = () => {
     setExporting(true)
     const formattedData = Object.values(data).map((d) => ({
       ...d,
-      taxon: taxa[d.taxon].name,
+      taxon: taxa[parseInt(d.taxon)],
       date: new Date(d.timestamp).toLocaleDateString(),
       time: new Date(d.timestamp).toLocaleTimeString(),
     }))
 
-    await axios
-      .post(
+    try {
+      await axios.post(
         ".netlify/functions/email",
         { data: formattedData, user },
         {
           responseType: "json",
         }
       )
-      .catch(() => setExporting(false))
+    } catch (e) {
+      setExporting(false)
+      alert("There was an error sending your data. Please try again.")
+      return
+    }
+
     setExporting(false)
+    setHasNewData(false)
   }
 
   const clearData = React.useCallback(async () => {
@@ -112,39 +122,43 @@ const SettingsUpdateForm = () => {
         </div>
       </div>
       <div className="flex flex-col gap-2 content-between">
-        <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6">
-          <h4>Location</h4>
-          <div className="flex justify-center mt-2">
-            <label htmlFor="watch-location">
-              Watch location at all times (greater accuracy, more battery
-              consumption)
-              <input
-                type="checkbox"
-                id="watch-location"
-                className="ml-2"
-                checked={watchLocation}
-                onChange={(event) =>
-                  setSettings({ watchLocation: !watchLocation })
-                }
-              />
-            </label>
-          </div>
-          <GeoLocationInfoPanel />
-        </div>
+        {!highlightExport && (
+          <>
+            <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6">
+              <h4>Location</h4>
+              <div className="flex justify-center mt-2">
+                <label htmlFor="watch-location">
+                  Watch location at all times (greater accuracy, more battery
+                  consumption)
+                  <input
+                    type="checkbox"
+                    id="watch-location"
+                    className="ml-2"
+                    checked={watchLocation}
+                    onChange={(event) =>
+                      setSettings({ watchLocation: !watchLocation })
+                    }
+                  />
+                </label>
+              </div>
+              <GeoLocationInfoPanel />
+            </div>
 
-        <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6">
-          <h4>Update Your Details</h4>
-          <div className="flex justify-center mt-2">
-            <Link to="/settings/user">
-              <button
-                type="button"
-                className="border-2 bg-green-500 rounded px-4 py-2"
-              >
-                Update your details 🙋
-              </button>
-            </Link>
-          </div>
-        </div>
+            <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6">
+              <h4>Update Your Details</h4>
+              <div className="flex justify-center mt-2">
+                <Link to="/settings/user">
+                  <button
+                    type="button"
+                    className="border-2 bg-green-500 rounded px-4 py-2"
+                  >
+                    Update your details 🙋
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6">
           <h4>Export</h4>
@@ -173,35 +187,39 @@ const SettingsUpdateForm = () => {
           </div>
         </div>
 
-        <div className="flex-col bg-red-400 bg-opacity-20 rounded px-2 pb-6">
-          <h4>Danger Zone</h4>
-          <div className="flex justify-center mt-2">
-            <button
-              type="button"
-              className="border-2 border-white bg-red-600 rounded px-4 py-2"
-              disabled={clearing}
-              onClick={() => {
-                setClearing(true)
-                setTimeout(() => {
-                  const confirm = window.confirm(
-                    "This will permanently delete all data from Fieldbook. Are you sure?"
-                  )
-                  if (confirm) clearData()
-                  else {
-                    setClearing(false)
-                  }
-                }, 500)
-              }}
-            >
-              {!clearing && <span>Clear all data 🗑</span>}
-              {clearing && <span>Confirming...</span>}
-            </button>
-          </div>
-        </div>
+        {!highlightExport && (
+          <>
+            <div className="flex-col bg-red-400 bg-opacity-20 rounded px-2 pb-6">
+              <h4>Danger Zone</h4>
+              <div className="flex justify-center mt-2">
+                <button
+                  type="button"
+                  className="border-2 border-white bg-red-600 rounded px-4 py-2"
+                  disabled={clearing}
+                  onClick={() => {
+                    setClearing(true)
+                    setTimeout(() => {
+                      const confirm = window.confirm(
+                        "This will permanently delete all data from Fieldbook. Are you sure?"
+                      )
+                      if (confirm) clearData()
+                      else {
+                        setClearing(false)
+                      }
+                    }, 500)
+                  }}
+                >
+                  {!clearing && <span>Clear all data 🗑</span>}
+                  {clearing && <span>Confirming...</span>}
+                </button>
+              </div>
+            </div>
 
-        <div className="flex-col bg-gray-400 bg-opacity-20 rounded px-2 py-2 my-1 text-sm">
-          Fieldbook version: {import.meta.env.COMMIT_REF}
-        </div>
+            <div className="flex-col bg-gray-400 bg-opacity-20 rounded px-2 py-2 my-1 text-sm">
+              Fieldbook version: {import.meta.env.COMMIT_REF}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
