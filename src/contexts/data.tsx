@@ -45,7 +45,10 @@ const DataProvider = ({ children }: { children: ReactNode }) => {
     "taxa",
     undefined
   )
-  const [hasNewData, setHasNewData] = React.useState<boolean>(false)
+  const [hasNewData, setHasNewData] = useLocalStorage<boolean>(
+    "hasNewData",
+    false
+  )
   const initialisedRef = React.useRef<boolean>(false)
 
   useEffect(() => {
