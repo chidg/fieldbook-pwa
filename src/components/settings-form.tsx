@@ -4,6 +4,7 @@ import { useUserContext, useDataContext } from "@/contexts"
 import { useGeoLocation, useHasGeoLocationPermission } from "@/hooks/location"
 import { useNetworkState } from "@uidotdev/usehooks"
 import { useNavigate, Link, useSearchParams } from "react-router-dom"
+import * as Sentry from "@sentry/react"
 import { taxa } from "@/config.json"
 
 const GeoLocationInfoPanel = () => {
@@ -86,6 +87,7 @@ const SettingsUpdateForm = () => {
       }
     } catch (e) {
       setExporting(false)
+      Sentry.captureException(e)
       alert("There was an error sending your data. Please try again.")
       return
     }
