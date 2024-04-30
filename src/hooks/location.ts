@@ -79,15 +79,19 @@ export const useHasGeoLocationPermission = () => {
   useEffect(() => {
     const eventListener: EventListener = (e) =>
       setPermStatus((e.target as PermissionStatus).state)
-    navigator.permissions.query({ name: "geolocation" }).then((x) => {
-      setPermStatus(x.state)
-      x.addEventListener("change", eventListener)
-    })
+
+    if (navigator.permissions)
+      navigator.permissions.query({ name: "geolocation" }).then((x) => {
+        setPermStatus(x.state)
+        x.addEventListener("change", eventListener)
+      })
+    else if (navigator.geolocation) setPermStatus("granted")
 
     return () => {
-      navigator.permissions
-        .query({ name: "geolocation" })
-        .then((x) => x.removeEventListener("change", eventListener))
+      navigator.permissions &&
+        navigator.permissions
+          .query({ name: "geolocation" })
+          .then((x) => x.removeEventListener("change", eventListener))
     }
   }, [])
 
