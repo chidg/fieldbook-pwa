@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useEffect, useCallback } from "react"
 import axios from "axios"
 import { useUserContext, useDataContext } from "@/contexts"
 import { useGeoLocation, useHasGeoLocationPermission } from "@/hooks/location"
@@ -59,11 +59,12 @@ const SettingsUpdateForm = () => {
   } = useUserContext()
   const { data, setData, setHasNewData, hasNewData } = useDataContext()
   const [params] = useSearchParams()
-  const highlightExport = params.get("export") !== null && hasNewData
+  const highlightExport = params.get("export") !== null
   const [exporting, setExporting] = useState(false)
+  const [exportSuccess, setExportSuccess] = useState(false)
   const [clearing, setClearing] = useState(false)
 
-  const sendStuff = async () => {
+  const sendStuff = useCallback(async () => {
     setExporting(true)
     const formattedData = Object.values(data).map((d) => ({
       ...d,
@@ -73,13 +74,16 @@ const SettingsUpdateForm = () => {
     }))
 
     try {
-      await axios.post(
+      const result = await axios.post(
         ".netlify/functions/email",
         { data: formattedData, user },
         {
           responseType: "json",
         }
       )
+      if (result.status === 200) {
+        setExportSuccess(true)
+      }
     } catch (e) {
       setExporting(false)
       alert("There was an error sending your data. Please try again.")
@@ -88,7 +92,19 @@ const SettingsUpdateForm = () => {
 
     setExporting(false)
     setHasNewData(false)
-  }
+  }, [data])
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (exportSuccess) {
+      timer = setTimeout(() => {
+        setExportSuccess(false)
+      }, 5000)
+    }
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [exportSuccess])
 
   const clearData = React.useCallback(async () => {
     setData({})
@@ -177,12 +193,23 @@ const SettingsUpdateForm = () => {
           <div className="flex justify-center mt-2">
             <button
               type="button"
-              className="border-2 bg-green-500 rounded px-4 py-2 disabled:bg-green-200"
+              className={`border-2 bg-green-500 rounded px-4 py-2 disabled:bg-green-200 transition-colors duration-700 ${
+                exportSuccess && "border-purple-600 bg-green-200"
+              }`}
               onClick={sendStuff}
-              disabled={exporting || !online}
+              disabled={exporting || !online || exportSuccess}
             >
-              {!exporting && <span>Export Data 🎉</span>}
-              {exporting && <span>Exporting...</span>}
+              {!exportSuccess && (
+                <>
+                  {!exporting && <span>Export Data 🚀</span>}
+                  {exporting && <span>Exporting...</span>}
+                </>
+              )}
+              {exportSuccess && (
+                <span className="text-purple-600">
+                  Data Exported Successfully 🎉
+                </span>
+              )}
             </button>
           </div>
         </div>
