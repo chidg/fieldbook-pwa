@@ -71,7 +71,7 @@ export const ItemDetail = () => {
   if (!instance) return null
 
   return (
-    <div className="text-white rounded px-4">
+    <div className="text-white px-4 flex flex-col gap-2">
       <div className="flex justify-between items-center">
         <h3 className="text-lg flex-1">{taxonName}</h3>
         <Link
@@ -85,7 +85,7 @@ export const ItemDetail = () => {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
+              className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -101,25 +101,31 @@ export const ItemDetail = () => {
         </Link>
       </div>
       <hr />
-      <div onClick={() => nav(-1)} className="flex pt-2 text-xs cursor-pointer">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4"
-          fill="none"
-          viewBox="4 0 24 24"
-          stroke="currentColor"
+      <div className="w-fit">
+        <button
+          type="button"
+          onClick={() => nav(-1)}
+          className="inline-flex items-center text-xs border border-gray-200 rounded-md pr-1"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>{" "}
-        Back
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="4 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>{" "}
+          <span>Back</span>
+        </button>
       </div>
 
-      <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-2">
+      <div className="flex-col bg-gray-200 bg-opacity-20 rounded p-2">
         {instance && (
           <div className="grid grid-cols-3 text-sm">
             <div>Recorded at:</div>

@@ -16,7 +16,7 @@ const DataListItem = ({ item }: { item: DataItem }) => {
   const taxonName = useTaxonName(item)
 
   return (
-    <div className="flex justify-start items-center bg-gray-200 bg-opacity-20 text-white focus:text-blue-400 focus:bg-blue-100 rounded-sm px-2 py-2 my-1">
+    <div className="flex justify-start items-center bg-gray-200 bg-opacity-20 text-white focus:text-blue-400 focus:bg-blue-100 rounded-sm px-2 py-1 my-1">
       <div className="font-sm px-2">
         {format(new Date(item.timestamp), "H:mm")}
       </div>
@@ -32,7 +32,7 @@ const DataListItem = ({ item }: { item: DataItem }) => {
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
+            className="h-8 w-8"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
