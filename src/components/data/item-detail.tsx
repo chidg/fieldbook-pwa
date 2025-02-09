@@ -5,6 +5,7 @@ import Map, { Source, Layer, LayerProps, ViewState } from "react-map-gl"
 import config from "@/config.json"
 import { useNavigate, Link, useParams } from "react-router-dom"
 import { useTaxonName } from "@/hooks/useTaxonName"
+import "mapbox-gl/dist/mapbox-gl.css"
 
 const layerStyle: LayerProps = {
   id: "point",
@@ -100,16 +101,15 @@ export const ItemDetail = () => {
           </button>
         </Link>
       </div>
-      <hr />
       <div className="w-fit">
         <button
           type="button"
           onClick={() => nav(-1)}
-          className="inline-flex items-center text-xs border border-gray-200 rounded-md pr-1"
+          className="inline-flex items-center text-white text-sm px-1 rounded border-white border"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
+            className="h-4 w-4"
             fill="none"
             viewBox="4 0 24 24"
             stroke="currentColor"
@@ -124,6 +124,7 @@ export const ItemDetail = () => {
           <span>Back</span>
         </button>
       </div>
+      <hr />
 
       <div className="flex-col bg-gray-200 bg-opacity-20 rounded p-2">
         {instance && (

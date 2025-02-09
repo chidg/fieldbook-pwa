@@ -19,13 +19,13 @@ export interface DataItem {
   otherTaxon?: string
   idConfidence: number
   notes: string
-  density: (typeof config.densities)[number]
-  size: (typeof config.sizes)[number]
+  density: string
+  size: string
   location?: GeolocationCoordinates
   timestamp: number
 }
 
-type Data = Record<string, DataItem>
+export type Data = Record<string, DataItem>
 
 interface DataState {
   data: Data

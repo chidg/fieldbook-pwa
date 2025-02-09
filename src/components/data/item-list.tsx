@@ -10,6 +10,7 @@ import {
 import { useDataByDate } from "@/hooks/useDataByDate"
 import { useDensityOptions } from "@/hooks/useDensity"
 import { useTaxonName } from "@/hooks/useTaxonName"
+import { Data } from "@/contexts/data"
 
 const DataListItem = ({ item }: { item: DataItem }) => {
   const densities = useDensityOptions()
@@ -49,47 +50,22 @@ const DataListItem = ({ item }: { item: DataItem }) => {
 }
 
 export const DataList = () => {
-  const { data } = useDataContext()
-  const { user } = useUserContext()
   const { setNewestFirst, newestFirst } = useMetaContext()
   const displayData = useDataByDate(newestFirst)
 
-  const dataItemsCount = Object.keys(data || {}).length
-
   return (
     <>
-      <Link to="data/new">
-        <div className="fab bg-gradient-to-br from-purple-800 to-purple-500">
-          🌱
-        </div>
-      </Link>
-
-      {/* Search bar */}
-      {dataItemsCount > 0 && (
-        <div className="mb-1">
-          <div
-            className="flex justify-end text-white text-sm px-1"
-            onClick={() => {
-              setNewestFirst(!newestFirst)
-            }}
-          >
-            <span className="rounded px-1 border-white border-2">
-              <>
-                {newestFirst && <>Showing oldest first</>}
-                {!newestFirst && <>Showing newest first</>}
-              </>
-            </span>
-          </div>
-        </div>
-      )}
-      {!dataItemsCount && (
-        <div className="grid row mx-10">
-          <div className="border-2 border-white text-white rounded px-4 py-2">
-            <p>Hi {user?.name}, welcome to Fieldbook!</p>
-            <p>Hit the 🌱 below to start adding weed records.</p>
-          </div>
-        </div>
-      )}
+      <div className="mb-1 flex justify-end px-1">
+        <button
+          className="text-white text-sm px-1 rounded border-white border"
+          onClick={() => {
+            setNewestFirst(!newestFirst)
+          }}
+        >
+          {newestFirst && <>Showing oldest first</>}
+          {!newestFirst && <>Showing newest first</>}
+        </button>
+      </div>
       {Object.keys(displayData).map((dateString) => (
         <div key={`collection-${dateString}`}>
           <div className="bg-white bg-opacity-80 text-gray-600 text-sm font-medium px-1">
