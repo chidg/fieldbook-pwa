@@ -1,24 +1,11 @@
-import { useMemo, useState } from "react"
-import config from "@/config.json"
-import { DataItem, useDataContext } from "@/contexts"
-import Map, { Source, LayerProps, Marker, Popup } from "react-map-gl"
+import { useState } from "react"
+import { useDataContext } from "@/contexts"
+import Map, { Marker } from "react-map-gl"
 
 import { useViewState } from "@/hooks/useViewState"
 import "mapbox-gl/dist/mapbox-gl.css"
-import { LeafIcon, MapPin } from "lucide-react"
-import { taxaOptions } from "@/contexts/data"
-import { useDensityOptions } from "@/hooks/useDensity"
-
-const layerStyle: LayerProps = {
-  id: "point",
-  type: "circle",
-  paint: {
-    "circle-radius": 8,
-    "circle-stroke-color": "#7c3aed",
-    "circle-color": "#9663ef",
-    "circle-stroke-width": 1,
-  },
-}
+import { LeafIcon } from "lucide-react"
+import { Popup, useShowPopup } from "../popup"
 
 export const ItemListMap = () => {
   const { data } = useDataContext()
@@ -29,7 +16,7 @@ export const ItemListMap = () => {
       .map((item) => [item.location!.longitude, item.location!.latitude])
   )
   const [viewState, setViewState] = useState(initialViewState)
-  const [showPopup, setShowPopup] = useState<DataItem | null>(null)
+  const [showPopup, setShowPopup] = useShowPopup()
 
   return (
     <div className="h-screen">
@@ -59,22 +46,7 @@ export const ItemListMap = () => {
               </div>
             </Marker>
           ))}
-        {showPopup && (
-          <Popup
-            onClose={() => setShowPopup(null)}
-            latitude={showPopup.location!.latitude}
-            longitude={showPopup.location!.longitude}
-          >
-            <div className="flex flex-col gap-1">
-              <span className="text-primary">
-                {taxaOptions[showPopup.taxon].name}
-              </span>
-              <span className="text-primary">
-                {config.densities[parseInt(showPopup.density)]}
-              </span>
-            </div>
-          </Popup>
-        )}
+        <Popup showPopup={showPopup} setShowPopup={setShowPopup} />
       </Map>
     </div>
   )

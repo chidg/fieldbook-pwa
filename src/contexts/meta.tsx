@@ -1,17 +1,33 @@
-import { ReactNode, createContext, useState, useContext } from "react"
+import {
+  ReactNode,
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+} from "react"
+import { useDataContext } from "./data"
 
+type ViewTypes = "list" | "map" | "empty"
 interface MetaState {
   newestFirst: boolean
   setNewestFirst: (value: boolean) => void
-  viewType: "list" | "map"
-  setViewType: (value: "list" | "map") => void
+  viewType: ViewTypes
+  setViewType: (value: ViewTypes) => void
 }
 
 const MetaContext = createContext<MetaState | undefined>(undefined)
 
 const MetaProvider = ({ children }: { children: ReactNode }) => {
   const [newestFirst, setNewestFirst] = useState<boolean>(false)
-  const [viewType, setViewType] = useState<"list" | "map">("list")
+  const { data } = useDataContext()
+  const [viewType, setViewType] = useState<ViewTypes>(
+    Object.keys(data).length > 0 ? "list" : "empty"
+  )
+
+  useEffect(() => {
+    if (viewType === "empty" && Object.keys(data).length > 0)
+      setViewType("list")
+  }, [viewType, data])
 
   return (
     <MetaContext.Provider

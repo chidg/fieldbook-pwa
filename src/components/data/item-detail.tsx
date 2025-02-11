@@ -1,11 +1,13 @@
 import React from "react"
 
 import { DataItem, useDataContext } from "@/contexts"
-import Map, { Source, Layer, LayerProps, ViewState } from "react-map-gl"
+import Map, { LayerProps, Marker, ViewState } from "react-map-gl"
 import config from "@/config.json"
 import { useNavigate, Link, useParams } from "react-router-dom"
 import { useTaxonName } from "@/hooks/useTaxonName"
 import "mapbox-gl/dist/mapbox-gl.css"
+import { Popup, useShowPopup } from "../popup"
+import { LeafIcon } from "lucide-react"
 
 const layerStyle: LayerProps = {
   id: "point",
@@ -20,11 +22,11 @@ const layerStyle: LayerProps = {
 
 type MapDetails = {
   viewport: Partial<ViewState>
-  geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>
 }
 
 export const ItemDetail = () => {
   const nav = useNavigate()
+  const [showPopup, setShowPopup] = useShowPopup()
 
   const { data } = useDataContext()
   const { id: instanceId } = useParams()
@@ -52,16 +54,6 @@ export const ItemDetail = () => {
           latitude,
           longitude,
           zoom: 12,
-        },
-        geoJson: {
-          type: "FeatureCollection",
-          features: [
-            {
-              type: "Feature",
-              geometry: { type: "Point", coordinates: [longitude, latitude] },
-              properties: {},
-            },
-          ],
         },
       })
     }
@@ -175,13 +167,20 @@ export const ItemDetail = () => {
               style={{ width: "100%", height: "100%" }}
               mapStyle="mapbox://styles/mapbox/satellite-v9"
             >
-              <Source
-                id="item-location"
-                type="geojson"
-                data={mapDetails.geoJson}
+              <Marker
+                key={instance.id}
+                latitude={instance.location!.latitude}
+                longitude={instance.location!.longitude}
+                onClick={(e) => {
+                  e.originalEvent.stopPropagation()
+                  setShowPopup(instance)
+                }}
               >
-                <Layer {...layerStyle} />
-              </Source>
+                <div className="rounded-full bg-white cursor-pointer bg-opacity-60 p-1">
+                  <LeafIcon className="h-5 w-5 text-purple-500" />
+                </div>
+              </Marker>
+              <Popup setShowPopup={setShowPopup} showPopup={showPopup} />
             </Map>
           </div>
         )}
