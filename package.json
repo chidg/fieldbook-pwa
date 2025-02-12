@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "serve": "vite preview --port 3000",
+    "serve": "vite preview --port 5173",
     "lint": "eslint . --ext .ts,.tsx,.js",
     "prepare": "husky install",
     "test": "vitest"

@@ -11,11 +11,11 @@ const ItemValidation = Yup.object().shape({
 })
 
 export type ItemFormValues = {
-  taxon: (typeof config.taxa)[number]
-  otherTaxon: string
+  taxon: keyof typeof config.taxa
   idConfidence: string
-  density: string
-  size: (typeof config.sizes)[number]
+  density: keyof typeof config.densities
+  size: keyof typeof config.sizes
+  otherTaxon: string
   notes: string
 }
 
@@ -26,18 +26,15 @@ interface ItemFormProps extends FormikConfig<ItemFormValues> {
   children?: ReactNode
 }
 
-const transformConfigToSelect = (
-  configType: keyof typeof config,
-  itemId: string
-) => ({
-  label: config[configType][parseInt(itemId)],
-  value: itemId,
-})
+type SelectOption = {
+  label: string
+  value: string
+}
 
-const getOptionsForConfig = (configType: keyof typeof config) =>
-  config[configType].map((option, index) => ({
-    label: option,
-    value: index.toString(),
+const getOptionsForConfig = (configType: keyof typeof config): SelectOption[] =>
+  Object.entries(config[configType]).map(([value, label]) => ({
+    label,
+    value,
   }))
 
 const ItemForm: React.FC<ItemFormProps> = ({
@@ -63,12 +60,9 @@ const ItemForm: React.FC<ItemFormProps> = ({
             configType: keyof typeof config,
             fieldName: keyof NonNullable<ItemFormValues>
           ) => {
-            return transformConfigToSelect(
-              configType,
-              values[fieldName] !== undefined
-                ? values[fieldName]
-                : initialValues[fieldName]
-            )
+            const options = getOptionsForConfig(configType)
+            const value = values[fieldName]
+            return options.find((option) => option.value === value) || null
           },
           [values, initialValues]
         )
@@ -90,7 +84,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
               />
             </div>
 
-            {parseInt(values.taxon) === config.taxa.length - 1 && (
+            {values.taxon === "other" && (
               <div className={`pb-4 transition duration-500`}>
                 <label
                   className="text-sm block font-bold pb-2"
@@ -116,7 +110,10 @@ const ItemForm: React.FC<ItemFormProps> = ({
               </label>
               <Select
                 value={getSelectValue("idConfidenceLevels", "idConfidence")}
-                options={getOptionsForConfig("idConfidenceLevels")}
+                options={config.idConfidenceLevels.map((item, i) => ({
+                  label: item,
+                  value: i.toString(),
+                }))}
                 onChange={(value) => {
                   setFieldValue("idConfidence", value?.value)
                 }}

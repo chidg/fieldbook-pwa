@@ -7,8 +7,6 @@ import { useGeoLocation, useGeoLocationDisplay } from "@/hooks/location"
 import ItemForm, { ItemFormValues } from "./item-form"
 import { useLatestDataItem } from "@/hooks/useLatestDataItem"
 
-import { taxa } from "@/config.json"
-
 export const ItemFormCreate: React.FC = () => {
   const navigate = useNavigate()
   const { saveItem } = useDataContext()
@@ -40,14 +38,11 @@ export const ItemFormCreate: React.FC = () => {
       locationDisplay={locationDisplay}
       locationAccuracy={geoLocation?.accuracy}
       initialValues={{
-        density: "0",
+        density: "absent",
         notes: "",
         idConfidence: "2",
-        size: "0",
-        taxon:
-          latest && parseInt(latest.taxon) !== taxa.length - 1
-            ? latest.taxon
-            : "0",
+        size: "small",
+        taxon: latest && latest.taxon !== "other" ? latest.taxon : "arum",
         otherTaxon: "",
       }}
       onSubmit={onSubmit}

@@ -9,17 +9,6 @@ import "mapbox-gl/dist/mapbox-gl.css"
 import { Popup, useShowPopup } from "../popup"
 import { LeafIcon } from "lucide-react"
 
-const layerStyle: LayerProps = {
-  id: "point",
-  type: "circle",
-  paint: {
-    "circle-radius": 8,
-    "circle-stroke-color": "#7c3aed",
-    "circle-color": "#9663ef",
-    "circle-stroke-width": 1,
-  },
-}
-
 type MapDetails = {
   viewport: Partial<ViewState>
 }
@@ -129,7 +118,7 @@ export const ItemDetail = () => {
               <>
                 <div>Density:</div>
                 <div className="col-span-2 justify-end">
-                  {config.densities[parseInt(instance.density)]}
+                  {config.densities[instance.density]}
                 </div>
               </>
             )}
@@ -137,7 +126,7 @@ export const ItemDetail = () => {
               <>
                 <div>Size:</div>
                 <div className="col-span-2 justify-end">
-                  {config.sizes[parseInt(instance.size)]}
+                  {config.sizes[instance.size]}
                 </div>
               </>
             )}

@@ -1,37 +1,33 @@
 {
-    "taxa": [
-        "Arum Lily",
-        "Sydney Golden Wattle",
-        "Flinders Range Wattle",
-        "Blackwood (Blackwood Wattle)",
-        "Sweet Pittosporum",
-        "Olive",
-        "Victorian Teatree",
-        "Fig",
-        "Polygala",
-        "Broom (Genista species)",
-        "Dolichos",
-        "Asparagus Fern (Asparagus scandens)",
-        "Blackberry",
-        "Other"
-    ],
-    "densities": [
-        "Absent",
-        "Individual plant",
-        "Isolated or few scattered plants ",
-        "Many scattered or clumped plants",
-        "Large dense infestation, less than 20 x 20 m",
-        "Extensive dense infestation, greater than 20 x 20 m"
-    ],
-    "idConfidenceLevels": [
-        "Unsure",
-        "Reasonably sure",
-        "Certain"
-    ],
-    "sizes": [
-        "Mostly small young plants",
-        "Mixed aged plants",
-        "Mostly large mature plants"
-    ]
-
+  "taxa": {
+    "arum": "Arum Lily",
+    "wattle": "Sydney Golden Wattle",
+    "flinders": "Flinders Range Wattle",
+    "blackwood": "Blackwood (Blackwood Wattle)",
+    "pittosporum": "Sweet Pittosporum",
+    "olive": "Olive",
+    "teatree": "Victorian Teatree",
+    "fig": "Fig",
+    "polygala": "Polygala",
+    "broom": "Broom (Genista species)",
+    "dolichos": "Dolichos",
+    "asparagus": "Asparagus Fern (Asparagus scandens)",
+    "blackberry": "Blackberry",
+    "other": "Other"
+  },
+  "densities": {
+    "absent": "Absent",
+    "individual": "Individual plant",
+    "scattered": "Isolated or few scattered plants ",
+    "clumped": "Many scattered or clumped plants",
+    "dense": "Large dense infestation, less than 20 x 20 m",
+    "extensive": "Extensive dense infestation, greater than 20 x 20 m"
+  },
+  "idConfidenceLevels": ["Unsure", "Reasonably sure", "Certain"],
+  "sizes": {
+    "small": "Mostly small young plants",
+    "juvenile": "Juvenile plants",
+    "mixed": "Mixed aged plants",
+    "large": "Mostly large mature plants"
+  }
 }

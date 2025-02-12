@@ -1,5 +1,4 @@
 import { DataItem } from "@/contexts"
-import { taxaOptions } from "@/contexts/data"
 import { useState } from "react"
 import config from "@/config.json"
 import { Popup as ReactMapPopup } from "react-map-gl"
@@ -16,8 +15,8 @@ export const Popup = ({
   setShowPopup: (arg: DataItem | null) => void
 }) => {
   if (!showPopup) return null
-  const taxonName = taxaOptions[parseInt(showPopup.taxon)].name
-  const density = config.densities[parseInt(showPopup.density)]
+  const taxonName = config.taxa[showPopup.taxon]
+  const density = config.densities[showPopup.density]
   return (
     <ReactMapPopup
       onClose={() => setShowPopup(null)}

@@ -15,29 +15,34 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       strategies: "injectManifest",
+      injectRegister: false,
       srcDir: "src",
       filename: "sw.ts",
+      devOptions: {
+        enabled: true,
+        type: "module",
+      },
       manifest: {
         short_name: "Fieldbook NCMRR",
         name: "Fieldbook for NCMRR",
         icons: [
           {
-            src: "android-chrome-192x192.png",
+            src: "/android-chrome-192x192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "android-chrome-512x512.png",
+            src: "/android-chrome-512x512.png",
             sizes: "512x512",
             type: "image/png",
           },
           {
-            src: "favicon.ico",
+            src: "/favicon.ico",
             sizes: "64x64 32x32 24x24 16x16",
             type: "image/x-icon",
           },
         ],
-        start_url: ".",
+        start_url: "/",
         display: "standalone",
         theme_color: "#000000",
         background_color: "#ffffff",

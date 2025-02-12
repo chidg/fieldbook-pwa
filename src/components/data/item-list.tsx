@@ -1,12 +1,7 @@
 import { Link } from "react-router-dom"
 import format from "date-fns/format"
 
-import {
-  DataItem,
-  useDataContext,
-  useUserContext,
-  useMetaContext,
-} from "@/contexts"
+import { DataItem, useMetaContext } from "@/contexts"
 import { useDataByDate } from "@/hooks/useDataByDate"
 import { useDensityOptions } from "@/hooks/useDensity"
 import { useTaxonName } from "@/hooks/useTaxonName"
@@ -23,7 +18,7 @@ const DataListItem = ({ item }: { item: DataItem }) => {
       </div>
       <div className="font-sm font-semibold px-2">{taxonName}</div>
       <div className="flex-grow font-medium px-2">
-        {item.density && <span>{densities[parseInt(item.density)]}</span>}
+        {item.density && <span>{densities[item.density]}</span>}
       </div>
       <div className="font-normal tracking-wide">
         <Link
