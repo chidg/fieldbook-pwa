@@ -10,28 +10,6 @@ import { CacheableResponsePlugin } from "workbox-cacheable-response"
 
 declare const self: ServiceWorkerGlobalScope
 
-// Basic PWA setup
-clientsClaim()
-if (!import.meta.env.DEV) {
-  precacheAndRoute(self.__WB_MANIFEST)
-}
-
-// Cache mapbox tiles
-registerRoute(
-  new RegExp(
-    /(https:)?(\/\/([^/?#]*)?)(mapbox.com)([^?#]*)(\?([^#]*))?(#(.*))?/g
-  ),
-  new StaleWhileRevalidate({
-    cacheName: "maptiles",
-    plugins: [
-      new ExpirationPlugin({ maxEntries: 100 }),
-      new CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
-    ],
-  })
-)
-
 // Migration functionality
 // In sw.ts
 self.addEventListener("install", (event) => {
@@ -62,6 +40,28 @@ self.addEventListener("activate", (event) => {
     })()
   )
 })
+
+// Basic PWA setup
+clientsClaim()
+if (!import.meta.env.DEV) {
+  precacheAndRoute(self.__WB_MANIFEST)
+}
+
+// Cache mapbox tiles
+registerRoute(
+  new RegExp(
+    /(https:)?(\/\/([^/?#]*)?)(mapbox.com)([^?#]*)(\?([^#]*))?(#(.*))?/g
+  ),
+  new StaleWhileRevalidate({
+    cacheName: "maptiles",
+    plugins: [
+      new ExpirationPlugin({ maxEntries: 100 }),
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+    ],
+  })
+)
 
 // Handle skip waiting
 self.addEventListener("message", (event) => {
