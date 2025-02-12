@@ -14,7 +14,7 @@ export type ItemFormValues = {
   taxon: keyof typeof config.taxa
   idConfidence: string
   density: keyof typeof config.densities
-  size: keyof typeof config.sizes
+  size: keyof typeof config.sizes | undefined
   otherTaxon: string
   notes: string
 }
@@ -132,19 +132,20 @@ const ItemForm: React.FC<ItemFormProps> = ({
                 }}
               />
             </div>
-
-            <div className="pb-4">
-              <label className="text-sm block font-bold pb-2" htmlFor="size">
-                Size
-              </label>
-              <Select
-                value={getSelectValue("sizes", "size")}
-                options={getOptionsForConfig("sizes")}
-                onChange={(value) => {
-                  setFieldValue("size", value?.value)
-                }}
-              />
-            </div>
+            {values.density !== "absent" && (
+              <div className="pb-4">
+                <label className="text-sm block font-bold pb-2" htmlFor="size">
+                  Size
+                </label>
+                <Select
+                  value={getSelectValue("sizes", "size")}
+                  options={getOptionsForConfig("sizes")}
+                  onChange={(value) => {
+                    setFieldValue("size", value?.value)
+                  }}
+                />
+              </div>
+            )}
 
             <div className="pb-4">
               <label className="text-sm block font-bold pb-2" htmlFor="notes">

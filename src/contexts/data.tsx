@@ -23,7 +23,7 @@ export interface DataItem {
   idConfidence: number
   notes: string
   density: keyof typeof config.densities
-  size: keyof typeof config.sizes
+  size?: keyof typeof config.sizes
   location?: GeolocationCoordinates
   timestamp: number
 }

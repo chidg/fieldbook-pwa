@@ -65,7 +65,8 @@ const sendEmail = async ({
     const records = dataArray.map((item) => {
       return {
         ...item,
-        recorder: user.email,
+        recorder: user.name,
+        recorderEmail: user.email,
         taxon: item.taxon ? config.taxa[item.taxon] : "",
         otherTaxon: item.otherTaxon ? item.otherTaxon : "",
         idConfidence: config.idConfidenceLevels[item.idConfidence] ?? "",
