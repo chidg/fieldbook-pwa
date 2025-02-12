@@ -17,15 +17,23 @@ if (import.meta.env.VITE_APP_SENTRY_DSN) {
 }
 
 if ("serviceWorker" in navigator) {
+  console.log("[Production] Setting up service worker message listener")
+
   navigator.serviceWorker.addEventListener("message", (event) => {
+    console.log("[Production] Received message from SW:", event.data)
+
     if (event.data.type === "PERFORM_MIGRATION") {
+      console.log("[Production] Starting migration...")
       const success = performMigration()
+      console.log("[Production] Migration complete, success:", success)
+
       if (success) {
-        console.log("Migration success")
+        console.log("[Production] Reloading page...")
         window.location.reload()
       }
     }
   })
+
   navigator.serviceWorker.register(
     import.meta.env.MODE === "production" ? "/sw.js" : "/dev-sw.js?dev-sw",
     { type: import.meta.env.MODE === "production" ? "classic" : "module" }

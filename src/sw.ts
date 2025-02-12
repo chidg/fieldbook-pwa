@@ -33,23 +33,31 @@ registerRoute(
 )
 
 // Migration functionality
+// In sw.ts
 self.addEventListener("install", (event) => {
-  console.log("Install event received", { event })
+  console.log("[Production] Install event received", { event })
 })
 
 self.addEventListener("activate", (event) => {
+  console.log("[Production] Activate event START", { event })
+
   event.waitUntil(
     (async () => {
       try {
         const clients = await self.clients.matchAll()
+        console.log("[Production] Found clients:", clients.length)
 
         clients.forEach((client) => {
+          console.log(
+            "[Production] Sending migration message to client",
+            client.id
+          )
           client.postMessage({
             type: "PERFORM_MIGRATION",
           })
         })
       } catch (error) {
-        console.error("Migration setup failed:", error)
+        console.error("[Production] Migration setup failed:", error)
       }
     })()
   )
