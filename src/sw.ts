@@ -22,18 +22,43 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       try {
-        const clients = await self.clients.matchAll()
-        console.log("[Production] Found clients:", clients.length)
+        // First claim clients
+        clientsClaim()
 
-        clients.forEach((client) => {
+        // Then try to get clients multiple times with a delay
+        let attempts = 0
+        const maxAttempts = 3
+
+        while (attempts < maxAttempts) {
+          const clients = await self.clients.matchAll()
           console.log(
-            "[Production] Sending migration message to client",
-            client.id
+            "[Production] Found clients (attempt " + (attempts + 1) + "):",
+            clients.length
           )
-          client.postMessage({
-            type: "PERFORM_MIGRATION",
-          })
-        })
+
+          if (clients.length > 0) {
+            clients.forEach((client) => {
+              console.log(
+                "[Production] Sending migration message to client",
+                client.id
+              )
+              client.postMessage({
+                type: "PERFORM_MIGRATION",
+              })
+            })
+            break
+          }
+
+          // Wait a bit before trying again
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+          attempts++
+        }
+
+        if (attempts === maxAttempts) {
+          console.log(
+            "[Production] No clients found after " + maxAttempts + " attempts"
+          )
+        }
       } catch (error) {
         console.error("[Production] Migration setup failed:", error)
       }
@@ -42,7 +67,6 @@ self.addEventListener("activate", (event) => {
 })
 
 // Basic PWA setup
-clientsClaim()
 if (!import.meta.env.DEV) {
   precacheAndRoute(self.__WB_MANIFEST)
 }
