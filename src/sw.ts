@@ -11,9 +11,9 @@ import { CacheableResponsePlugin } from "workbox-cacheable-response"
 declare const self: ServiceWorkerGlobalScope
 
 // Migration functionality
-// In sw.ts
 self.addEventListener("install", (event) => {
   console.log("[Production] Install event received", { event })
+  self.skipWaiting()
 })
 
 self.addEventListener("activate", (event) => {
