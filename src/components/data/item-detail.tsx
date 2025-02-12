@@ -1,29 +1,21 @@
 import React from "react"
 
 import { DataItem, useDataContext } from "@/contexts"
-import Map, { Source, Layer, LayerProps, ViewState } from "react-map-gl"
+import Map, { LayerProps, Marker, ViewState } from "react-map-gl"
 import config from "@/config.json"
 import { useNavigate, Link, useParams } from "react-router-dom"
 import { useTaxonName } from "@/hooks/useTaxonName"
-
-const layerStyle: LayerProps = {
-  id: "point",
-  type: "circle",
-  paint: {
-    "circle-radius": 8,
-    "circle-stroke-color": "#7c3aed",
-    "circle-color": "#9663ef",
-    "circle-stroke-width": 1,
-  },
-}
+import "mapbox-gl/dist/mapbox-gl.css"
+import { Popup, useShowPopup } from "../popup"
+import { LeafIcon } from "lucide-react"
 
 type MapDetails = {
   viewport: Partial<ViewState>
-  geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry>
 }
 
 export const ItemDetail = () => {
   const nav = useNavigate()
+  const [showPopup, setShowPopup] = useShowPopup()
 
   const { data } = useDataContext()
   const { id: instanceId } = useParams()
@@ -52,16 +44,6 @@ export const ItemDetail = () => {
           longitude,
           zoom: 12,
         },
-        geoJson: {
-          type: "FeatureCollection",
-          features: [
-            {
-              type: "Feature",
-              geometry: { type: "Point", coordinates: [longitude, latitude] },
-              properties: {},
-            },
-          ],
-        },
       })
     }
   }, [instance, setMapDetails])
@@ -71,7 +53,7 @@ export const ItemDetail = () => {
   if (!instance) return null
 
   return (
-    <div className="text-white rounded px-4">
+    <div className="text-white px-4 flex flex-col gap-2">
       <div className="flex justify-between items-center">
         <h3 className="text-lg flex-1">{taxonName}</h3>
         <Link
@@ -85,7 +67,7 @@ export const ItemDetail = () => {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
+              className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -100,26 +82,32 @@ export const ItemDetail = () => {
           </button>
         </Link>
       </div>
-      <hr />
-      <div onClick={() => nav(-1)} className="flex pt-2 text-xs cursor-pointer">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4"
-          fill="none"
-          viewBox="4 0 24 24"
-          stroke="currentColor"
+      <div className="w-fit">
+        <button
+          type="button"
+          onClick={() => nav(-1)}
+          className="inline-flex items-center text-white text-sm px-1 rounded border-white border"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>{" "}
-        Back
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="4 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>{" "}
+          <span>Back</span>
+        </button>
       </div>
+      <hr />
 
-      <div className="flex-col bg-gray-200 bg-opacity-20 rounded px-2 pb-6 my-2">
+      <div className="flex-col bg-gray-200 bg-opacity-20 rounded p-2">
         {instance && (
           <div className="grid grid-cols-3 text-sm">
             <div>Recorded at:</div>
@@ -130,7 +118,7 @@ export const ItemDetail = () => {
               <>
                 <div>Density:</div>
                 <div className="col-span-2 justify-end">
-                  {config.densities[parseInt(instance.density)]}
+                  {config.densities[instance.density]}
                 </div>
               </>
             )}
@@ -138,7 +126,7 @@ export const ItemDetail = () => {
               <>
                 <div>Size:</div>
                 <div className="col-span-2 justify-end">
-                  {config.sizes[parseInt(instance.size)]}
+                  {config.sizes[instance.size]}
                 </div>
               </>
             )}
@@ -168,13 +156,20 @@ export const ItemDetail = () => {
               style={{ width: "100%", height: "100%" }}
               mapStyle="mapbox://styles/mapbox/satellite-v9"
             >
-              <Source
-                id="item-location"
-                type="geojson"
-                data={mapDetails.geoJson}
+              <Marker
+                key={instance.id}
+                latitude={instance.location!.latitude}
+                longitude={instance.location!.longitude}
+                onClick={(e) => {
+                  e.originalEvent.stopPropagation()
+                  setShowPopup(instance)
+                }}
               >
-                <Layer {...layerStyle} />
-              </Source>
+                <div className="rounded-full bg-white cursor-pointer bg-opacity-60 p-1">
+                  <LeafIcon className="h-5 w-5 text-purple-500" />
+                </div>
+              </Marker>
+              <Popup setShowPopup={setShowPopup} showPopup={showPopup} />
             </Map>
           </div>
         )}

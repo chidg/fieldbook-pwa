@@ -69,7 +69,6 @@ const SettingsUpdateForm = () => {
     setExporting(true)
     const formattedData = Object.values(data).map((d) => ({
       ...d,
-      taxon: taxa[parseInt(d.taxon)],
       date: new Date(d.timestamp).toLocaleDateString(),
       time: new Date(d.timestamp).toLocaleTimeString(),
     }))
