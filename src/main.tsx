@@ -18,6 +18,19 @@ if (import.meta.env.VITE_APP_SENTRY_DSN) {
 
 if ("serviceWorker" in navigator) {
   console.log("[Production] Setting up service worker message listener")
+  navigator.serviceWorker.ready.then((registration) => {
+    console.log(
+      "[Production] Service worker ready, state:",
+      registration.active?.state
+    )
+
+    registration.addEventListener("statechange", () => {
+      console.log(
+        "[Production] Service worker state changed:",
+        registration.active?.state
+      )
+    })
+  })
 
   navigator.serviceWorker.addEventListener("message", (event) => {
     console.log("[Production] Received message from SW:", event.data)
