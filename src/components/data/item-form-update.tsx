@@ -54,7 +54,7 @@ export const ItemFormUpdate: React.FC = () => {
     <ItemForm
       locationDisplay={getLocationDisplay()}
       initialValues={{
-        density: instance.density.toString(),
+        density: instance.density,
         taxon: instance.taxon,
         otherTaxon: instance.otherTaxon || "",
         idConfidence: instance.idConfidence.toString(),

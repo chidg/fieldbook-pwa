@@ -5,7 +5,8 @@ import { taxa } from "@/config.json"
 export const useTaxonName = (dataItem?: DataItem) => {
   return useMemo(() => {
     if (!dataItem) return ""
-    const taxonId = parseInt(dataItem.taxon)
-    return taxonId === taxa.length - 1 ? dataItem.otherTaxon : taxa[taxonId]
+    return dataItem.taxon === "other"
+      ? dataItem.otherTaxon
+      : taxa[dataItem.taxon]
   }, [dataItem?.taxon])
 }
