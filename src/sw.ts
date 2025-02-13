@@ -11,13 +11,14 @@ import { CacheableResponsePlugin } from "workbox-cacheable-response"
 declare const self: ServiceWorkerGlobalScope
 
 // Precache must be first, before any event listeners
+const manifest = self.__WB_MANIFEST
 if (!import.meta.env.DEV) {
-  precacheAndRoute(self.__WB_MANIFEST)
+  precacheAndRoute(manifest)
 }
 
 self.addEventListener("install", (event) => {
   console.log("[Production] Install event received", { event })
-  console.log("Precache manifest:", self.__WB_MANIFEST)
+  console.log("Precache manifest:", manifest)
   self.skipWaiting()
 })
 
