@@ -1,5 +1,5 @@
 import React from "react"
-import "./styles/tailwind.css"
+import "./styles/index.css"
 import App from "./App"
 import * as Sentry from "@sentry/react"
 import * as SentryBrowser from "@sentry/browser"
