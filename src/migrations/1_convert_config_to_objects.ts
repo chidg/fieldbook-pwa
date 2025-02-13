@@ -124,7 +124,6 @@ export function performMigration() {
   try {
     // Get data from localStorage
     const data: Data = JSON.parse(localStorage.getItem("data") || "{}")
-
     // check if any data items have already been migrated:
     if (Object.values(data).length > 0) {
       if (Object.values(data)[0].taxon in MAPPINGS.taxon) return false

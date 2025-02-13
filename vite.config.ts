@@ -47,6 +47,10 @@ export default defineConfig({
         theme_color: "#000000",
         background_color: "#ffffff",
       },
+      injectManifest: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+        globIgnores: ["**/*.map", "**/*.txt", "mockServiceWorker.js"],
+      },
     }),
     pluginChecker({ typescript: true }),
   ],

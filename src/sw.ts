@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 /* eslint-disable no-restricted-globals */
 
-import { clientsClaim, RouteHandlerCallbackOptions } from "workbox-core"
+import { RouteHandlerCallbackOptions } from "workbox-core"
 import { createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing"
 import { NetworkFirst, StaleWhileRevalidate } from "workbox-strategies"
@@ -16,39 +16,72 @@ self.addEventListener("install", (event) => {
 })
 
 self.addEventListener("activate", (event) => {
+  console.info("[SW] Activation started")
+
   event.waitUntil(
     (async () => {
       try {
         // First claim clients
-        clientsClaim()
+        await self.clients.claim()
 
-        // Then try to get clients multiple times with a delay
+        // Give a small delay for claim to take effect
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
+        let success = false
         let attempts = 0
-        const maxAttempts = 3
+        const maxAttempts = 5
+        const retryDelay = 2000 // 2 seconds between attempts
 
-        while (attempts < maxAttempts) {
-          const clients = await self.clients.matchAll()
-          if (clients.length > 0) {
-            clients.forEach((client) => {
-              client.postMessage({
-                type: "PERFORM_MIGRATION",
+        while (attempts < maxAttempts && !success) {
+          console.info(`[SW] Attempt ${attempts + 1} to find clients`)
+
+          // Get all clients
+          const allClients = await self.clients.matchAll({
+            includeUncontrolled: true, // Important: get even uncontrolled clients
+            type: "window", // We only care about window clients
+          })
+          if (allClients.length > 0) {
+            console.info("[SW] Found clients, sending migration message")
+
+            await Promise.all(
+              allClients.map(async (client) => {
+                try {
+                  client.postMessage({
+                    type: "PERFORM_MIGRATION",
+                  })
+                  console.info(
+                    "[SW] Sent migration message to client",
+                    client.id
+                  )
+                } catch (err) {
+                  console.error(
+                    "[SW] Failed to send message to client",
+                    client.id,
+                    err
+                  )
+                }
               })
-            })
+            )
+
+            success = true
             break
           }
 
-          // Wait a bit before trying again
-          await new Promise((resolve) => setTimeout(resolve, 1000))
+          console.info(
+            `[SW] No controlled clients found, waiting ${retryDelay}ms before retry`
+          )
+          await new Promise((resolve) => setTimeout(resolve, retryDelay))
           attempts++
         }
 
-        if (attempts === maxAttempts) {
-          console.log(
-            "[Production] No clients found after " + maxAttempts + " attempts"
+        if (!success) {
+          console.warn(
+            `[SW] Failed to find controlled clients after ${maxAttempts} attempts`
           )
         }
       } catch (error) {
-        console.error("[Production] Migration setup failed:", error)
+        console.error("[SW] Migration setup failed:", error)
+        console.error(error) // Log the full error object
       }
     })()
   )
@@ -134,10 +167,21 @@ self.addEventListener("fetch", (event) => {
 
 // Add specific handling for assets
 registerRoute(
-  ({ request }) =>
-    request.destination === "style" || request.destination === "image",
+  ({ request }) => request.destination === "image",
   new StaleWhileRevalidate({
     cacheName: "assets",
+  })
+)
+// Modified CSS handling to use NetworkFirst
+registerRoute(
+  ({ request }) => request.destination === "style",
+  new NetworkFirst({
+    cacheName: "styles-cache",
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+    ],
   })
 )
 
