@@ -10,6 +10,25 @@ import { CacheableResponsePlugin } from "workbox-cacheable-response"
 
 declare const self: ServiceWorkerGlobalScope
 
+// Basic PWA setup - IMPORTANT: This needs to come BEFORE other route handlers
+if (!import.meta.env.DEV) {
+  precacheAndRoute(self.__WB_MANIFEST)
+}
+
+// Register CSS handling BEFORE navigation routes
+registerRoute(
+  ({ request }) => request.destination === "style",
+  new NetworkFirst({
+    cacheName: "styles-cache",
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+    ],
+    networkTimeoutSeconds: 3,
+  })
+)
+
 // Migration functionality
 self.addEventListener("install", (event) => {
   self.skipWaiting()
@@ -87,11 +106,6 @@ self.addEventListener("activate", (event) => {
   )
 })
 
-// Basic PWA setup
-if (!import.meta.env.DEV) {
-  precacheAndRoute(self.__WB_MANIFEST)
-}
-
 // Cache mapbox tiles
 registerRoute(
   new RegExp(
@@ -111,7 +125,11 @@ registerRoute(
 const isDev = import.meta.env.DEV
 
 const navigationHandler = async (params: RouteHandlerCallbackOptions) => {
-  // First try to get the actual request
+  // Explicitly check if this is a CSS request and skip navigation handling
+  if (params.request.destination === "style") {
+    return fetch(params.request)
+  }
+
   try {
     const response = await fetch(params.request)
     if (response.ok) {
@@ -121,13 +139,15 @@ const navigationHandler = async (params: RouteHandlerCallbackOptions) => {
     console.log("Navigation fetch failed, falling back to index.html", error)
   }
 
-  // Fall back to index.html
   return isDev
     ? await fetch("/index.html")
     : await createHandlerBoundToURL("/index.html")(params)
 }
 
-const fileExtensionRegexp = new RegExp("/[^/?]+\\.[^/]+$")
+// Improved file extension regex that explicitly includes CSS
+const fileExtensionRegexp = new RegExp(
+  "/[^/?]+\\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$"
+)
 const navigationRoute = new NavigationRoute(navigationHandler, {
   denylist: [fileExtensionRegexp],
 })
