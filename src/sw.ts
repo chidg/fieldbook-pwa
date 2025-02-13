@@ -14,7 +14,6 @@ import { precacheAndRoute, createHandlerBoundToURL } from "workbox-precaching"
 import { registerRoute, NavigationRoute } from "workbox-routing"
 import { StaleWhileRevalidate } from "workbox-strategies"
 import { CacheableResponsePlugin } from "workbox-cacheable-response"
-import config from "./config.json"
 
 declare const self: ServiceWorkerGlobalScope
 
