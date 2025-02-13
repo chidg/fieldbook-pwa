@@ -116,18 +116,31 @@ export function migrateData(data: any) {
 }
 
 export function performMigration() {
+  const migration = JSON.parse(
+    localStorage.getItem("fieldBookMigrations") || "{}"
+  )
+  if (migration[1]) return false
+
   try {
     // Get data from localStorage
     const data: Data = JSON.parse(localStorage.getItem("data") || "{}")
 
-    // Migrate the data
-    const migratedData = Object.fromEntries(
-      Object.entries(data).map(([id, value]) => [id, migrateData(value)])
+    // check if any data items have already been migrated:
+    if (Object.values(data).length > 0) {
+      if (Object.values(data)[0].taxon in MAPPINGS.taxon) return false
+
+      // otherwise migrate the data
+      const migratedData = Object.fromEntries(
+        Object.entries(data).map(([id, value]) => [id, migrateData(value)])
+      )
+
+      // Save back to localStorage
+      localStorage.setItem("data", JSON.stringify(migratedData))
+    }
+    localStorage.setItem(
+      "fieldBookMigrations",
+      JSON.stringify({ 1: Date.now() })
     )
-
-    // Save back to localStorage
-    localStorage.setItem("data", JSON.stringify(migratedData))
-
     return true
   } catch (error) {
     console.error("Migration failed:", error)
