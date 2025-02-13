@@ -4,7 +4,7 @@
 import { RouteHandlerCallbackOptions } from "workbox-core"
 import { createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing"
-import { NetworkFirst, StaleWhileRevalidate } from "workbox-strategies"
+import { StaleWhileRevalidate } from "workbox-strategies"
 import { ExpirationPlugin } from "workbox-expiration"
 import { CacheableResponsePlugin } from "workbox-cacheable-response"
 
@@ -17,9 +17,14 @@ if (!import.meta.env.DEV) {
 }
 
 self.addEventListener("install", (event) => {
-  console.log("[Production] Install event received", { event })
-  console.log("Precache manifest:", manifest)
-  self.skipWaiting()
+  event.waitUntil(
+    (async () => {
+      console.log("[SW] Installing new version")
+      console.log("Precache manifest:", JSON.stringify(manifest, null, 2))
+
+      await self.skipWaiting() // Wait for skip to complete
+    })()
+  )
 })
 
 self.addEventListener("activate", (event) => {
@@ -94,22 +99,6 @@ self.addEventListener("activate", (event) => {
   )
 })
 
-// Cache mapbox tiles
-registerRoute(
-  new RegExp(
-    /(https:)?(\/\/([^/?#]*)?)(mapbox.com)([^?#]*)(\?([^#]*))?(#(.*))?/g
-  ),
-  new StaleWhileRevalidate({
-    cacheName: "maptiles",
-    plugins: [
-      new ExpirationPlugin({ maxEntries: 500 }),
-      new CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
-    ],
-  })
-)
-
 const isDev = import.meta.env.DEV
 
 const navigationHandler = async (params: RouteHandlerCallbackOptions) => {
@@ -127,9 +116,8 @@ const navigationHandler = async (params: RouteHandlerCallbackOptions) => {
     : await createHandlerBoundToURL("/index.html")(params)
 }
 
-// Improved file extension regex that explicitly includes CSS
 const fileExtensionRegexp = new RegExp(
-  "/[^/?]+\\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$"
+  "\\/[^\\/]+\\.[^\\/]+$" // Match any URL with file extension
 )
 const navigationRoute = new NavigationRoute(navigationHandler, {
   denylist: [fileExtensionRegexp],
@@ -137,7 +125,22 @@ const navigationRoute = new NavigationRoute(navigationHandler, {
 
 registerRoute(navigationRoute)
 
-// IMPORTANT: Handle Google Analytics first, before any other routes
+// Cache mapbox tiles
+registerRoute(
+  new RegExp(
+    /(https:)?(\/\/([^/?#]*)?)(mapbox.com)([^?#]*)(\?([^#]*))?(#(.*))?/g
+  ),
+  new StaleWhileRevalidate({
+    cacheName: "maptiles",
+    plugins: [
+      new ExpirationPlugin({ maxEntries: 500 }),
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+    ],
+  })
+)
+
 self.addEventListener("fetch", (event) => {
   if (event.request.url.includes("google-analytics.com")) {
     event.respondWith(
