@@ -2,7 +2,11 @@
 /* eslint-disable no-restricted-globals */
 
 import { RouteHandlerCallbackOptions } from "workbox-core"
-import { createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
+import {
+  cleanupOutdatedCaches,
+  createHandlerBoundToURL,
+  precacheAndRoute,
+} from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing"
 import { StaleWhileRevalidate } from "workbox-strategies"
 import { ExpirationPlugin } from "workbox-expiration"
@@ -13,6 +17,7 @@ declare const self: ServiceWorkerGlobalScope
 // Precache must be first, before any event listeners
 const manifest = self.__WB_MANIFEST
 if (!import.meta.env.DEV) {
+  cleanupOutdatedCaches()
   precacheAndRoute(manifest)
 }
 
