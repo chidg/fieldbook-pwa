@@ -10,27 +10,14 @@ import { CacheableResponsePlugin } from "workbox-cacheable-response"
 
 declare const self: ServiceWorkerGlobalScope
 
-// Basic PWA setup - IMPORTANT: This needs to come BEFORE other route handlers
+// Precache must be first, before any event listeners
 if (!import.meta.env.DEV) {
   precacheAndRoute(self.__WB_MANIFEST)
 }
 
-// Register CSS handling BEFORE navigation routes
-registerRoute(
-  ({ request }) => request.destination === "style",
-  new NetworkFirst({
-    cacheName: "styles-cache",
-    plugins: [
-      new CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
-    ],
-    networkTimeoutSeconds: 3,
-  })
-)
-
-// Migration functionality
 self.addEventListener("install", (event) => {
+  console.log("[Production] Install event received", { event })
+  console.log("Precache manifest:", self.__WB_MANIFEST)
   self.skipWaiting()
 })
 
@@ -125,11 +112,6 @@ registerRoute(
 const isDev = import.meta.env.DEV
 
 const navigationHandler = async (params: RouteHandlerCallbackOptions) => {
-  // Explicitly check if this is a CSS request and skip navigation handling
-  if (params.request.destination === "style") {
-    return fetch(params.request)
-  }
-
   try {
     const response = await fetch(params.request)
     if (response.ok) {
@@ -190,18 +172,6 @@ registerRoute(
   ({ request }) => request.destination === "image",
   new StaleWhileRevalidate({
     cacheName: "assets",
-  })
-)
-// Modified CSS handling to use NetworkFirst
-registerRoute(
-  ({ request }) => request.destination === "style",
-  new NetworkFirst({
-    cacheName: "styles-cache",
-    plugins: [
-      new CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
-    ],
   })
 )
 
