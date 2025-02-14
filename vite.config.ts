@@ -52,7 +52,7 @@ export default defineConfig({
       injectManifest: {
         globDirectory: "build",
         globPatterns: [
-          "assets/*.{js,css}",
+          "**/assets/*.{js,css}",
           "index.html",
           "manifest.webmanifest",
         ],
