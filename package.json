@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "serve": "vite preview --port 3000",
+    "serve": "vite preview --port 5173",
     "lint": "eslint . --ext .ts,.tsx,.js",
     "prepare": "husky install",
     "test": "vitest"
@@ -19,6 +19,7 @@
     "csv-writer": "^1.6.0",
     "date-fns": "^2.30.0",
     "formik": "^2.4.5",
+    "lucide-react": "^0.475.0",
     "mailgun.js": "^9.3.0",
     "mapbox-gl": "^2.15.0",
     "react": "^18.2.0",
