@@ -4,7 +4,6 @@ import tsconfigPaths from "vite-tsconfig-paths"
 import pluginChecker from "vite-plugin-checker"
 import { VitePWA } from "vite-plugin-pwa"
 
-// https://vitejs.dev/config/
 export default defineConfig({
   build: {
     outDir: "./build",
@@ -13,7 +12,7 @@ export default defineConfig({
     react(),
     tsconfigPaths(),
     VitePWA({
-      registerType: "autoUpdate",
+      registerType: "prompt",
       strategies: "injectManifest",
       injectRegister: false,
       srcDir: "src",
@@ -47,9 +46,17 @@ export default defineConfig({
         theme_color: "#000000",
         background_color: "#ffffff",
       },
+      workbox: {
+        cleanupOutdatedCaches: true,
+      },
       injectManifest: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
-        globIgnores: ["**/*.map", "**/*.txt", "mockServiceWorker.js"],
+        globDirectory: "build",
+        globPatterns: [
+          "assets/*.{js,css}",
+          "index.html",
+          "manifest.webmanifest",
+        ],
+        globIgnores: ["**/*.map"],
       },
     }),
     pluginChecker({ typescript: true }),
