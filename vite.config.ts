@@ -12,11 +12,7 @@ export default defineConfig({
     react(),
     tsconfigPaths(),
     VitePWA({
-      registerType: "prompt",
-      strategies: "injectManifest",
-      injectRegister: false,
       srcDir: "src",
-      filename: "sw.ts",
       devOptions: {
         enabled: true,
         type: "module",
@@ -52,7 +48,7 @@ export default defineConfig({
       injectManifest: {
         globDirectory: "build",
         globPatterns: [
-          "**/assets/*.{js,css}",
+          "**/assets/**/*.{js,css}",
           "index.html",
           "manifest.webmanifest",
         ],

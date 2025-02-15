@@ -16,37 +16,6 @@ if (import.meta.env.VITE_APP_SENTRY_DSN) {
   })
 }
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.ready.then((registration) => {
-    registration.addEventListener("statechange", () => {
-      console.log(
-        "[Production] Service worker state changed:",
-        registration.active?.state
-      )
-    })
-  })
-
-  navigator.serviceWorker.addEventListener("message", (event) => {
-    console.log("[Production] Received message from SW:", event.data)
-
-    if (event.data.type === "PERFORM_MIGRATION") {
-      console.log("[Production] Starting migration...")
-      const success = performMigration()
-      console.log("[Production] Migration complete, success:", success)
-
-      if (success) {
-        console.log("[Production] Reloading page...")
-        window.location.reload()
-      }
-    }
-  })
-
-  navigator.serviceWorker.register(
-    import.meta.env.MODE === "production" ? "/sw.js" : "/dev-sw.js?dev-sw",
-    { type: import.meta.env.MODE === "production" ? "classic" : "module" }
-  )
-}
-
 createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <UserProvider>

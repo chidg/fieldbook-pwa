@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect } from "react"
 import { useLocalStorage } from "@uidotdev/usehooks"
 import config from "@/config.json"
+import { performMigration } from "@/migrations/1_convert_config_to_objects"
 
 export interface Taxon {
   id: string
@@ -43,10 +44,20 @@ const DataContext = React.createContext<DataState | undefined>(undefined)
 
 const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useLocalStorage<Data>("data", {})
+  const [migrations] = useLocalStorage<Record<number, number>>(
+    "fieldBookMigrations",
+    {}
+  )
   const [hasNewData, setHasNewData] = useLocalStorage<boolean>(
     "hasNewData",
     false
   )
+
+  useEffect(() => {
+    if (Object.keys(data).length > 0 && migrations[1] === undefined) {
+      performMigration()
+    }
+  }, [data, migrations])
 
   const saveItem = React.useCallback(
     (item: DataItem) => {
