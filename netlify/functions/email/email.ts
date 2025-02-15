@@ -8,14 +8,14 @@ const RECIPENT_EMAIL = process.env.DATA_RECIPIENT_EMAIL
 
 const mailgun = new Mailgun(formData)
 
-interface DataItem {
+export interface DataItem {
   id: string
-  taxon: (typeof config.taxa)[number]
+  taxon: keyof typeof config.taxa
   otherTaxon?: string
   idConfidence: number
-  density: (typeof config.densities)[number]
-  size: (typeof config.sizes)[number]
   notes: string
+  density: keyof typeof config.densities
+  size: keyof typeof config.sizes
   location?: GeolocationCoordinates
   date: string
   time: string
@@ -65,12 +65,13 @@ const sendEmail = async ({
     const records = dataArray.map((item) => {
       return {
         ...item,
-        recorder: user.email,
-        taxon: item.taxon ? item.taxon : "",
+        recorder: user.name,
+        recorderEmail: user.email,
+        taxon: item.taxon ? config.taxa[item.taxon] : "",
         otherTaxon: item.otherTaxon ? item.otherTaxon : "",
         idConfidence: config.idConfidenceLevels[item.idConfidence] ?? "",
-        density: item.density ? config.densities[parseInt(item.density)] : "",
-        size: item.size ? config.sizes[parseInt(item.size)] : "",
+        density: item.density ? config.densities[item.density] : "",
+        size: item.size ? config.sizes[item.size] : "",
         latitude: item.location?.latitude ? item.location?.latitude : "",
         longitude: item.location?.longitude ? item.location?.longitude : "",
       }
