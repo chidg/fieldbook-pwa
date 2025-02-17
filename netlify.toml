@@ -1,4 +1,9 @@
 [[redirects]]
+  from = "/assets/test.css"
+  to = "/404.html"
+  status = 404
+  
+[[redirects]]
   from = "/assets/index-*.css"
   to = "/404.html"
   status = 404
