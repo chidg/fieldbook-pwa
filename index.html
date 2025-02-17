@@ -7,48 +7,82 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <!-- Add this before your script tags -->
     <style>
-      /* Minimal styling to prevent FOUC */
-      .js-loading {
+      /* Initial state hides the main content but shows the spinner */
+      #root {
         opacity: 0;
       }
-      .js-loading-complete {
+      .js-loading-complete #root {
         opacity: 1;
         transition: opacity 0.3s ease-in;
+      }
+
+      /* Loading spinner container */
+      .loading-spinner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      /* The spinner itself */
+      .loading-spinner::after {
+        content: "";
+        display: block;
+        width: 33vh;
+        height: 33vh;
+        max-width: 240px;
+        max-height: 240px;
+        border-radius: 50%;
+        border: 3px solid #e5e5e5;
+        border-top-color: #9333ea;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Hide spinner when styles are loaded */
+      .js-loading-complete .loading-spinner {
+        display: none;
       }
     </style>
     <title>Fieldbook</title>
   </head>
-  <body
-    class="bg-gradient-to-br from-purple-600 to-blue-200 bg-fixed h-screen js-loading"
-  >
+  <body class="bg-gradient-to-br from-purple-600 to-blue-200 bg-fixed h-screen">
+    <div class="loading-spinner"></div>
     <div id="root"></div>
     <script>
       // Add this before your main script
       ;(function () {
-        function checkStylesAndReload() {
-          console.log("checkstyles")
-          // Check for any loaded stylesheets
-          const sheets = Array.from(document.styleSheets)
-          const hasStyles = sheets.some((sheet) => {
+        async function checkStylesAndReload() {
+          // Check if we have any linked stylesheets with rules that aren't the inline ones above
+          const styleSheets = document.styleSheets
+
+          const hasStyles = Array.from(document.styleSheets).some((sheet) => {
             try {
-              return sheet.cssRules && sheet.cssRules.length > 0
+              const hasRules = sheet.cssRules && sheet.cssRules.length > 0
+              return hasRules && sheet.cssRules[0].selectorText !== "#root"
             } catch (e) {
-              return false
+              // If we can't access rules due to CORS, check if the sheet has loaded
+              // by verifying it has a non-null href (already checked) and no error state
+              return !sheet.disabled && !sheet.error
             }
           })
-          console.log({ hasStyles })
 
           if (!hasStyles && "serviceWorker" in navigator) {
-            // No styles found, force reload
+            // No external styles found, force reload
             window.location.reload()
           } else {
             // Styles found, show content
-            document.body.classList.replace("js-loading", "js-loading-complete")
+            document.body.classList.add("js-loading-complete")
           }
         }
 
         // Check after JavaScript has had a chance to load CSS
-        setTimeout(checkStylesAndReload, 2000)
+        setTimeout(checkStylesAndReload, 1000)
       })()
     </script>
     <script type="module" src="/src/main.tsx"></script>
