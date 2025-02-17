@@ -1,7 +1,7 @@
 # Only apply in deploy previews
 [context.deploy-preview]
   [[redirects]]
-    from = "/assests/test-preview.css"
+    from = "/**/test-preview.css"
     to = "/404.html"
     status = 404
 
