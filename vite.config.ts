@@ -44,6 +44,23 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
+        runtimeCaching: [
+          {
+            urlPattern: /\.css$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "css-cache",
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+              expiration: {
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+            },
+          },
+        ],
       },
       injectManifest: {
         globDirectory: "build",
