@@ -71,6 +71,7 @@ export default defineConfig({
         ],
         globIgnores: ["**/*.map"],
       },
+      registerType: "autoUpdate",
     }),
     pluginChecker({ typescript: true }),
   ],
