@@ -1,3 +1,30 @@
+[[redirects]]
+  from = "/assets/index-*.css"
+  to = "/assets/index-:splat.css"
+  status = 404
+  force = true
+  conditions = {Path = {match = "^/assets/index-[a-f0-9]+\\.css$"}}
+
+[[redirects]]
+  from = "/assets/*.css"
+  to = "/assets/:splat.css"
+  status = 200
+
+[[redirects]]
+  from = "/assets/*.js"
+  to = "/assets/:splat.js"
+  status = 200
+
+[[redirects]]
+  from = "/assets/*.{png,jpg,gif,svg,ico}"
+  to = "/assets/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 [[headers]]
   for = "/assets/*.css"
   [headers.values]

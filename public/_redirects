@@ -1,4 +1,0 @@
-/assets/*.css /assets/:splat.css 200
-/assets/*.js /assets/:splat.js 200
-/assets/*.{png,jpg,gif,svg,ico} /assets/:splat 200
-/* /index.html 200
