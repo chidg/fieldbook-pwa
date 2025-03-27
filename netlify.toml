@@ -12,8 +12,8 @@
 
 [[redirects]]
   from = "/assets/index-ee9eee5a.css"  # The specific old hash
-  to = "/404.html"
-  status = 404
+  to = "/assets/index-9b85d681.css"
+  status = 200
   force = true
 
 [[redirects]]
