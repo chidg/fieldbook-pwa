@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react"
 import tsconfigPaths from "vite-tsconfig-paths"
 import pluginChecker from "vite-plugin-checker"
 import { VitePWA } from "vite-plugin-pwa"
-import basicSsl from "@vitejs/plugin-basic-ssl"
 
 export default defineConfig({
   build: {
@@ -12,12 +11,6 @@ export default defineConfig({
   plugins: [
     react(),
     tsconfigPaths(),
-    basicSsl({
-      /** name of certification */
-      name: "test",
-      /** custom trust domains */
-    }),
-
     VitePWA({
       srcDir: "src",
       devOptions: {
@@ -53,21 +46,6 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
-        runtimeCaching: [
-          {
-            urlPattern: /\.css$/i,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "css-cache",
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-              expiration: {
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-              },
-            },
-          },
-        ],
       },
       injectManifest: {
         globDirectory: "build",
