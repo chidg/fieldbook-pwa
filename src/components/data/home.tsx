@@ -10,9 +10,9 @@ export const Home = () => {
   const { viewType, setViewType } = useMetaContext()
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col gap-2">
       {/* Header section */}
-      <div className="flex-none">
+      <div>
         {viewType === "empty" && (
           <div className="grid row mx-10">
             <div className="border-2 border-white text-white rounded px-4 py-2">
@@ -22,7 +22,7 @@ export const Home = () => {
           </div>
         )}
         {viewType !== "empty" && (
-          <div className="px-1 mb-2">
+          <div className="px-1">
             <button
               className="text-white text-sm px-1 rounded border-white border"
               onClick={() => {
@@ -36,20 +36,15 @@ export const Home = () => {
       </div>
 
       {/* Main content section */}
-      <div className="flex-1 relative">
+      <div>
         {viewType === "list" && <DataList />}
-        {viewType === "map" && (
-          <div className="absolute inset-0">
-            <ItemListMap />
+        {viewType === "map" && <ItemListMap />}
+        <Link to="data/new" className="z-50">
+          <div className="fab bg-gradient-to-br from-purple-800 to-purple-500">
+            🌱
           </div>
-        )}
+        </Link>
       </div>
-
-      <Link to="data/new" className="z-50">
-        <div className="fab bg-gradient-to-br from-purple-800 to-purple-500">
-          🌱
-        </div>
-      </Link>
     </div>
   )
 }
