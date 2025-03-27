@@ -54,7 +54,7 @@ const DataProvider = ({ children }: { children: ReactNode }) => {
   )
 
   useEffect(() => {
-    if (Object.keys(data).length > 0 && migrations[1] === undefined) {
+    if (Object.keys(data).length > 0 && Object.keys(migrations).length === 0) {
       performMigration()
     }
   }, [data, migrations])
