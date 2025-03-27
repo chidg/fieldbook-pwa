@@ -5,7 +5,6 @@ import * as Sentry from "@sentry/react"
 import * as SentryBrowser from "@sentry/browser"
 import { UserProvider, DataProvider, MetaProvider } from "@/contexts"
 import { createRoot } from "react-dom/client"
-import { performMigration } from "./migrations/1_convert_config_to_objects"
 
 if (import.meta.env.VITE_APP_SENTRY_DSN) {
   Sentry.init({
