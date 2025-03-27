@@ -4,10 +4,124 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- Add this before your script tags -->
+    <style>
+      /* Initial state hides the main content but shows the spinner */
+      #root {
+        opacity: 0;
+      }
+      .js-loading-complete #root {
+        opacity: 1;
+        transition: opacity 0.3s ease-in;
+      }
+
+      /* Loading spinner container */
+      .loading-spinner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      /* The spinner itself */
+      .loading-spinner::after {
+        content: "";
+        display: block;
+        width: 33vh;
+        height: 33vh;
+        max-width: 240px;
+        max-height: 240px;
+        border-radius: 50%;
+        border: 3px solid #e5e5e5;
+        border-top-color: #9333ea;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Hide spinner when styles are loaded */
+      .js-loading-complete .loading-spinner {
+        display: none;
+      }
+
+      /* Add debug overlay */
+      #debug-overlay {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        font-family: monospace;
+        font-size: 12px;
+        padding: 10px;
+        max-height: 30vh;
+        overflow-y: auto;
+        z-index: 9999;
+        white-space: pre;
+        display: none;
+      }
+    </style>
     <title>Fieldbook</title>
   </head>
   <body class="bg-gradient-to-br from-purple-600 to-blue-200 bg-fixed h-screen">
+    <div id="debug-overlay"></div>
     <div id="root"></div>
+    <script>
+      // Add this before your main script
+      ;(function () {
+        function log(message) {
+          const debugOverlay = document.getElementById("debug-overlay")
+          const timestamp = new Date().toISOString().split("T")[1]
+          debugOverlay.textContent += `${timestamp} ${message}\n`
+          console.log(`${timestamp} ${message}`)
+        }
+
+        // Show debug overlay in iOS PWA
+        if (window.navigator.standalone) {
+          document.getElementById("debug-overlay").style.display = "block"
+        }
+
+        async function checkStylesAndReload() {
+          log("Checking styles...")
+          const allSheets = Array.from(document.styleSheets)
+          log(`Total stylesheets: ${allSheets.length}`)
+          allSheets.forEach((sheet, i) => {
+            log(`Sheet ${i}: ${sheet.href || "inline"}`)
+          })
+
+          // Check if we have any linked stylesheets with rules that aren't the inline ones above
+          const styleSheets = document.styleSheets
+
+          const hasStyles = Array.from(document.styleSheets).some((sheet) => {
+            try {
+              const hasRules = sheet.cssRules && sheet.cssRules.length > 0
+              return hasRules && sheet.cssRules[0].selectorText !== "#root"
+            } catch (e) {
+              // If we can't access rules due to CORS, check if the sheet has loaded
+              // by verifying it has a non-null href (already checked) and no error state
+              return !sheet.disabled && !sheet.error
+            }
+          })
+
+          if (!hasStyles && "serviceWorker" in navigator) {
+            // No external styles found, force reload
+            window.location.reload()
+          } else {
+            // Styles found, show content
+            document.body.classList.add("js-loading-complete")
+          }
+        }
+
+        // Check after JavaScript has had a chance to load CSS
+        setTimeout(checkStylesAndReload, 1000)
+      })()
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

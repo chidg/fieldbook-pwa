@@ -10,7 +10,7 @@ import {
 import { useGoogleAnalytics, useRedirectToLogin } from "@/hooks"
 import UserForm from "@/components/user-form"
 import {
-  ItemList,
+  Home,
   ItemFormUpdate,
   ItemFormCreate,
   ItemDetail,
@@ -113,7 +113,7 @@ function App() {
           }
         />
         <Route path="/" element={<AuthWrapper />}>
-          <Route index element={<ItemList />} />
+          <Route index element={<Home />} />
           <Route path="settings">
             <Route index element={<SettingsUpdate />} />
             <Route
