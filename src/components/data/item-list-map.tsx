@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useDataContext } from "@/contexts"
 import Map, { Marker } from "react-map-gl"
 
@@ -17,9 +17,31 @@ export const ItemListMap = () => {
   )
   const [viewState, setViewState] = useState(initialViewState)
   const [showPopup, setShowPopup] = useShowPopup()
+  const [mapHeight, setMapHeight] = useState("calc(100vh - 100px)")
+  const mapContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const updateMapHeight = () => {
+      if (mapContainerRef.current) {
+        // Get the top position of the map container
+        const topPosition = mapContainerRef.current.getBoundingClientRect().top
+        // Calculate remaining viewport height
+        setMapHeight(`calc(100vh - ${topPosition}px)`)
+      }
+    }
+
+    // Initial calculation
+    updateMapHeight()
+
+    // Add resize listener
+    window.addEventListener("resize", updateMapHeight)
+
+    // Cleanup
+    return () => window.removeEventListener("resize", updateMapHeight)
+  }, [])
 
   return (
-    <div className="h-screen">
+    <div ref={mapContainerRef} className="w-full" style={{ height: mapHeight }}>
       <Map
         reuseMaps
         mapboxAccessToken={import.meta.env.VITE_APP_MAPBOX_ACCESS_TOKEN}
