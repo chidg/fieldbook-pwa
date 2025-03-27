@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react"
 import tsconfigPaths from "vite-tsconfig-paths"
 import pluginChecker from "vite-plugin-checker"
 import { VitePWA } from "vite-plugin-pwa"
+import basicSsl from "@vitejs/plugin-basic-ssl"
 
 export default defineConfig({
   build: {
@@ -11,6 +12,12 @@ export default defineConfig({
   plugins: [
     react(),
     tsconfigPaths(),
+    basicSsl({
+      /** name of certification */
+      name: "test",
+      /** custom trust domains */
+    }),
+
     VitePWA({
       srcDir: "src",
       devOptions: {
