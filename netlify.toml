@@ -1,0 +1,21 @@
+[[redirects]]
+  from = "/assets/index-ee9eee5a.css"  # The specific old hash
+  to = "/assets/index-abe4d4d6.css"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/assets/index-*.css"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/assets/*.css"
+  [headers.values]
+    Content-Type = "text/css"
+    Cache-Control = "public, max-age=31536000, immutable"

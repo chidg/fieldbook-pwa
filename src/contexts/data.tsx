@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect } from "react"
 import { useLocalStorage } from "@uidotdev/usehooks"
 import config from "@/config.json"
+import { performMigration } from "@/migrations/1_convert_config_to_objects"
 
 export interface Taxon {
   id: string
@@ -10,22 +11,25 @@ export interface Taxon {
 type Taxa = Record<string, Taxon>
 
 export const taxaOptions: Taxa = Object.fromEntries(
-  config.taxa.map((t, i) => [i.toString(), { name: t, id: i.toString() }])
+  Object.entries(config.taxa).map(([key, value]) => [
+    key,
+    { name: value, id: key },
+  ])
 )
 
 export interface DataItem {
   id: string
-  taxon: string
+  taxon: keyof typeof config.taxa
   otherTaxon?: string
   idConfidence: number
   notes: string
-  density: (typeof config.densities)[number]
-  size: (typeof config.sizes)[number]
+  density: keyof typeof config.densities
+  size?: keyof typeof config.sizes
   location?: GeolocationCoordinates
   timestamp: number
 }
 
-type Data = Record<string, DataItem>
+export type Data = Record<string, DataItem>
 
 interface DataState {
   data: Data
@@ -33,7 +37,6 @@ interface DataState {
   hasNewData: boolean
   setHasNewData: (arg0: boolean) => void
   saveItem: (arg0: DataItem) => void
-  saveTaxon: (arg0: Taxon) => void
   deleteItem: (id: string) => void
 }
 
@@ -41,38 +44,21 @@ const DataContext = React.createContext<DataState | undefined>(undefined)
 
 const DataProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useLocalStorage<Data>("data", {})
-  const [customTaxa, setCustomTaxa] = useLocalStorage<Taxa | undefined>(
-    "taxa",
-    undefined
+  const [migrations] = useLocalStorage<Record<number, number>>(
+    "fieldBookMigrations",
+    {}
   )
   const [hasNewData, setHasNewData] = useLocalStorage<boolean>(
     "hasNewData",
     false
   )
-  const initialisedRef = React.useRef<boolean>(false)
 
   useEffect(() => {
-    if (initialisedRef.current) return
-    if (!customTaxa) return
-    // migration to remove custom taxa entirely
-    const newTaxa = Object.fromEntries(
-      Object.entries(customTaxa).filter(([id]) => !(id in taxaOptions))
-    )
-
-    const newData = Object.fromEntries(
-      Object.entries(data).map(([id, item]) => {
-        if (item.taxon in newTaxa) {
-          item.otherTaxon = newTaxa[item.taxon].name
-          item.taxon = (config.taxa.length - 1).toString()
-        }
-        return [id, item]
-      })
-    )
-    setData(newData)
-    setCustomTaxa(undefined)
-
-    initialisedRef.current = true
-  }, [data, setData, customTaxa, setCustomTaxa])
+    if (Object.keys(data).length > 0 && Object.keys(migrations).length === 0) {
+      performMigration()
+      window.location.reload()
+    }
+  }, [data, migrations])
 
   const saveItem = React.useCallback(
     (item: DataItem) => {
@@ -80,16 +66,6 @@ const DataProvider = ({ children }: { children: ReactNode }) => {
       setData((existing) => ({ ...existing, [item.id]: item }))
     },
     [data, setData]
-  )
-
-  const saveTaxon = React.useCallback(
-    (taxon: Taxon) => {
-      setCustomTaxa((existing) => ({
-        ...existing,
-        [taxon.id]: taxon,
-      }))
-    },
-    [setCustomTaxa]
   )
 
   const deleteItem = React.useCallback(
@@ -108,7 +84,6 @@ const DataProvider = ({ children }: { children: ReactNode }) => {
         hasNewData,
         setHasNewData,
         saveItem,
-        saveTaxon,
         deleteItem,
       }}
     >
