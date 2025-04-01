@@ -41,6 +41,7 @@ export const ItemFormCreate: React.FC = () => {
         density: "absent",
         notes: "",
         idConfidence: "2",
+        controlled: false,
         size: undefined,
         taxon: latest && latest.taxon !== "other" ? latest.taxon : "arum",
         otherTaxon: "",

@@ -14,6 +14,7 @@ export type ItemFormValues = {
   taxon: keyof typeof config.taxa
   idConfidence: string
   density: keyof typeof config.densities
+  controlled: boolean
   size: keyof typeof config.sizes | undefined
   otherTaxon: string
   notes: string
@@ -68,7 +69,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
         )
 
         return (
-          <Form className=" bg-white shadow-md rounded px-12 py-8 pt-8">
+          <Form className=" bg-white shadow-md rounded px-6 py-8 pt-8">
             <div className="pb-4">
               <h3 className="text-lg block">🌱 {title}</h3>
             </div>
@@ -146,12 +147,34 @@ const ItemForm: React.FC<ItemFormProps> = ({
                 />
               </div>
             )}
+            <div className="pb-4">
+              <label
+                className="text-sm block font-bold pb-2"
+                htmlFor="controlled"
+              >
+                Controlled?
+                <div className="flex items-center font-normal">
+                  <input
+                    type="checkbox"
+                    id="controlled"
+                    name="controlled"
+                    checked={values.controlled}
+                    onChange={({ target }) => {
+                      setFieldValue("controlled", target.checked)
+                    }}
+                    className="text-lg"
+                  />{" "}
+                  <span>{values.controlled ? "Yes" : "No"}</span>
+                </div>
+              </label>
+            </div>
 
             <div className="pb-4">
               <label className="text-sm block font-bold pb-2" htmlFor="notes">
                 Notes (Optional)
               </label>
               <Field
+                autoComplete="off"
                 id="notes"
                 name="notes"
                 type="text"

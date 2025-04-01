@@ -130,6 +130,12 @@ export const ItemDetail = () => {
                 </div>
               </>
             )}
+            <>
+              <div>Controlled:</div>
+              <div className="col-span-2 justify-end">
+                {instance.controlled ? "Yes" : "No"}
+              </div>
+            </>
             {instance.idConfidence !== undefined && (
               <>
                 <div>ID Confidence:</div>

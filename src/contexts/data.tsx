@@ -25,6 +25,7 @@ export interface DataItem {
   notes: string
   density: keyof typeof config.densities
   size?: keyof typeof config.sizes
+  controlled?: boolean
   location?: GeolocationCoordinates
   timestamp: number
 }
