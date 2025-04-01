@@ -148,25 +148,23 @@ const ItemForm: React.FC<ItemFormProps> = ({
               </div>
             )}
             <div className="pb-4">
-              <label
-                className="text-sm block font-bold pb-2"
-                htmlFor="controlled"
-              >
+              <label className="text-sm block font-bold pb-2">
                 Controlled?
-                <div className="flex items-center font-normal">
-                  <input
-                    type="checkbox"
-                    id="controlled"
-                    name="controlled"
-                    checked={values.controlled}
-                    onChange={({ target }) => {
-                      setFieldValue("controlled", target.checked)
-                    }}
-                    className="text-lg"
-                  />{" "}
-                  <span>{values.controlled ? "Yes" : "No"}</span>
-                </div>
               </label>
+
+              <div className="flex items-center font-normal gap-2">
+                <input
+                  type="checkbox"
+                  id="controlled"
+                  name="controlled"
+                  checked={values.controlled}
+                  onChange={({ target }) => {
+                    setFieldValue("controlled", target.checked)
+                  }}
+                  className="text-lg"
+                />
+                <span>{values.controlled ? "Yes" : "No"}</span>
+              </div>
             </div>
 
             <div className="pb-4">
