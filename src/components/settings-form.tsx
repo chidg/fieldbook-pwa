@@ -217,6 +217,19 @@ const SettingsUpdateForm = () => {
 
         {!highlightExport && (
           <>
+            <div className="flex-col bg-gray-200 bg-opacity-20 rounded p-2">
+              <h4>About Fieldbook</h4>
+              Fieldbook is made by{" "}
+              <a
+                href="https://fieldworklabs.xyz"
+                className="underline font-bold"
+                target="_blank"
+              >
+                Fieldwork Labs
+              </a>
+              .
+            </div>
+
             <div className="flex-col bg-red-400 bg-opacity-20 rounded px-2 pb-6">
               <h4>Danger Zone</h4>
               <div className="flex justify-center mt-2">
@@ -244,7 +257,7 @@ const SettingsUpdateForm = () => {
             </div>
 
             <div className="flex-col bg-gray-400 bg-opacity-20 rounded px-2 py-2 my-1 text-sm">
-              Fieldbook version: {import.meta.env.COMMIT_REF}
+              Fieldbook version: {import.meta.env.VITE_COMMIT_REF}
             </div>
           </>
         )}

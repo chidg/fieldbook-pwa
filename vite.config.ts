@@ -3,6 +3,22 @@ import react from "@vitejs/plugin-react"
 import tsconfigPaths from "vite-tsconfig-paths"
 import pluginChecker from "vite-plugin-checker"
 import { VitePWA } from "vite-plugin-pwa"
+import { execSync } from "child_process"
+
+function gitCommitPlugin() {
+  return {
+    name: "git-commit",
+    config(config: any) {
+      const commitHash = execSync("git rev-parse --short HEAD")
+        .toString()
+        .trim()
+      config.define = {
+        ...config.define,
+        "import.meta.env.VITE_COMMIT_REF": JSON.stringify(commitHash),
+      }
+    },
+  }
+}
 
 export default defineConfig({
   build: {
@@ -11,6 +27,7 @@ export default defineConfig({
   plugins: [
     react(),
     tsconfigPaths(),
+    gitCommitPlugin(),
     VitePWA({
       srcDir: "src",
       devOptions: {
